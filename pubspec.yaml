@@ -1,0 +1,21 @@
+name: q_architecture
+description: A new Flutter package project.
+version: 0.0.1
+homepage: www.google.com
+
+environment:
+  sdk: ">=3.0.0 <4.0.0"
+
+dependencies:
+  equatable: ^2.0.5
+  flutter:
+    sdk: flutter
+  hooks_riverpod: ^2.3.6
+  state_notifier_test: ^0.0.9
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  mocktail: ^0.3.0
+
+flutter: null
