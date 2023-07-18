@@ -1,0 +1,139 @@
+// ignore_for_file: always_use_package_imports
+
+import 'dart:math';
+
+import 'package:example/data/api_client.dart';
+import 'package:hooks_riverpod/hooks_riverpod.dart';
+import 'package:q_architecture/paginated_notifier.dart';
+import 'package:q_architecture/q_architecture.dart';
+
+import '../../domain/entities/example_user.dart';
+import '../mappers/example_user_entity_mapper.dart';
+import '../models/example_user_response.dart';
+
+final exampleRepositoryProvider = Provider<ExampleRepository>(
+  (ref) => ExampleRepositoryImp(
+    ref.watch(apiClientProvider),
+    ref.watch(exampleUserEntityMapperProvider),
+  ),
+);
+
+abstract class ExampleRepository {
+  EitherFailureOr<ExampleUser> apiCallExample();
+  EitherFailureOr<String> getSomeString();
+
+  EitherFailureOr<String> getSomeOtherString();
+
+  StreamFailureOr<String> getSomeStringsStreamed();
+
+  PaginatedStreamFailureOr<String> getPaginatedStreamResult(int page);
+
+  PaginatedEitherFailureOr<String> getPaginatedResult(int page);
+}
+
+class ExampleRepositoryImp implements ExampleRepository {
+  final ApiClient _apiClient;
+  final EntityMapper<ExampleUser, ExampleUserResponse> _userMapper;
+  var _counter = 0;
+
+  ExampleRepositoryImp(
+    this._apiClient,
+    this._userMapper,
+  );
+
+  @override
+  EitherFailureOr<ExampleUser> apiCallExample() async {
+    try {
+      final userResponse = await _apiClient.getUser();
+      final user = _userMapper(userResponse);
+      return right(user);
+    } catch (error, stackTrace) {
+      return left(
+        Failure.generic(error: error, stackTrace: stackTrace),
+      );
+    }
+  }
+
+  @override
+  EitherFailureOr<String> getSomeOtherString() async {
+    await 3.seconds;
+    if (Random().nextBool()) {
+      return right(Random().nextBool() ? 'Some sentence' : '');
+    } else {
+      return left(Failure.generic());
+    }
+  }
+
+  @override
+  StreamFailureOr<String> getSomeStringsStreamed() async* {
+    yield right('Some sentence from cache');
+
+    await 3.seconds;
+    yield right('Some sentence from network');
+  }
+
+  @override
+  EitherFailureOr<String> getSomeString() async {
+    await 3.seconds;
+    if (Random().nextBool()) {
+      return right('some sentence');
+    } else {
+      return left(Failure.generic());
+    }
+  }
+
+  @override
+  PaginatedStreamFailureOr<String> getPaginatedStreamResult(int page) async* {
+    if (page == 1) {
+      _counter = 0;
+    }
+    List<String>? someStrings;
+    if (page == 1) {
+      someStrings = _getStrings();
+      yield right(PaginatedList(data: someStrings, isLast: false, page: 1));
+    }
+    await 3.seconds;
+    if (Random().nextBool()) {
+      yield right(
+        PaginatedList(
+          data: someStrings ?? _getStrings(),
+          isLast: page == 4,
+          page: page,
+        ),
+      );
+    } else {
+      yield left(Failure.generic());
+    }
+  }
+
+  @override
+  PaginatedEitherFailureOr<String> getPaginatedResult(int page) async {
+    await 3.seconds;
+    if (Random().nextBool()) {
+      if (page == 1) {
+        _counter = 0;
+      }
+      return right(
+        PaginatedList(
+          data: _getStrings(),
+          isLast: page == 4,
+          page: page,
+        ),
+      );
+    }
+    return left(Failure.generic());
+  }
+
+  List<String> _getStrings() => [
+        '${++_counter}',
+        '${++_counter}',
+        '${++_counter}',
+        '${++_counter}',
+        '${++_counter}',
+        '${++_counter}',
+        '${++_counter}',
+        '${++_counter}',
+        '${++_counter}',
+        '${++_counter}',
+      ];
+}
