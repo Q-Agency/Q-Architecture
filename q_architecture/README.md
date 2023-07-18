@@ -86,10 +86,7 @@ That is all you need to get you started, to find out more, head over to the tabl
 - [Global loading](#global-loading)
 - [Global failure](#global-failure)
 - [Global info](#global-info)
-- [Navigation](#navigation)
 - [BaseWidget](#basewidget)
-- [Switch navigation package to AutoRoute package](#switch-navigation-package-to-autoroute-package)
-- [Switch navigation package to GoRouter package](#switch-navigation-package-to-go_router-package)
 
 ## Example - BaseStateNotifier
 
@@ -767,169 +764,52 @@ void globalInfoListener() {
 }
 ```
 
-## Navigation
-
-**globalNavigationProvider** with **RouteAction** type can be used to execute push, pop and similar
-navigation actions. Navigation can be used directly by updating **globalNavigationProvider** or by
-using extension on WidgetRef class which initially provides **pushNamed**,
-**pushReplacementNamed** and **pop** methods.
-**BaseWidget** registers listener for **globalNavigationProvider** and therefore any change
-triggers **execute** method of **RouteAction** object.
-
-### Global navigation listener
-
-```dart
-void globalNavigationListener() {
-  listen<RouteAction?>(
-    globalNavigationProvider,
-        (_, state) => state?.execute(read(baseRouterProvider)),
-  );
-}
-```
-
-To navigate from current to the next page it can be done like this:
-
-```
-ref.pushNamed(nextPageRouteName);
-```
-
-or to pop back to previous page:
-
-```
-ref.pop();
-```
-
-With pushNamed and pushReplacementNamed methods, optional **data** parameter can be passed 
-containing some data that you might want to pass to the next screen. To read that data on 
-the next screen (data can be shared within the same BeamLocation) **getData** method can be 
-called on the BaseRouter class:
-```
-ref.read(baseRouterProvider).getData
-```
-
-If more navigation actions are necessary, RouteAction can be subclassed with desired action and new
-method can be added into BaseStateNotifier that will use that class. Also, BaseRouter can be
-expanded with new navigation method and then implemented in the descendant class which will be used
-in RouteAction descendant class.
-
-Default navigation package being used is **Beamer** and in **baseRouterProvider** its BaseRouter
-subclass BeamerRouter is being instantiated.
-
-If necessary, by making few changes navigation package can be easily switched to **AutoRoute**,
-**GoRouter** or probably any other navigation package but here short notes will be provided for only
-two mentioned alternatives to Beamer.
-
 ## BaseWidget
 
-You can wrap the entire app in **BaseWidget** which listens to:
+You can wrap the each widget in **BaseWidget** which listens to:
 
 * **globalFailureProvider**
-
-* **globalNavigationProvider**
 
 * **globalLoadingProvider**.
 
 * **globalInfoProvider**
 
+You are required to pass in the **onFailure** and **onGlobalInfo** handlers.
+
 ```dart
 
 class BaseWidget extends ConsumerWidget {
   final Widget child;
+  final Widget? loadingIndicator;
+  final Function(Failure) onFailure;
+  final Function(GlobalInfo) onGlobalInfo;
 
   const BaseWidget({
-    Key? key,
     required this.child,
+    required this.onFailure,
+    required this.onGlobalInfo,
+    this.loadingIndicator,
+    Key? key,
   }) : super(key: key);
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    // if you need context to showDialog or bottomSheet, use BaseRouter's navigatorContext because main context
-    // won't work as BaseWidget is the first widget in builder method of MaterialApp.router so Navigator is not ready yet.
-    // Be careful not to use it directly in build method (it is not ready yet), but in button callback or within 
-    // WidgetsBinding.instance.addPostFrameCallback.
-    // final navigatorContext = ref.read(baseRouterProvider).navigatorContext;
-    ref.globalFailureListener();
-    ref.globalNavigationListener();
-    ref.globalInfoListener();
+    ref.listen<Failure?>(globalFailureProvider, (_, failure) {
+      if (failure == null) return;
+      onFailure(failure);
+    });
+    ref.listen<GlobalInfo?>(globalInfoProvider, (_, globalInfo) {
+      if (globalInfo == null) return;
+      onGlobalInfo(globalInfo);
+    });
     final showLoading = ref.watch(globalLoadingProvider);
     return Stack(
       children: [
         child,
-        if (showLoading) const BaseLoadingIndicator(),
+        if (showLoading) loadingIndicator ?? const BaseLoadingIndicator(),
       ],
     );
   }
 }
 ```
 
-## Switch navigation package to AutoRoute package
-
-1. add auto_route dependency to pubspec.yaml
-2. create app_router.dart file, define AppRouter class with options defined in its documentation
-3. (including generating .gr.dart file by running **flutter packages pub run build_runner build**
-   in terminal)
-4. create **AppRouterRouter** class in **base_router.dart** and override BaseRouter's navigation
-   methods, it can look something like this:
-
-  ```
-  class AppRouterRouter extends BaseRouter {
-    AppRouterRouter({required super.routerDelegate, required super.routeInformationParser, super.router});
-
-    @override
-    void pushNamed(String routeName, {dynamic data}) {
-      (router as AppRouter).pushNamed(routeName);
-    }
-  
-    ...
-  }
-  ```
-
-5. update **baseRouterProvider** in **base_router_provider.dart** to use **AppRouterRouter**
-   class instead of **BeamerRouter**
-6. remove **BeamerProvider** widget from **main.dart**
-
-&nbsp;
-
-## Switch navigation package to go_router package:
-
-1. add go_router dependency to pubspec.yaml
-
-2. create **GoRouterRouter** class in **base_router.dart** and override BaseRouter's navigation
-   methods, it can look something like this:
-      ```
-      class GoRouterRouter extends BaseRouter {
-        GoRouterRouter({
-          required super.routerDelegate,
-          required super.routeInformationParser,
-          super.routeInformationProvider,
-          super.router,
-        });
-      
-        @override
-        void pushNamed(String routeName, {dynamic data}) {
-          (router as GoRouter).push(routeName, extra: data);
-        }
-      
-        ...
-      }
-      ```
-3. update **baseRouterProvider** in **base_router_provider.dart** to use **GoRouterRouter** class
-   instead of **BeamerRouter**
-
-  ```
-  final baseRouterProvider = StateProvider<BaseRouter>((ref) {
-    final goRouter = GoRouter(
-      routes: <GoRoute>[
-        ...
-      ],
-    );
-    return GoRouterRouter(
-      routerDelegate: goRouter.routerDelegate,
-      routeInformationParser: goRouter.routeInformationParser,
-      routeInformationProvider: goRouter.routeInformationProvider,
-      router: goRouter,
-    );
-  });
-  ```
-
-4. remove **BeamerProvider** widget from **main.dart**

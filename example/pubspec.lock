@@ -198,14 +198,6 @@ packages:
     description: flutter
     source: sdk
     version: "0.0.0"
-  flutter_form_builder:
-    dependency: "direct main"
-    description:
-      name: flutter_form_builder
-      sha256: "9b098f6a5f8a6381016a5fe9cdccc900683917d1fb930e1c6c6c051ca0f01f08"
-      url: "https://pub.dev"
-    source: hosted
-    version: "9.0.0"
   flutter_hooks:
     dependency: transitive
     description:
@@ -222,11 +214,6 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "2.0.2"
-  flutter_localizations:
-    dependency: transitive
-    description: flutter
-    source: sdk
-    version: "0.0.0"
   flutter_riverpod:
     dependency: transitive
     description:
@@ -240,14 +227,6 @@ packages:
     description: flutter
     source: sdk
     version: "0.0.0"
-  form_builder_validators:
-    dependency: "direct main"
-    description:
-      name: form_builder_validators
-      sha256: e04998b1597d76a51da7f009ed3b2f12d4173f13e146e8744fd2453e8595a2c9
-      url: "https://pub.dev"
-    source: hosted
-    version: "9.0.0"
   frontend_server_client:
     dependency: transitive
     description:
@@ -288,14 +267,6 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "4.0.2"
-  intl:
-    dependency: transitive
-    description:
-      name: intl
-      sha256: a3715e3bc90294e971cb7dc063fbf3cd9ee0ebf8604ffeafabd9e6f16abbdbe6
-      url: "https://pub.dev"
-    source: hosted
-    version: "0.18.0"
   io:
     dependency: transitive
     description:
@@ -654,4 +625,4 @@ packages:
     version: "3.1.2"
 sdks:
   dart: ">=3.0.2 <4.0.0"
-  flutter: ">=3.10.0"
+  flutter: ">=3.0.0"
