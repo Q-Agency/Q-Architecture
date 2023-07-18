@@ -17,7 +17,11 @@ class ExamplePaginatedNotifier extends PaginatedNotifier<String, Object> {
   final ExampleRepository _repository;
 
   ExamplePaginatedNotifier(this._repository, Ref ref)
-      : super(ref, const PaginatedState.loading());
+      : super(
+          ref,
+          const PaginatedState.loading(),
+          useGlobalFailure: true,
+        );
 
   @override
   PaginatedEitherFailureOr<String> getListOrFailure(

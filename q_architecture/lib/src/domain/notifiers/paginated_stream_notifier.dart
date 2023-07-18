@@ -9,11 +9,17 @@ typedef PaginatedStreamFailureOr<Entity>
 
 abstract class PaginatedStreamNotifier<Entity, Param>
     extends SimpleStateNotifier<PaginatedState<Entity>> {
+  final bool useGlobalFailure;
+
   PaginatedList<Entity>? _lastPaginatedList;
   Param? _parameter;
   StreamSubscription? _listStreamSubscription;
 
-  PaginatedStreamNotifier(super.ref, super.initialState);
+  PaginatedStreamNotifier(
+    super.ref,
+    super.initialState, {
+    this.useGlobalFailure = false,
+  });
 
   @override
   void dispose() {
@@ -67,7 +73,11 @@ abstract class PaginatedStreamNotifier<Entity, Param>
     _listStreamSubscription =
         getListStreamOrFailure(page, parameter).listen((result) {
       result.fold(
-        (failure) => state = PaginatedState.error(updatedList, failure),
+        (failure) {
+          if (useGlobalFailure)
+            ref.read(globalFailureProvider.notifier).update((_) => failure);
+          state = PaginatedState.error(updatedList, failure);
+        },
         (paginatedList) {
           _lastPaginatedList = paginatedList;
           updatedList = currentList + paginatedList.data;

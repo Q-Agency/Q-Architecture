@@ -7,7 +7,11 @@ typedef PaginatedEitherFailureOr<Entity>
 
 abstract class PaginatedNotifier<Entity, Param>
     extends PaginatedStreamNotifier<Entity, Param> {
-  PaginatedNotifier(super.ref, super.initialState);
+  PaginatedNotifier(
+    super.ref,
+    super.initialState, {
+    super.useGlobalFailure,
+  });
 
   @protected
   PaginatedEitherFailureOr<Entity> getListOrFailure(
