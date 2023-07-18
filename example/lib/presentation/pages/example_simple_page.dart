@@ -3,7 +3,6 @@ import 'package:example/domain/notifiers/example_simple_notifier/example_simple_
 import 'package:example/presentation/pages/example_page.dart';
 import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
-import 'package:q_architecture/q_architecture.dart';
 
 class ExampleSimplePage extends ConsumerWidget {
   static const routeName = '/simple-page';
@@ -46,11 +45,12 @@ class ExampleSimplePage extends ConsumerWidget {
             child: const Text('Global loading example'),
           ),
           ElevatedButton(
-            onPressed: ref.pop,
+            onPressed: Navigator.of(context).pop,
             child: const Text('Go back!'),
           ),
           TextButton(
-            onPressed: () => ref.pushNamed(ExamplePage3.routeName),
+            onPressed: () =>
+                Navigator.of(context).pushNamed(ExamplePage3.routeName),
             child: const Text('Navigate'),
           ),
         ],

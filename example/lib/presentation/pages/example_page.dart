@@ -6,7 +6,6 @@ import 'package:example/presentation/pages/example_simple_page.dart';
 import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:q_architecture/base_state_notifier.dart';
-import 'package:q_architecture/q_architecture.dart';
 
 import '../../domain/notifiers/example_filters/example_filters_provider.dart';
 import '../../domain/notifiers/example_notifier/example_state_notifier.dart';
@@ -65,20 +64,23 @@ class ExamplePage extends ConsumerWidget {
               ),
             ),
             TextButton(
-              onPressed: () => ref.pushNamed(ExampleSimplePage.routeName),
+              onPressed: () =>
+                  Navigator.of(context).pushNamed(ExampleSimplePage.routeName),
               child: const Text('Navigate'),
             ),
             TextButton(
-              onPressed: () => ref.pushNamed(FormExamplePage.routeName),
+              onPressed: () =>
+                  Navigator.of(context).pushNamed(FormExamplePage.routeName),
               child: const Text('Go to form example'),
             ),
             TextButton(
-              onPressed: () => ref.pushNamed(PaginationExamplePage.routeName),
+              onPressed: () => Navigator.of(context)
+                  .pushNamed(PaginationExamplePage.routeName),
               child: const Text('Go to pagination'),
             ),
             TextButton(
-              onPressed: () =>
-                  ref.pushNamed(PaginationStreamExamplePage.routeName),
+              onPressed: () => Navigator.of(context)
+                  .pushNamed(PaginationStreamExamplePage.routeName),
               child: const Text('Go to stream pagination'),
             ),
           ],
@@ -102,9 +104,7 @@ class ExamplePage3 extends ConsumerWidget {
         children: [
           ElevatedButton(
             onPressed: () {
-              // Navigate back to the second screen by popping the current route
-              // off the stack.
-              ref.pop();
+              Navigator.of(context).pop();
             },
             child: const Text('Go back!'),
           ),
