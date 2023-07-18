@@ -16,3 +16,5 @@ export 'src/domain/providers/global_info_provider.dart';
 export 'src/domain/providers/global_loading_provider.dart';
 export 'src/domain/utils/int_extension.dart';
 export 'src/presentation/widgets/paginated_list_view.dart';
+export 'src/presentation/widgets/base_widget.dart';
+export 'src/presentation/widgets/base_loading_indicator.dart';

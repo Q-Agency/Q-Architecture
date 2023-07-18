@@ -9,7 +9,6 @@ import 'package:q_architecture/base_state_notifier.dart';
 
 import '../../domain/notifiers/example_filters/example_filters_provider.dart';
 import '../../domain/notifiers/example_notifier/example_state_notifier.dart';
-import 'form_example_page.dart';
 import 'pagination_example_page.dart';
 import 'pagination_stream_example_page.dart';
 
@@ -67,11 +66,6 @@ class ExamplePage extends ConsumerWidget {
               onPressed: () =>
                   Navigator.of(context).pushNamed(ExampleSimplePage.routeName),
               child: const Text('Navigate'),
-            ),
-            TextButton(
-              onPressed: () =>
-                  Navigator.of(context).pushNamed(FormExamplePage.routeName),
-              child: const Text('Go to form example'),
             ),
             TextButton(
               onPressed: () => Navigator.of(context)

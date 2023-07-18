@@ -1,10 +1,10 @@
 import 'package:example/presentation/pages/example_page.dart';
 import 'package:example/presentation/pages/example_simple_page.dart';
-import 'package:example/presentation/pages/form_example_page.dart';
 import 'package:example/presentation/pages/pagination_example_page.dart';
 import 'package:example/presentation/pages/pagination_stream_example_page.dart';
 import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
+import 'package:q_architecture/q_architecture.dart';
 
 void main() {
   runApp(const MyApp());
@@ -24,13 +24,41 @@ class MyApp extends StatelessWidget {
         ),
         routes: {
           ExamplePage.routeName: (_) => const ExamplePage(),
-          FormExamplePage.routeName: (_) => FormExamplePage(),
           PaginationExamplePage.routeName: (_) => const PaginationExamplePage(),
           PaginationStreamExamplePage.routeName: (_) =>
               const PaginationStreamExamplePage(),
           ExampleSimplePage.routeName: (_) => const ExampleSimplePage(),
         },
+        builder: (context, child) => Material(
+          type: MaterialType.transparency,
+          child: MyBaseWidget(child: child),
+        ),
       ),
+    );
+  }
+}
+
+class MyBaseWidget extends StatelessWidget {
+  final Widget? child;
+  const MyBaseWidget({
+    this.child,
+    super.key,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return BaseWidget(
+      onFailure: (failure) => ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('${failure.title} ${failure.error}'),
+        ),
+      ),
+      onGlobalInfo: (globalInfo) => ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('${globalInfo.globalInfoStatus} ${globalInfo.message}'),
+        ),
+      ),
+      child: child ?? const SizedBox(),
     );
   }
 }

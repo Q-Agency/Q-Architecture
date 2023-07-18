@@ -2,8 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:q_architecture/q_architecture.dart';
 
-import 'package:q_architecture/src/presentation/widgets/base_loading_indicator.dart';
-
 class BaseWidget extends ConsumerWidget {
   final Widget child;
   final Widget? loadingIndicator;
