@@ -1,5 +1,7 @@
 # Q-Architecture
 
+A set of reusable classes that should speed up your development time and reduce unnecessary boilerplate code. Powered by [riverpod](https://github.com/rrousselGit/riverpod).
+
 ## Get started
 
 - Create your abstract repository and implement it
@@ -811,5 +813,19 @@ class BaseWidget extends ConsumerWidget {
     );
   }
 }
+```
+
+You can simply wrap each widget with your version of the BaseWidget in the builder of your MaterialApp:
+
+```dart
+ProviderScope(
+      child: MaterialApp(
+        title: 'Q Architecture',
+        builder: (context, child) => Material(
+          type: MaterialType.transparency,
+          child: MessageDisplayingBaseWidget(child: child),
+        ),
+      ),
+    );
 ```
 
