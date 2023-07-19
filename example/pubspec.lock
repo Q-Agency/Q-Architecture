@@ -406,7 +406,7 @@ packages:
   q_architecture:
     dependency: "direct main"
     description:
-      path: "../q_architecture"
+      path: ".."
       relative: true
     source: path
     version: "0.0.1"

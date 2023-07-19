@@ -16,7 +16,7 @@ dependencies:
   hooks_riverpod: ^2.3.6
   json_annotation: ^4.8.1
   q_architecture:
-    path: ../q_architecture
+    path: ..
 
 dev_dependencies:
   flutter_lints: ^2.0.0
