@@ -136,7 +136,7 @@ abstract class BaseStateNotifier<DataState>
   ///Set [withLoadingState] == true if you want to reset [BaseStateNotifier] state to [BaseState.initial]
   void _unsetLoading(bool withLoadingState) {
     final isAlreadyLoading = switch (state) {
-      Loading() => true,
+      BaseLoading() => true,
       _ => false,
     };
     if (withLoadingState && isAlreadyLoading) {

@@ -417,7 +417,7 @@ void main() {
           expect(next, const BaseState.data(''));
         },
         skipUpdateCondition: (previous, next) => switch (next) {
-          Loading() => true,
+          BaseLoading() => true,
           _ => false,
         },
       );

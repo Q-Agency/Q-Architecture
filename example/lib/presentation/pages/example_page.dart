@@ -29,10 +29,10 @@ class ExamplePage extends ConsumerWidget {
           children: [
             Text(
               switch (state) {
-                Data(data: final sentence) => sentence,
-                Loading() => 'Loading',
-                Initial() => 'Initial',
-                Error(failure: final failure) => failure.toString(),
+                BaseData(data: final sentence) => sentence,
+                BaseLoading() => 'Loading',
+                BaseInitial() => 'Initial',
+                BaseError(failure: final failure) => failure.toString(),
               },
             ),
             TextButton(
