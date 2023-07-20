@@ -406,9 +406,10 @@ packages:
   q_architecture:
     dependency: "direct main"
     description:
-      path: ".."
-      relative: true
-    source: path
+      name: q_architecture
+      sha256: bd60c7c6efd3504bbf52fff7199545d1e2a8f2f1e0f8f22419b4d92feb0f9801
+      url: "https://pub.dev"
+    source: hosted
     version: "0.1.0"
   riverpod:
     dependency: transitive
