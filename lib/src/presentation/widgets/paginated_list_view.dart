@@ -66,7 +66,7 @@ class PaginatedListView<Entity, Param> extends ConsumerWidget {
             : null;
 
     return switch (paginatedState) {
-      LoadingMore<Entity>(list: final list) => _ListView(
+      PaginatedLoadingMore<Entity>(list: final list) => _ListView(
           itemBuilder: itemBuilder,
           list: list,
           isLoading: true,
@@ -80,7 +80,8 @@ class PaginatedListView<Entity, Param> extends ConsumerWidget {
           onNotification: (info) => _onScrollNotification(info, ref),
           scrollPhysics: scrollPhysics,
         ),
-      Loaded(list: final list, isLastPage: final isLastPage) => _ListView(
+      PaginatedLoaded(list: final list, isLastPage: final isLastPage) =>
+        _ListView(
           itemBuilder: itemBuilder,
           list: list,
           listPadding: listPadding,

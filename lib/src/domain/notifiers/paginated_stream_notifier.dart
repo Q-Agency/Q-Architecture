@@ -39,9 +39,9 @@ abstract class PaginatedStreamNotifier<Entity, Param>
 
   Future<void> getNextPage() async {
     if (_lastPaginatedList?.isLast ?? false) return;
-    if (state is LoadingMore) return;
+    if (state is PaginatedLoadingMore) return;
     final currentList = switch (state) {
-      Loaded<Entity>(list: final list) => list,
+      PaginatedLoaded<Entity>(list: final list) => list,
       PaginatedError<Entity>(list: final list) => list,
       _ => <Entity>[],
     };
