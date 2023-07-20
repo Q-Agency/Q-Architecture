@@ -34,10 +34,6 @@ class ExampleStateNotifier extends BaseStateNotifier<String> {
         //Set to true if you want to update state to BaseState.loading()
         withLoadingState: true,
 
-        //Set to true if your method gets called more than once in a short period,
-        //with debounceDuration param, default Duration can be changed
-        withDebounce: false,
-
         //Do some actions with data
         //If you return true, base state will be updated to BaseState.data(data)
         //If you return false, depending on withLoadingState, if true it will be

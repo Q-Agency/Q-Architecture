@@ -166,23 +166,6 @@ void main() {
     );
 
     stateNotifierTest<TestNotifier, BaseState<String>>(
-      'should emit [loading, data] when successful response withDebounce true',
-      setUp: () {
-        providerContainer = getProviderContainer();
-      },
-      build: () => providerContainer.read(provider.notifier),
-      actions: (stateNotifier) async {
-        stateNotifier.execute(getSuccessfulResponse(), withDebounce: true);
-        await stateNotifier.execute(
-          getSuccessfulResponse(),
-          withDebounce: true,
-        );
-      },
-      expect: () =>
-          [const BaseState<Never>.loading(), const BaseState.data('')],
-    );
-
-    stateNotifierTest<TestNotifier, BaseState<String>>(
       'should emit [loading, data] when successful response and onDataReceived true',
       setUp: () {
         providerContainer = getProviderContainer();

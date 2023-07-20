@@ -123,10 +123,6 @@ class ExampleStateNotifier extends BaseStateNotifier<String> {
         //Set to true if you want to update state to BaseState.loading()
         withLoadingState: true,
 
-        //Set to true if your method gets called more than once in a short period, 
-        //with debounceDuration param, default Duration can be changed
-        withDebounce: false,
-
         //Do some actions with data
         //If you return true, base state will be updated to BaseState.data(data)
         //If you return false, depending on withLoadingState, if true it will be 
@@ -450,7 +446,7 @@ final class Data<State> extends BaseState<State> {
 
 Abstract StateNotifier class which provides some convenient methods to be used by subclassing it. It
 can be used when BaseState doesn't suit you and you need more states, this notifier has **showGlobalLoading**, 
-**clearGlobalLoading**, **setGlobalFailure**, **on** and **debounce** methods that are marked as **@protected** 
+**clearGlobalLoading**, **setGlobalFailure**, **on** and debounce**** methods that are marked as **@protected** 
 so you can easily use them in your subclasses.
 
 * **showGlobalLoading** & **clearGlobalLoading** for handling global loading

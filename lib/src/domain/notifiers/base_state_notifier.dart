@@ -37,10 +37,7 @@ abstract class BaseStateNotifier<DataState>
     bool withLoadingState = true,
     bool globalLoading = false,
     bool globalFailure = true,
-    bool withDebounce = false,
-    Duration debounceDuration = const Duration(milliseconds: 500),
   }) async {
-    if (withDebounce) await debounce(duration: debounceDuration);
     _setLoading(withLoadingState, globalLoading);
 
     final result = await function;
