@@ -93,8 +93,7 @@ That is all you need to get you started, to find out more, head over to the tabl
 ## Example - BaseStateNotifier
 
 BaseStateNotifier is a generic notifier which every notifier should extend to avoid writing 
-repetitive code and access global loading and failure handling. Route navigation is also abstracted 
-and made easy to use and even switch navigation packages if necessary.
+repetitive code and access global loading and failure handling.
 
 ### ExampleStateNotifier
 
@@ -169,7 +168,6 @@ class ExamplePage extends ConsumerWidget {
       body: Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
-          crossAxisAlignment: CrossAxisAlignment.center,
           children: [
             Text(
               switch (state) {
@@ -213,11 +211,9 @@ you want to use some benefits of BaseNotifier, then SimpleStateNotifier is here 
 ### ExampleSimpleStateNotifier
 
 ```dart
-
-final exampleSimpleStateNotifierProvider = StateNotifierProvider<
-    ExampleSimpleStateNotifier,
-    ExampleSimpleState>(
-      (ref) {
+final exampleSimpleStateNotifierProvider = StateNotifierProvider.autoDispose<
+    ExampleSimpleStateNotifier, ExampleSimpleState>(
+  (ref) {
     return ExampleSimpleStateNotifier(
       ref.watch(exampleRepositoryProvider),
       ref,
@@ -225,9 +221,9 @@ final exampleSimpleStateNotifierProvider = StateNotifierProvider<
   },
 );
 
-class ExampleSimpleStateNotifier extends SimpleStateNotifier<ExampleSimpleState> {
+class ExampleSimpleStateNotifier
+    extends SimpleStateNotifier<ExampleSimpleState> {
   final ExampleRepository _exampleRepository;
-
   ExampleSimpleStateNotifier(this._exampleRepository, Ref ref)
       : super(ref, const ExampleSimpleState.initial());
 
@@ -235,12 +231,12 @@ class ExampleSimpleStateNotifier extends SimpleStateNotifier<ExampleSimpleState>
   Future<void> getSomeStringSimpleExample() async {
     await debounce();
     state = const ExampleSimpleState.fetching();
-    final response = await _exampleRepository.getSomeOtherString();
-    response.fold(
-          (failure) {
+    final result = await _exampleRepository.getSomeOtherString();
+    result.fold(
+      (failure) {
         state = ExampleSimpleState.error(failure);
       },
-          (data) {
+      (data) {
         if (data.isEmpty) {
           state = const ExampleSimpleState.empty();
         } else {
@@ -250,16 +246,16 @@ class ExampleSimpleStateNotifier extends SimpleStateNotifier<ExampleSimpleState>
     );
   }
 
-  /// Example method when you want to use global loading and global failure methods 
+  /// Example method when you want to use global loading and global failure methods
   /// when calling some repository method
   Future<void> getSomeStringSimpleExampleGlobalLoading() async {
     showGlobalLoading();
-    final response = await _exampleRepository.getSomeOtherString();
-    response.fold(
-          (failure) {
+    final result = await _exampleRepository.getSomeOtherString();
+    result.fold(
+      (failure) {
         setGlobalFailure(failure);
       },
-          (data) {
+      (data) {
         clearGlobalLoading();
         if (data.isEmpty) {
           state = const ExampleSimpleState.empty();
@@ -324,19 +320,13 @@ final class Success extends ExampleSimpleState {
 ### ExampleSimplePage
 
 ```dart
-class ExampleSimplePage extends ConsumerStatefulWidget {
+class ExampleSimplePage extends ConsumerWidget {
   static const routeName = '/simple-page';
 
   const ExampleSimplePage({super.key});
 
   @override
-  ConsumerState<ExampleSimplePage> createState() => _ExampleSimplePageState();
-}
-
-class _ExampleSimplePageState extends ConsumerState<ExampleSimplePage>
-    with SingleTickerProviderStateMixin {
-  @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final state = ref.watch(exampleSimpleStateNotifierProvider);
     return Scaffold(
       body: Column(
@@ -344,10 +334,11 @@ class _ExampleSimplePageState extends ConsumerState<ExampleSimplePage>
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
           Text(
-            switch(state) {
+            switch (state) {
+              Initial() => 'Initial',
               Empty() => 'Empty',
               Fetching() => 'Fetching',
-              Success(data: final string) => string,
+              Success(sentence: final string) => string,
               Error(failure: final failure) => failure.title,
             },
             textAlign: TextAlign.center,
@@ -370,11 +361,12 @@ class _ExampleSimplePageState extends ConsumerState<ExampleSimplePage>
             child: const Text('Global loading example'),
           ),
           ElevatedButton(
-            onPressed: ref.pop,
+            onPressed: Navigator.of(context).pop,
             child: const Text('Go back!'),
           ),
           TextButton(
-            onPressed: () => ref.pushNamed(ExamplePage3.routeName),
+            onPressed: () =>
+                Navigator.of(context).pushNamed(ExamplePage3.routeName),
             child: const Text('Navigate'),
           ),
         ],
