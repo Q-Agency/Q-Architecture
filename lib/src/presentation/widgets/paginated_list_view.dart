@@ -45,7 +45,8 @@ class PaginatedListView<Entity, Param> extends ConsumerWidget {
     this.scrollPhysics,
     super.key,
   }) : assert(
-            autoDisposeStateNotifier != null || stateNotifierProvider != null);
+          autoDisposeStateNotifier != null || stateNotifierProvider != null,
+        );
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -186,27 +187,29 @@ class _ListView<Entity> extends StatelessWidget {
     return list.isNotEmpty
         ? NotificationListener(
             onNotification: onNotification,
-            child: refreshWidgetBuilder(ListView.separated(
-              physics: scrollPhysics,
-              padding: listPadding,
-              scrollDirection: scrollDirection,
-              itemBuilder: (context, index) {
-                if (index == list.length + 1) {
-                  return isLoading
-                      ? loading ??
-                          const Center(child: CircularProgressIndicator())
-                      : const SizedBox();
-                }
-                if (index == list.length) {
-                  return loadMoreButtonBuilder?.call() ?? const SizedBox();
-                }
-                return itemBuilder(context, list[index]);
-              },
-              itemCount: list.length + 2,
-              separatorBuilder: (_, index) => index < list.length - 1
-                  ? separator ?? SizedBox(height: spacing ?? 10)
-                  : const SizedBox(),
-            )),
+            child: refreshWidgetBuilder(
+              ListView.separated(
+                physics: scrollPhysics,
+                padding: listPadding,
+                scrollDirection: scrollDirection,
+                itemBuilder: (context, index) {
+                  if (index == list.length + 1) {
+                    return isLoading
+                        ? loading ??
+                            const Center(child: CircularProgressIndicator())
+                        : const SizedBox();
+                  }
+                  if (index == list.length) {
+                    return loadMoreButtonBuilder?.call() ?? const SizedBox();
+                  }
+                  return itemBuilder(context, list[index]);
+                },
+                itemCount: list.length + 2,
+                separatorBuilder: (_, index) => index < list.length - 1
+                    ? separator ?? SizedBox(height: spacing ?? 10)
+                    : const SizedBox(),
+              ),
+            ),
           )
         : emptyListBuilder();
   }
