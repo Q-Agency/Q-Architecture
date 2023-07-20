@@ -21,10 +21,12 @@ void main() {
   setUpAll(() {
     testRepository = MockTestRepository();
   });
-  ProviderContainer getProviderContainer() => ProviderContainer(overrides: [
-        testNotifierProvider
-            .overrideWith((ref) => TestNotifier(testRepository, ref)),
-      ]);
+  ProviderContainer getProviderContainer() => ProviderContainer(
+        overrides: [
+          testNotifierProvider
+              .overrideWith((ref) => TestNotifier(testRepository, ref)),
+        ],
+      );
 
   List<String> getList({required int page}) =>
       List.generate(5, (index) => 'page: $page, index: $index');
@@ -37,11 +39,13 @@ void main() {
     if (shouldFail) {
       return left(Failure.generic(title: 'Unknown error occurred'));
     }
-    return right(PaginatedList(
-      data: List.generate(5, (index) => 'page: $page, index: $index'),
-      isLast: page == 2,
-      page: page,
-    ));
+    return right(
+      PaginatedList(
+        data: List.generate(5, (index) => 'page: $page, index: $index'),
+        isLast: page == 2,
+        page: page,
+      ),
+    );
   }
 
   group('getInitialList()', () {

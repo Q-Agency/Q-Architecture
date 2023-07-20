@@ -37,10 +37,7 @@ abstract class BaseStateNotifier<DataState>
     bool withLoadingState = true,
     bool globalLoading = false,
     bool globalFailure = true,
-    bool withDebounce = false,
-    Duration debounceDuration = const Duration(milliseconds: 500),
   }) async {
-    if (withDebounce) await debounce(duration: debounceDuration);
     _setLoading(withLoadingState, globalLoading);
 
     final result = await function;
@@ -139,7 +136,7 @@ abstract class BaseStateNotifier<DataState>
   ///Set [withLoadingState] == true if you want to reset [BaseStateNotifier] state to [BaseState.initial]
   void _unsetLoading(bool withLoadingState) {
     final isAlreadyLoading = switch (state) {
-      Loading() => true,
+      BaseLoading() => true,
       _ => false,
     };
     if (withLoadingState && isAlreadyLoading) {

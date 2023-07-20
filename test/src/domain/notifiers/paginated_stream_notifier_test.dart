@@ -20,10 +20,12 @@ void main() {
   setUpAll(() {
     testRepository = MockTestRepository();
   });
-  ProviderContainer getProviderContainer() => ProviderContainer(overrides: [
-        testNotifierProvider
-            .overrideWith((ref) => TestNotifier(testRepository, ref)),
-      ]);
+  ProviderContainer getProviderContainer() => ProviderContainer(
+        overrides: [
+          testNotifierProvider
+              .overrideWith((ref) => TestNotifier(testRepository, ref)),
+        ],
+      );
 
   List<String> getList({required int page}) =>
       List.generate(5, (index) => 'page: $page, index: $index');
