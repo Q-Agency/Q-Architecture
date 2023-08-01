@@ -1,5 +1,6 @@
 //ignore_for_file: prefer-match-file-name
 
+import 'package:either_dart/either.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:mocktail/mocktail.dart';
@@ -37,9 +38,9 @@ void main() {
   }) async {
     await 300.milliseconds;
     if (shouldFail) {
-      return left(Failure.generic(title: 'Unknown error occurred'));
+      return Left(Failure.generic(title: 'Unknown error occurred'));
     }
-    return right(
+    return Right(
       PaginatedList(
         data: List.generate(5, (index) => 'page: $page, index: $index'),
         isLast: page == 2,

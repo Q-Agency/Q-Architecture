@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:either_dart/either.dart';
 import 'package:flutter/foundation.dart';
 import 'package:q_architecture/paginated_notifier.dart';
 import 'package:q_architecture/q_architecture.dart';

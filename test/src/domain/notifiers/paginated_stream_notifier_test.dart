@@ -1,3 +1,4 @@
+import 'package:either_dart/either.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:mocktail/mocktail.dart';
@@ -40,13 +41,13 @@ void main() {
       page: page,
     );
     if (page == 1) {
-      yield right(paginatedList);
+      yield Right(paginatedList);
     }
     await 300.milliseconds;
     if (shouldFail) {
-      yield left(Failure.generic(title: 'Unknown error occurred'));
+      yield Left(Failure.generic(title: 'Unknown error occurred'));
     } else {
-      yield right(paginatedList);
+      yield Right(paginatedList);
     }
   }
 

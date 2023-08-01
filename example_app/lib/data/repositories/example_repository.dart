@@ -2,6 +2,7 @@
 
 import 'dart:math';
 
+import 'package:either_dart/either.dart';
 import 'package:example/data/api_client.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:q_architecture/paginated_notifier.dart';
@@ -46,9 +47,9 @@ class ExampleRepositoryImp implements ExampleRepository {
     try {
       final userResponse = await _apiClient.getUser();
       final user = _userMapper(userResponse);
-      return right(user);
+      return Right(user);
     } catch (error, stackTrace) {
-      return left(
+      return Left(
         Failure.generic(error: error, stackTrace: stackTrace),
       );
     }
@@ -58,27 +59,27 @@ class ExampleRepositoryImp implements ExampleRepository {
   EitherFailureOr<String> getSomeOtherString() async {
     await 3.seconds;
     if (Random().nextBool()) {
-      return right(Random().nextBool() ? 'Some sentence' : '');
+      return Right(Random().nextBool() ? 'Some sentence' : '');
     } else {
-      return left(Failure.generic());
+      return Left(Failure.generic());
     }
   }
 
   @override
   StreamFailureOr<String> getSomeStringsStreamed() async* {
-    yield right('Some sentence from cache');
+    yield const Right('Some sentence from cache');
 
     await 3.seconds;
-    yield right('Some sentence from network');
+    yield const Right('Some sentence from network');
   }
 
   @override
   EitherFailureOr<String> getSomeString() async {
     await 3.seconds;
     if (Random().nextBool()) {
-      return right('some sentence');
+      return const Right('some sentence');
     } else {
-      return left(Failure.generic());
+      return Left(Failure.generic());
     }
   }
 
@@ -90,11 +91,11 @@ class ExampleRepositoryImp implements ExampleRepository {
     List<String>? someStrings;
     if (page == 1) {
       someStrings = _getStrings();
-      yield right(PaginatedList(data: someStrings, isLast: false, page: 1));
+      yield Right(PaginatedList(data: someStrings, isLast: false, page: 1));
     }
     await 3.seconds;
     if (Random().nextBool()) {
-      yield right(
+      yield Right(
         PaginatedList(
           data: someStrings ?? _getStrings(),
           isLast: page == 4,
@@ -102,7 +103,7 @@ class ExampleRepositoryImp implements ExampleRepository {
         ),
       );
     } else {
-      yield left(Failure.generic());
+      yield Left(Failure.generic());
     }
   }
 
@@ -113,7 +114,7 @@ class ExampleRepositoryImp implements ExampleRepository {
       if (page == 1) {
         _counter = 0;
       }
-      return right(
+      return Right(
         PaginatedList(
           data: _getStrings(),
           isLast: page == 4,
@@ -121,7 +122,7 @@ class ExampleRepositoryImp implements ExampleRepository {
         ),
       );
     }
-    return left(Failure.generic());
+    return Left(Failure.generic());
   }
 
   List<String> _getStrings() => [

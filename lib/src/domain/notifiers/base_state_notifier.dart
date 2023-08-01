@@ -1,5 +1,6 @@
 // ignore_for_file: always_use_package_imports
 
+import 'package:either_dart/either.dart';
 import 'package:flutter/foundation.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
