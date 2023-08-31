@@ -26,7 +26,7 @@ class ExampleSimpleStateNotifier
   Future<void> getSomeStringSimpleExample() async {
     await debounce();
     state = const ExampleSimpleState.fetching();
-    final result = await _exampleRepository.getSomeOtherString();
+    final result = await _exampleRepository.getSomeString();
     result.fold(
       (failure) {
         state = ExampleSimpleState.error(failure);
@@ -45,7 +45,7 @@ class ExampleSimpleStateNotifier
   /// when calling some repository method
   Future<void> getSomeStringSimpleExampleGlobalLoading() async {
     showGlobalLoading();
-    final result = await _exampleRepository.getSomeOtherString();
+    final result = await _exampleRepository.getSomeString();
     result.fold(
       (failure) {
         setGlobalFailure(failure);
