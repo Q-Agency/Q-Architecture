@@ -18,3 +18,4 @@ export 'src/domain/utils/int_extension.dart';
 export 'src/presentation/widgets/paginated_list_view.dart';
 export 'src/presentation/widgets/base_widget.dart';
 export 'src/presentation/widgets/base_loading_indicator.dart';
+export 'src/data/mixins/error_to_failure_mixin.dart';
