@@ -42,16 +42,6 @@ class ApiErrorResolver implements ErrorResolver {
           stackTrace: stackTrace,
         );
   }
-
-  @override
-  // ignore: override_on_non_overriding_member
-  List<Object?> get props => [
-        failures,
-      ];
-
-  @override
-  // ignore: override_on_non_overriding_member
-  bool? get stringify => true;
 }
 
 extension IterableExtension<T> on Iterable<T> {
