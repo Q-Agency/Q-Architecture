@@ -1,6 +1,9 @@
 import 'package:either_dart/either.dart';
 import 'package:q_architecture/q_architecture.dart';
 
+/// Executes received [function] within a try-catch block.
+///
+/// If an error occurrs, the function calls the [errorResolver] to handle the cought exception.
 mixin ErrorToFailureMixin {
   EitherFailureOr<T> execute<T>(
     EitherFailureOr<T> Function() function, {

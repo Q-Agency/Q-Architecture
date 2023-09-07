@@ -820,4 +820,68 @@ ProviderScope(
 
 ## ErrorToFailureMixin
 
-You can simply mark 
+This mixin should reduce the needed boilerplate code for appropriate error handling in repositories.
+
+It executes the received function within a try-catch block. If an error occurrs, the function calls the errorResolver to handle the cought exception.
+
+### ErrorResolver
+
+Simple abstract interface witha a single method for resolving a thrown error into an appropriate Failure.
+
+```dart
+abstract interface class ErrorResolver {
+  Failure resolve<T>(Object error, [StackTrace? stackTrace]);
+}
+```
+
+### ApiErrorResolver
+
+An implementation of the ErrorResolver interface that handles DioException errors by using the passed statusCodeToFailure map.
+
+```dart
+final class ApiErrorResolver implements ErrorResolver {
+  final Map<int, Failure> statusCodeToFailure;
+
+  const ApiErrorResolver({
+    required this.statusCodeToFailure,
+  });
+
+  @override
+  Failure resolve<T>(Object error, [StackTrace? stackTrace]) {
+    if (error is! DioException)
+      return Failure.generic(error: error, stackTrace: stackTrace);
+    final response = error.response;
+    final key = statusCodeToFailure.keys
+        .firstWhereOrNull((code) => code == response?.statusCode);
+    return statusCodeToFailure[key] ??
+        Failure.generic(error: error, stackTrace: stackTrace);
+  }
+}
+```
+
+### Usage example
+
+```dart
+const exampleApiErrorResolver = ApiErrorResolver(
+  statusCodeToFailure: {
+    404: UnauthorizedFailure(),
+  },
+);
+```
+
+```dart
+class ExampleRepositoryImp
+    with ErrorToFailureMixin
+    implements ExampleRepository {
+...
+  @override
+  EitherFailureOr<ExampleUser> apiCallExample() => execute(
+        () async {
+          final userResponse = await _apiClient.getUser();
+          final user = _userMapper(userResponse);
+          return Right(user);
+        },
+        errorResolver: exampleApiErrorResolver,
+      );
+...
+```
