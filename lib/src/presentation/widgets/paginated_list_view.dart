@@ -215,7 +215,7 @@ class _ListView<Entity> extends StatelessWidget {
   }
 }
 
-extension PaginatedScrollNotification on ScrollNotification {
+extension _PaginatedScrollNotification on ScrollNotification {
   static const _loadMoreScrollOffset = 50;
   bool get shouldLoadMore =>
       metrics.pixels >= metrics.maxScrollExtent - _loadMoreScrollOffset;
