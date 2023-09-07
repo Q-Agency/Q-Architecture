@@ -89,6 +89,7 @@ That is all you need to get you started, to find out more, head over to the tabl
 - [Global failure](#global-failure)
 - [Global info](#global-info)
 - [BaseWidget](#basewidget)
+- [ErrorToFailureMixin](#errortofailuremixin)
 
 ## Example - BaseStateNotifier
 
@@ -817,3 +818,6 @@ ProviderScope(
     );
 ```
 
+## ErrorToFailureMixin
+
+You can simply mark 
