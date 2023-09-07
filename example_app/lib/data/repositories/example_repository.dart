@@ -4,6 +4,7 @@ import 'dart:math';
 
 import 'package:either_dart/either.dart';
 import 'package:example/data/api_client.dart';
+import 'package:example/data/repositories/error_resolvers.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:q_architecture/paginated_notifier.dart';
 import 'package:q_architecture/q_architecture.dart';
@@ -23,8 +24,6 @@ abstract class ExampleRepository {
   EitherFailureOr<ExampleUser> apiCallExample();
   EitherFailureOr<String> getSomeString();
 
-  EitherFailureOr<String> getSomeOtherString();
-
   StreamFailureOr<String> getSomeStringsStreamed();
 
   PaginatedStreamFailureOr<String> getPaginatedStreamResult(int page);
@@ -32,7 +31,9 @@ abstract class ExampleRepository {
   PaginatedEitherFailureOr<String> getPaginatedResult(int page);
 }
 
-class ExampleRepositoryImp implements ExampleRepository {
+class ExampleRepositoryImp
+    with ErrorToFailureMixin
+    implements ExampleRepository {
   final ApiClient _apiClient;
   final EntityMapper<ExampleUser, ExampleUserResponse> _userMapper;
   var _counter = 0;
@@ -43,27 +44,14 @@ class ExampleRepositoryImp implements ExampleRepository {
   );
 
   @override
-  EitherFailureOr<ExampleUser> apiCallExample() async {
-    try {
-      final userResponse = await _apiClient.getUser();
-      final user = _userMapper(userResponse);
-      return Right(user);
-    } catch (error, stackTrace) {
-      return Left(
-        Failure.generic(error: error, stackTrace: stackTrace),
+  EitherFailureOr<ExampleUser> apiCallExample() => execute(
+        () async {
+          final userResponse = await _apiClient.getUser();
+          final user = _userMapper(userResponse);
+          return Right(user);
+        },
+        errorResolver: exampleApiErrorResolver,
       );
-    }
-  }
-
-  @override
-  EitherFailureOr<String> getSomeOtherString() async {
-    await 3.seconds;
-    if (Random().nextBool()) {
-      return Right(Random().nextBool() ? 'Some sentence' : '');
-    } else {
-      return Left(Failure.generic());
-    }
-  }
 
   @override
   StreamFailureOr<String> getSomeStringsStreamed() async* {
@@ -74,14 +62,17 @@ class ExampleRepositoryImp implements ExampleRepository {
   }
 
   @override
-  EitherFailureOr<String> getSomeString() async {
-    await 3.seconds;
-    if (Random().nextBool()) {
-      return const Right('some sentence');
-    } else {
-      return Left(Failure.generic());
-    }
-  }
+  EitherFailureOr<String> getSomeString() => execute(
+        () async {
+          await 3.seconds;
+          if (Random().nextBool()) {
+            return const Right('Some sentence');
+          } else {
+            throw Exception();
+          }
+        },
+        errorResolver: CustomErrorResolver(),
+      );
 
   @override
   PaginatedStreamFailureOr<String> getPaginatedStreamResult(int page) async* {
