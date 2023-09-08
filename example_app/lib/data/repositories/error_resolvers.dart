@@ -1,7 +1,7 @@
 import 'package:q_architecture/q_architecture.dart';
 
 const exampleApiErrorResolver = ApiErrorResolver(
-  failures: {
+  statusCodeToFailure: {
     404: UnauthorizedFailure(),
   },
 );
