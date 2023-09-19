@@ -2,7 +2,7 @@ name: q_architecture
 description: >
   A set of reusable classes that should speed up your development time  and
   reduce unnecessary boilerplate code.
-version: 0.1.4
+version: 0.1.5
 repository: https://github.com/Q-Agency/Q-Architecture
 issue_tracker: https://github.com/Q-Agency/Q-Architecture/issues
 

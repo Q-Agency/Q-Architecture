@@ -9,8 +9,14 @@ class PaginatedListView<Entity, Param> extends ConsumerWidget {
       PaginatedState<Entity>>? autoDisposeStateNotifier;
   final StateNotifierProvider<PaginatedStreamNotifier<Entity, Param>,
       PaginatedState<Entity>>? stateNotifierProvider;
-  final Widget Function(Widget child, Future<void> Function() onRefresh)?
-      refreshWidgetBuilder;
+  final Widget Function(
+    Future<void> Function() onRefresh,
+    Widget child,
+  )? refreshWidgetBuilder;
+  final Widget Function(
+    ScrollController controller,
+    Widget child,
+  )? scrollbarWidgetBuilder;
   final Widget Function(Future<void> Function() onRefresh) emptyListBuilder;
   final Widget? Function(
     Failure failure,
@@ -26,6 +32,7 @@ class PaginatedListView<Entity, Param> extends ConsumerWidget {
   final PaginatedListViewType paginatedListViewType;
   final Widget Function(VoidCallback onLoadMore)? loadMoreButtonBuilder;
   final ScrollPhysics? scrollPhysics;
+  final ScrollController? scrollController;
 
   const PaginatedListView({
     required this.itemBuilder,
@@ -33,6 +40,7 @@ class PaginatedListView<Entity, Param> extends ConsumerWidget {
     this.autoDisposeStateNotifier,
     this.stateNotifierProvider,
     this.refreshWidgetBuilder,
+    this.scrollbarWidgetBuilder,
     this.onError,
     this.loading,
     this.loadingMore,
@@ -43,6 +51,7 @@ class PaginatedListView<Entity, Param> extends ConsumerWidget {
     this.paginatedListViewType = PaginatedListViewType.infiniteScroll,
     this.loadMoreButtonBuilder,
     this.scrollPhysics,
+    this.scrollController,
     super.key,
   }) : assert(
           autoDisposeStateNotifier != null || stateNotifierProvider != null,
@@ -51,12 +60,20 @@ class PaginatedListView<Entity, Param> extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final paginatedState = ref.watch(stateNotifier);
-    Widget getRefreshWidget(child) =>
-        refreshWidgetBuilder?.call(child, () async => _refresh(ref)) ??
+    Widget getRefreshWidget({required Widget child}) =>
+        refreshWidgetBuilder?.call(
+          () async => _refresh(ref),
+          child,
+        ) ??
         RefreshIndicator(
           onRefresh: () async => _refresh(ref),
           child: child,
         );
+    Widget getScrollbarWidget({
+      required ScrollController controller,
+      required Widget child,
+    }) =>
+        scrollbarWidgetBuilder?.call(controller, child) ?? child;
     Widget getListEmpty() => emptyListBuilder.call(() async => _refresh(ref));
 
     Widget? getLoadMoreButton(bool isLastPage) =>
@@ -77,9 +94,11 @@ class PaginatedListView<Entity, Param> extends ConsumerWidget {
           spacing: spacing,
           separator: separator,
           refreshWidgetBuilder: getRefreshWidget,
+          scrollbarWidgetBuilder: getScrollbarWidget,
           emptyListBuilder: getListEmpty,
           onNotification: (info) => _onScrollNotification(info, ref),
           scrollPhysics: scrollPhysics,
+          scrollController: scrollController,
         ),
       PaginatedLoaded(list: final list, isLastPage: final isLastPage) =>
         _ListView(
@@ -90,10 +109,12 @@ class PaginatedListView<Entity, Param> extends ConsumerWidget {
           spacing: spacing,
           separator: separator,
           refreshWidgetBuilder: getRefreshWidget,
+          scrollbarWidgetBuilder: getScrollbarWidget,
           emptyListBuilder: getListEmpty,
           onNotification: (info) => _onScrollNotification(info, ref),
           loadMoreButtonBuilder: () => getLoadMoreButton(isLastPage),
           scrollPhysics: scrollPhysics,
+          scrollController: scrollController,
         ),
       PaginatedLoading() => loading ??
           const Center(
@@ -109,10 +130,12 @@ class PaginatedListView<Entity, Param> extends ConsumerWidget {
               spacing: spacing,
               separator: separator,
               refreshWidgetBuilder: getRefreshWidget,
+              scrollbarWidgetBuilder: getScrollbarWidget,
               emptyListBuilder: getListEmpty,
               onNotification: (info) => _onScrollNotification(info, ref),
               loadMoreButtonBuilder: () => getLoadMoreButton(false),
               scrollPhysics: scrollPhysics,
+              scrollController: scrollController,
             ),
     };
   }
@@ -150,9 +173,13 @@ class PaginatedListView<Entity, Param> extends ConsumerWidget {
 
 enum PaginatedListViewType { infiniteScroll, loadMoreButton }
 
-class _ListView<Entity> extends StatelessWidget {
+class _ListView<Entity> extends StatefulWidget {
   final Widget? Function(BuildContext, Entity) itemBuilder;
-  final Widget Function(Widget child) refreshWidgetBuilder;
+  final Widget Function({required Widget child}) refreshWidgetBuilder;
+  final Widget Function({
+    required ScrollController controller,
+    required Widget child,
+  }) scrollbarWidgetBuilder;
   final Widget Function() emptyListBuilder;
   final Widget? Function()? loadMoreButtonBuilder;
   final List<Entity> list;
@@ -164,11 +191,13 @@ class _ListView<Entity> extends StatelessWidget {
   final double? spacing;
   final Axis scrollDirection;
   final ScrollPhysics? scrollPhysics;
+  final ScrollController? scrollController;
 
   const _ListView({
     required this.itemBuilder,
     required this.list,
     required this.refreshWidgetBuilder,
+    required this.scrollbarWidgetBuilder,
     required this.emptyListBuilder,
     this.loadMoreButtonBuilder,
     required this.onNotification,
@@ -179,39 +208,65 @@ class _ListView<Entity> extends StatelessWidget {
     this.spacing,
     required this.scrollDirection,
     this.scrollPhysics,
+    this.scrollController,
     super.key,
   });
 
   @override
+  State<_ListView<Entity>> createState() => _ListViewState<Entity>();
+}
+
+class _ListViewState<Entity> extends State<_ListView<Entity>> {
+  late final ScrollController _scrollController;
+
+  @override
+  void initState() {
+    super.initState();
+    _scrollController = widget.scrollController ?? ScrollController();
+  }
+
+  @override
+  void dispose() {
+    if (widget.scrollController == null) _scrollController.dispose();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
-    return list.isNotEmpty
+    return widget.list.isNotEmpty
         ? NotificationListener(
-            onNotification: onNotification,
-            child: refreshWidgetBuilder(
-              ListView.separated(
-                physics: scrollPhysics,
-                padding: listPadding,
-                scrollDirection: scrollDirection,
-                itemBuilder: (context, index) {
-                  if (index == list.length + 1) {
-                    return isLoading
-                        ? loading ??
-                            const Center(child: CircularProgressIndicator())
-                        : const SizedBox();
-                  }
-                  if (index == list.length) {
-                    return loadMoreButtonBuilder?.call() ?? const SizedBox();
-                  }
-                  return itemBuilder(context, list[index]);
-                },
-                itemCount: list.length + 2,
-                separatorBuilder: (_, index) => index < list.length - 1
-                    ? separator ?? SizedBox(height: spacing ?? 10)
-                    : const SizedBox(),
+            onNotification: widget.onNotification,
+            child: widget.refreshWidgetBuilder(
+              child: widget.scrollbarWidgetBuilder(
+                controller: _scrollController,
+                child: ListView.separated(
+                  controller: _scrollController,
+                  physics: widget.scrollPhysics,
+                  padding: widget.listPadding,
+                  scrollDirection: widget.scrollDirection,
+                  itemBuilder: (context, index) {
+                    if (index == widget.list.length + 1) {
+                      return widget.isLoading
+                          ? widget.loading ??
+                              const Center(child: CircularProgressIndicator())
+                          : const SizedBox();
+                    }
+                    if (index == widget.list.length) {
+                      return widget.loadMoreButtonBuilder?.call() ??
+                          const SizedBox();
+                    }
+                    return widget.itemBuilder(context, widget.list[index]);
+                  },
+                  itemCount: widget.list.length + 2,
+                  separatorBuilder: (_, index) => index < widget.list.length - 1
+                      ? widget.separator ??
+                          SizedBox(height: widget.spacing ?? 10)
+                      : const SizedBox(),
+                ),
               ),
             ),
           )
-        : emptyListBuilder();
+        : widget.emptyListBuilder();
   }
 }
 

@@ -1,3 +1,7 @@
+## 0.1.5
+
+Added optional scrollbarWidgetBuilder and scrollController parameters to PaginatedListView
+
 ## 0.1.4
 
 Added iterable_extension.dart to q_architecture export file
