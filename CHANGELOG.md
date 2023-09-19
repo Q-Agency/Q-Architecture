@@ -1,3 +1,7 @@
+## 0.1.4
+
+Added iterable_extension.dart to q_architecture export file
+
 ## 0.1.3
 
 Added ErrorToFailure mixin for easier error handling in repositories
