@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:q_architecture/paginated_notifier.dart';
 import 'package:q_architecture/q_architecture.dart';
@@ -173,7 +174,7 @@ class PaginatedListView<Entity, Param> extends ConsumerWidget {
 
 enum PaginatedListViewType { infiniteScroll, loadMoreButton }
 
-class _ListView<Entity> extends StatefulWidget {
+class _ListView<Entity> extends HookWidget {
   final Widget? Function(BuildContext, Entity) itemBuilder;
   final Widget Function({required Widget child}) refreshWidgetBuilder;
   final Widget Function({
@@ -213,60 +214,40 @@ class _ListView<Entity> extends StatefulWidget {
   });
 
   @override
-  State<_ListView<Entity>> createState() => _ListViewState<Entity>();
-}
-
-class _ListViewState<Entity> extends State<_ListView<Entity>> {
-  late final ScrollController _scrollController;
-
-  @override
-  void initState() {
-    super.initState();
-    _scrollController = widget.scrollController ?? ScrollController();
-  }
-
-  @override
-  void dispose() {
-    if (widget.scrollController == null) _scrollController.dispose();
-    super.dispose();
-  }
-
-  @override
   Widget build(BuildContext context) {
-    return widget.list.isNotEmpty
+    final controller = scrollController ?? useScrollController();
+    return list.isNotEmpty
         ? NotificationListener(
-            onNotification: widget.onNotification,
-            child: widget.refreshWidgetBuilder(
-              child: widget.scrollbarWidgetBuilder(
-                controller: _scrollController,
+            onNotification: onNotification,
+            child: refreshWidgetBuilder(
+              child: scrollbarWidgetBuilder(
+                controller: controller,
                 child: ListView.separated(
-                  controller: _scrollController,
-                  physics: widget.scrollPhysics,
-                  padding: widget.listPadding,
-                  scrollDirection: widget.scrollDirection,
+                  controller: controller,
+                  physics: scrollPhysics,
+                  padding: listPadding,
+                  scrollDirection: scrollDirection,
                   itemBuilder: (context, index) {
-                    if (index == widget.list.length + 1) {
-                      return widget.isLoading
-                          ? widget.loading ??
+                    if (index == list.length + 1) {
+                      return isLoading
+                          ? loading ??
                               const Center(child: CircularProgressIndicator())
                           : const SizedBox();
                     }
-                    if (index == widget.list.length) {
-                      return widget.loadMoreButtonBuilder?.call() ??
-                          const SizedBox();
+                    if (index == list.length) {
+                      return loadMoreButtonBuilder?.call() ?? const SizedBox();
                     }
-                    return widget.itemBuilder(context, widget.list[index]);
+                    return itemBuilder(context, list[index]);
                   },
-                  itemCount: widget.list.length + 2,
-                  separatorBuilder: (_, index) => index < widget.list.length - 1
-                      ? widget.separator ??
-                          SizedBox(height: widget.spacing ?? 10)
+                  itemCount: list.length + 2,
+                  separatorBuilder: (_, index) => index < list.length - 1
+                      ? separator ?? SizedBox(height: spacing ?? 10)
                       : const SizedBox(),
                 ),
               ),
             ),
           )
-        : widget.emptyListBuilder();
+        : emptyListBuilder();
   }
 }
 
