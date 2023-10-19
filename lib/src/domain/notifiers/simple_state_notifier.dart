@@ -91,6 +91,7 @@ abstract class SimpleStateNotifier<T> extends StateNotifier<T> {
     _isThrottling = true;
     final functionCompleter = Completer();
     final throttleCompleter = Completer();
+    var durationFinished = false;
     final completeThrottle = () {
       if (mounted && !throttleCompleter.isCompleted) {
         _isThrottling = false;
@@ -100,14 +101,15 @@ abstract class SimpleStateNotifier<T> extends StateNotifier<T> {
     function().then(
       (value) {
         functionCompleter.complete();
-        completeThrottle();
+        if (durationFinished) completeThrottle();
       },
       onError: (error) {
         functionCompleter.completeError(error);
-        completeThrottle();
+        if (durationFinished) completeThrottle();
       },
     );
     Future.delayed(duration, () {
+      durationFinished = true;
       if (!waitForFunction || functionCompleter.isCompleted) {
         completeThrottle();
       }
