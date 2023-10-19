@@ -1,3 +1,7 @@
+## 0.1.6
+
+Added throttle method to SimpleStateNotifier
+
 ## 0.1.5
 
 Added optional scrollbarWidgetBuilder and scrollController parameters to PaginatedListView

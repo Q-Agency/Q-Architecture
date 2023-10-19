@@ -9,8 +9,15 @@ import 'package:q_architecture/q_architecture.dart';
 abstract class SimpleStateNotifier<T> extends StateNotifier<T> {
   final Ref ref;
   Timer? _debounceTimer;
+  bool _isThrottling = false;
 
   SimpleStateNotifier(this.ref, T initialState) : super(initialState);
+
+  @override
+  void dispose() {
+    _debounceTimer?.cancel();
+    super.dispose();
+  }
 
   ///Show [BaseLoadingIndicator] above the entire app
   @protected
@@ -70,5 +77,44 @@ abstract class SimpleStateNotifier<T> extends StateNotifier<T> {
       () => debounceCompleter.complete(),
     );
     await debounceCompleter.future;
+  }
+
+  ///Execute given function and then block further executing of the same function for certain duration.
+  ///[waitForFunction] if set to true it will wait if function finishes after provided duration delay, otherwise will finish immediately after given duration
+  @protected
+  Future<void> throttle(
+    Future<void> Function() function, {
+    Duration duration = const Duration(milliseconds: 500),
+    bool waitForFunction = true,
+  }) async {
+    if (_isThrottling) return;
+    _isThrottling = true;
+    final functionCompleter = Completer();
+    final throttleCompleter = Completer();
+    final completeThrottle = () {
+      if (mounted && !throttleCompleter.isCompleted) {
+        _isThrottling = false;
+        throttleCompleter.complete();
+      }
+    };
+    function().then(
+      (value) {
+        functionCompleter.complete();
+        completeThrottle();
+      },
+      onError: (error) {
+        functionCompleter.completeError(error);
+        completeThrottle();
+      },
+    );
+    Future.delayed(duration, () {
+      if (!waitForFunction || functionCompleter.isCompleted) {
+        completeThrottle();
+      }
+    });
+    await Future.wait([
+      if (waitForFunction) functionCompleter.future,
+      throttleCompleter.future,
+    ]);
   }
 }

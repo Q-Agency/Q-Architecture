@@ -1,6 +1,5 @@
 import 'package:dio/dio.dart';
 import 'package:q_architecture/q_architecture.dart';
-import 'package:q_architecture/src/extensions/iterable_extensions.dart';
 
 /// An implementation of the [ErrorResolver] interface.
 ///
