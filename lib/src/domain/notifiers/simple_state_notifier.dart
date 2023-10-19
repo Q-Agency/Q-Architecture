@@ -119,4 +119,8 @@ abstract class SimpleStateNotifier<T> extends StateNotifier<T> {
       throttleCompleter.future,
     ]);
   }
+
+  ///Cancels if throttling is in progress
+  @protected
+  void cancelThrottle() => _isThrottling = false;
 }

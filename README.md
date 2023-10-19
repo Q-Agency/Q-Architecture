@@ -439,8 +439,8 @@ final class Data<State> extends BaseState<State> {
 
 Abstract StateNotifier class which provides some convenient methods to be used by subclassing it. It
 can be used when BaseState doesn't suit you and you need more states, this notifier has **showGlobalLoading**, 
-**clearGlobalLoading**, **setGlobalFailure**, **on**, **debounce** and **throttle** methods that are marked as **@protected** 
-so you can easily use them in your subclasses.
+**clearGlobalLoading**, **setGlobalFailure**, **on**, **debounce**, **throttle** and **cancelThrottle** methods 
+that are marked as **@protected** so you can easily use them in your subclasses.
 
 * **showGlobalLoading** & **clearGlobalLoading** for handling global loading
 
@@ -452,6 +452,8 @@ so you can easily use them in your subclasses.
 * **debounce** for waiting multiple method calls before only one method call can be executed
 
 * **throttle** for executing only first method call for some duration when there are multiple method calls
+
+* **cancelThrottle** for canceling throttling if in progress
 
 ## BaseStateNotifier
 
