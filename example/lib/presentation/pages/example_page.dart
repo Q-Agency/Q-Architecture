@@ -15,7 +15,7 @@ import 'pagination_stream_example_page.dart';
 class ExamplePage extends ConsumerWidget {
   static const routeName = '/';
 
-  const ExamplePage({Key? key}) : super(key: key);
+  const ExamplePage({super.key});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {

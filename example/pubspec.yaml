@@ -9,18 +9,18 @@ environment:
   sdk: ">=3.0.2 <4.0.0"
 
 dependencies:
-  cupertino_icons: ^1.0.2
+  cupertino_icons: ^1.0.6
   either_dart: ^1.0.0
   equatable: ^2.0.5
   flutter:
     sdk: flutter
-  hooks_riverpod: ^2.3.6
+  hooks_riverpod: ^2.4.4
   json_annotation: ^4.8.1
   q_architecture:
     path: ..
 
 dev_dependencies:
-  flutter_lints: ^2.0.0
+  flutter_lints: ^3.0.0
   flutter_test:
     sdk: flutter
   json_serializable: ^6.7.1
