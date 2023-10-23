@@ -11,7 +11,7 @@ class MessageDisplayingBaseWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return BaseWidget(
-      onFailure: (failure) => ScaffoldMessenger.of(context).showSnackBar(
+      onGlobalFailure: (failure) => ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text('${failure.title} ${failure.error}'),
         ),

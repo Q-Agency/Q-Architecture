@@ -92,12 +92,13 @@ abstract class SimpleStateNotifier<T> extends StateNotifier<T> {
     final functionCompleter = Completer();
     final throttleCompleter = Completer();
     var durationFinished = false;
-    final completeThrottle = () {
+    void completeThrottle() {
       if (mounted && !throttleCompleter.isCompleted) {
         _isThrottling = false;
         throttleCompleter.complete();
       }
-    };
+    }
+
     function().then(
       (value) {
         functionCompleter.complete();

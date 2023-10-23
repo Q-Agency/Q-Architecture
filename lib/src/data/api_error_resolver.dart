@@ -14,8 +14,9 @@ final class ApiErrorResolver implements ErrorResolver {
 
   @override
   Failure resolve<T>(Object error, [StackTrace? stackTrace]) {
-    if (error is! DioException)
+    if (error is! DioException) {
       return Failure.generic(error: error, stackTrace: stackTrace);
+    }
     final response = error.response;
     final key = statusCodeToFailure.keys
         .firstWhereOrNull((code) => code == response?.statusCode);

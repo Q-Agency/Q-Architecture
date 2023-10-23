@@ -20,7 +20,7 @@ void main() {
   ProviderContainer getProviderContainer() => ProviderContainer();
 
   EitherFailureOr<String> getSuccessfulResponse() async {
-    return Right('');
+    return const Right('');
   }
 
   EitherFailureOr<String> getFailureResponse() async {
@@ -28,9 +28,9 @@ void main() {
   }
 
   StreamFailureOr<String> getSuccessfulResponseStream() async* {
-    yield Right('a');
+    yield const Right('a');
     await 300.milliseconds;
-    yield Right('b');
+    yield const Right('b');
   }
 
   StreamFailureOr<String> getFailureResponseStream() async* {
@@ -38,7 +38,7 @@ void main() {
   }
 
   StreamFailureOr<String> getSuccessThenFailureResponseStream() async* {
-    yield Right('a');
+    yield const Right('a');
     await 300.milliseconds;
     yield Left(testGenericFailure);
   }
