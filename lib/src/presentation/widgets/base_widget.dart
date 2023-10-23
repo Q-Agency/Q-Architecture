@@ -5,22 +5,22 @@ import 'package:q_architecture/q_architecture.dart';
 class BaseWidget extends ConsumerWidget {
   final Widget child;
   final Widget? loadingIndicator;
-  final Function(Failure) onFailure;
-  final Function(GlobalInfo) onGlobalInfo;
+  final Function(Failure failure) onGlobalFailure;
+  final Function(GlobalInfo globalInfo) onGlobalInfo;
 
   const BaseWidget({
     required this.child,
-    required this.onFailure,
+    required this.onGlobalFailure,
     required this.onGlobalInfo,
     this.loadingIndicator,
-    Key? key,
-  }) : super(key: key);
+    super.key,
+  });
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     ref.listen<Failure?>(globalFailureProvider, (_, failure) {
       if (failure == null) return;
-      onFailure(failure);
+      onGlobalFailure(failure);
     });
     ref.listen<GlobalInfo?>(globalInfoProvider, (_, globalInfo) {
       if (globalInfo == null) return;

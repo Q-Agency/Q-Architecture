@@ -3,10 +3,7 @@ import 'package:flutter/material.dart';
 class BaseLoadingIndicator extends StatelessWidget {
   final String? text;
 
-  const BaseLoadingIndicator({
-    Key? key,
-    this.text,
-  }) : super(key: key);
+  const BaseLoadingIndicator({super.key, this.text});
 
   @override
   Widget build(BuildContext context) {

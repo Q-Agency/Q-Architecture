@@ -75,8 +75,9 @@ abstract class PaginatedStreamNotifier<Entity, Param>
         getListStreamOrFailure(page, parameter).listen((result) {
       result.fold(
         (failure) {
-          if (useGlobalFailure)
+          if (useGlobalFailure) {
             ref.read(globalFailureProvider.notifier).update((_) => failure);
+          }
           state = PaginatedState.error(updatedList, failure);
         },
         (paginatedList) {

@@ -1,3 +1,7 @@
+## 0.1.6
+
+Added throttle method to SimpleStateNotifier, renamed BaseWidget's onFailure callback to onGlobalFailure
+
 ## 0.1.5
 
 Added optional scrollbarWidgetBuilder and scrollController parameters to PaginatedListView
