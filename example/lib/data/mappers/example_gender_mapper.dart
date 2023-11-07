@@ -7,7 +7,10 @@ import '../../domain/entities/example_gender.dart';
 
 final exampleGenderMapperProvider =
     Provider<EntityMapper<ExampleGender, String>>(
-  (_) => (genderString) => _exampleGenderMap[genderString]!,
+  (_) => (
+    responseMapper: (genderString) => _exampleGenderMap[genderString]!,
+    requestMapper: null,
+  ),
 );
 
 final _exampleGenderMap = {
