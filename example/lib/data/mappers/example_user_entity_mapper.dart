@@ -9,10 +9,13 @@ import 'example_gender_mapper.dart';
 
 final exampleUserEntityMapperProvider =
     Provider<EntityMapper<ExampleUser, ExampleUserResponse>>(
-  (ref) => (response) => ExampleUser(
+  (ref) => (
+    responseMapper: (response) => ExampleUser(
         response.firstName,
         response.lastName,
         response.birthday,
-        ref.read(exampleGenderMapperProvider)(response.gender),
+        ref.read(exampleGenderMapperProvider).responseMapper(response.gender),
       ),
+    requestMapper: null,
+  ),
 );

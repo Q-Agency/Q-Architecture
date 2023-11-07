@@ -47,7 +47,7 @@ class ExampleRepositoryImp
   EitherFailureOr<ExampleUser> apiCallExample() => execute(
         () async {
           final userResponse = await _apiClient.getUser();
-          final user = _userMapper(userResponse);
+          final user = _userMapper.responseMapper(userResponse);
           return Right(user);
         },
         errorResolver: exampleApiErrorResolver,
