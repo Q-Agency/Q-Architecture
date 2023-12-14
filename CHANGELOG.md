@@ -1,4 +1,7 @@
-## 0.1.6
+## 0.1.8
+Added index parameter to PaginatedListView's itemBuilder attribute and documented PaginatedListView's attributes
+
+## 0.1.7
 
 Added throttle method to SimpleStateNotifier, renamed BaseWidget's onFailure callback to onGlobalFailure
 
