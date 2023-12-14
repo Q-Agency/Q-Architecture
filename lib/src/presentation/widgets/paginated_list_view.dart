@@ -5,32 +5,70 @@ import 'package:q_architecture/paginated_notifier.dart';
 import 'package:q_architecture/q_architecture.dart';
 
 class PaginatedListView<Entity, Param> extends ConsumerWidget {
-  final Widget? Function(BuildContext, Entity) itemBuilder;
+  /// required [itemBuilder] used for displaying each item in the scroll view,
+  /// provides [context], [item] object and its [index] within the list of items
+  final Widget? Function(BuildContext context, Entity item, int index)
+      itemBuilder;
   final AutoDisposeStateNotifierProvider<PaginatedStreamNotifier<Entity, Param>,
       PaginatedState<Entity>>? autoDisposeStateNotifier;
   final StateNotifierProvider<PaginatedStreamNotifier<Entity, Param>,
       PaginatedState<Entity>>? stateNotifierProvider;
+
+  /// optional builder to customize displaying the refresh functionality on
+  /// top of the scrollbar when scroll view is dragged all the way to the top,
+  /// defaults to RefreshIndicator
   final Widget Function(
     Future<void> Function() onRefresh,
     Widget child,
   )? refreshWidgetBuilder;
+
+  /// optional builder for displaying Scrollbar or some other custom
+  /// scroll bar widget
   final Widget Function(
     ScrollController controller,
     Widget child,
   )? scrollbarWidgetBuilder;
   final Widget Function(Future<void> Function() onRefresh) emptyListBuilder;
+
+  /// optional [onError] callback, provides [failure], information if
+  /// an error occurred while the list was empty or not via [listIsEmpty]
+  /// and [onRefresh] callback to easily trigger fetching the initial list again
   final Widget? Function(
     Failure failure,
     bool listIsEmpty,
     Future<void> Function() onRefresh,
   )? onError;
+
+  /// optional [loading] widget to be shown before first page is fetched,
+  /// defaults to CircularProgressIndicator()
   final Widget? loading;
+
+  /// optional [loadingMore] widget for displaying loader on the bottom of the scroll view
+  /// when fetching the next page if [paginatedListViewType] is set to [PaginatedListViewType.infiniteScroll],
+  /// defaults to CircularProgressIndicator()
   final Widget? loadingMore;
   final EdgeInsets? listPadding;
+
+  /// optional separator widget to be displayed between two items,
+  /// if given spacing attribute will be ignored
   final Widget? separator;
+
+  /// optional [spacing] between the items, defaults to 10px,
+  /// will be ignored if separator is given
   final double? spacing;
   final Axis scrollDirection;
+
+  /// [paginatedListViewType] attribute, determines a way to load more items,
+  /// automatically while scrolling if [PaginatedListViewType.infiniteScroll] is used or
+  /// via load more button if [PaginatedListViewType.loadMoreButton] is used,
+  /// defaults to [PaginatedListViewType.infiniteScroll]
   final PaginatedListViewType paginatedListViewType;
+
+  /// optional [loadMoreButtonBuilder] callback for displaying load more widget
+  /// on the bottom of the scroll view to the fetch next page by clicking on it,
+  /// provides [onLoadMore] callback to the fetch next page,
+  /// should not be null if [paginatedListViewType] is set to [PaginatedListViewType.loadMoreButton],
+  /// otherwise there will be no way to fetch the next page
   final Widget Function(VoidCallback onLoadMore)? loadMoreButtonBuilder;
   final ScrollPhysics? scrollPhysics;
   final ScrollController? scrollController;
@@ -66,10 +104,7 @@ class PaginatedListView<Entity, Param> extends ConsumerWidget {
           () async => _refresh(ref),
           child,
         ) ??
-        RefreshIndicator(
-          onRefresh: () async => _refresh(ref),
-          child: child,
-        );
+        RefreshIndicator(onRefresh: () async => _refresh(ref), child: child);
     Widget getScrollbarWidget({
       required ScrollController controller,
       required Widget child,
@@ -175,7 +210,8 @@ class PaginatedListView<Entity, Param> extends ConsumerWidget {
 enum PaginatedListViewType { infiniteScroll, loadMoreButton }
 
 class _ListView<Entity> extends HookWidget {
-  final Widget? Function(BuildContext, Entity) itemBuilder;
+  final Widget? Function(BuildContext context, Entity item, int index)
+      itemBuilder;
   final Widget Function({required Widget child}) refreshWidgetBuilder;
   final Widget Function({
     required ScrollController controller,
@@ -184,7 +220,7 @@ class _ListView<Entity> extends HookWidget {
   final Widget Function() emptyListBuilder;
   final Widget? Function()? loadMoreButtonBuilder;
   final List<Entity> list;
-  final bool Function(ScrollNotification) onNotification;
+  final bool Function(ScrollNotification notification) onNotification;
   final Widget? loading;
   final bool isLoading;
   final EdgeInsets? listPadding;
@@ -237,7 +273,7 @@ class _ListView<Entity> extends HookWidget {
                     if (index == list.length) {
                       return loadMoreButtonBuilder?.call() ?? const SizedBox();
                     }
-                    return itemBuilder(context, list[index]);
+                    return itemBuilder(context, list[index], index);
                   },
                   itemCount: list.length + 2,
                   separatorBuilder: (_, index) => index < list.length - 1

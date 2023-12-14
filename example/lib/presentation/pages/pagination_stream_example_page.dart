@@ -19,7 +19,7 @@ class PaginationStreamExamplePage extends StatelessWidget {
         title: const Text('Stream Pagination'),
       ),
       body: PaginatedListView(
-        itemBuilder: (context, word) => _PaginationExampleTile(word),
+        itemBuilder: (context, word, index) => _PaginationExampleTile(word),
         emptyListBuilder: (refresh) => const Center(
           child: Text('list empty'),
         ),
