@@ -1,13 +1,24 @@
+## 0.1.9
+
+Renamed PaginatedListView parameter from autoDisposeStateNotifier to
+autoDisposeStateNotifierProvider, added throttleIdentifier parameter to throttle
+and cancelThrottle function in SimpleStateNotifier to enable multiple uses at
+the same time in the same notifier
+
 ## 0.1.8
-Added index parameter to PaginatedListView's itemBuilder attribute and documented PaginatedListView's attributes
+
+Added index parameter to PaginatedListView's itemBuilder attribute and
+documented PaginatedListView's attributes
 
 ## 0.1.7
 
-Added throttle method to SimpleStateNotifier, renamed BaseWidget's onFailure callback to onGlobalFailure
+Added throttle method to SimpleStateNotifier, renamed BaseWidget's onFailure
+callback to onGlobalFailure
 
 ## 0.1.5
 
-Added optional scrollbarWidgetBuilder and scrollController parameters to PaginatedListView
+Added optional scrollbarWidgetBuilder and scrollController parameters to
+PaginatedListView
 
 ## 0.1.4
 

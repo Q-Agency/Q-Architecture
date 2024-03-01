@@ -43,11 +43,9 @@ linter:
     - prefer_final_in_for_each
     - constant_identifier_names
     - require_trailing_commas
+    - file_names
 
 analyzer:
-  plugins:
-    - dart_code_metrics
-
   errors:
     prefer_single_quotes: error
     cancel_subscriptions: error

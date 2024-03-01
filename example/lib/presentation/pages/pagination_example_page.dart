@@ -20,7 +20,7 @@ class PaginationExamplePage extends ConsumerWidget {
       ),
       body: PaginatedListView(
         itemBuilder: (context, word, index) => _PaginationExampleTile(word),
-        autoDisposeStateNotifier: paginatedNotifierProvider,
+        autoDisposeStateNotifierProvider: paginatedNotifierProvider,
         emptyListBuilder: (refresh) => const Center(
           child: Text('list empty'),
         ),

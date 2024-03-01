@@ -23,7 +23,7 @@ class PaginationStreamExamplePage extends StatelessWidget {
         emptyListBuilder: (refresh) => const Center(
           child: Text('list empty'),
         ),
-        autoDisposeStateNotifier: paginatedStreamNotifierProvider,
+        autoDisposeStateNotifierProvider: paginatedStreamNotifierProvider,
         onError: (failure, listIsEmpty, onRefresh) {
           log('failure occurred: $failure');
           return null;
