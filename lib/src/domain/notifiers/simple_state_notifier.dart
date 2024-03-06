@@ -9,7 +9,7 @@ import 'package:q_architecture/q_architecture.dart';
 abstract class SimpleStateNotifier<T> extends StateNotifier<T> {
   final Ref ref;
   Timer? _debounceTimer;
-  bool _isThrottling = false;
+  final Map<String, bool> _isThrottlingMap = {};
 
   SimpleStateNotifier(this.ref, T initialState) : super(initialState);
 
@@ -86,15 +86,16 @@ abstract class SimpleStateNotifier<T> extends StateNotifier<T> {
     Future<void> Function() function, {
     Duration duration = const Duration(milliseconds: 500),
     bool waitForFunction = true,
+    String throttleIdentifier = '',
   }) async {
-    if (_isThrottling) return;
-    _isThrottling = true;
+    if (_isThrottlingMap[throttleIdentifier] == true) return;
+    _isThrottlingMap[throttleIdentifier] = true;
     final functionCompleter = Completer();
     final throttleCompleter = Completer();
     var durationFinished = false;
     void completeThrottle() {
       if (mounted && !throttleCompleter.isCompleted) {
-        _isThrottling = false;
+        _isThrottlingMap[throttleIdentifier] = false;
         throttleCompleter.complete();
       }
     }
@@ -123,5 +124,6 @@ abstract class SimpleStateNotifier<T> extends StateNotifier<T> {
 
   ///Cancels if throttling is in progress
   @protected
-  void cancelThrottle() => _isThrottling = false;
+  void cancelThrottle({String throttleIdentifier = ''}) =>
+      _isThrottlingMap[throttleIdentifier] = false;
 }

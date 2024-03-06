@@ -10,7 +10,7 @@ class PaginatedListView<Entity, Param> extends ConsumerWidget {
   final Widget? Function(BuildContext context, Entity item, int index)
       itemBuilder;
   final AutoDisposeStateNotifierProvider<PaginatedStreamNotifier<Entity, Param>,
-      PaginatedState<Entity>>? autoDisposeStateNotifier;
+      PaginatedState<Entity>>? autoDisposeStateNotifierProvider;
   final StateNotifierProvider<PaginatedStreamNotifier<Entity, Param>,
       PaginatedState<Entity>>? stateNotifierProvider;
 
@@ -76,7 +76,7 @@ class PaginatedListView<Entity, Param> extends ConsumerWidget {
   const PaginatedListView({
     required this.itemBuilder,
     required this.emptyListBuilder,
-    this.autoDisposeStateNotifier,
+    this.autoDisposeStateNotifierProvider,
     this.stateNotifierProvider,
     this.refreshWidgetBuilder,
     this.scrollbarWidgetBuilder,
@@ -93,7 +93,8 @@ class PaginatedListView<Entity, Param> extends ConsumerWidget {
     this.scrollController,
     super.key,
   }) : assert(
-          autoDisposeStateNotifier != null || stateNotifierProvider != null,
+          autoDisposeStateNotifierProvider != null ||
+              stateNotifierProvider != null,
         );
 
   @override
@@ -177,7 +178,7 @@ class PaginatedListView<Entity, Param> extends ConsumerWidget {
   }
 
   ProviderListenable<PaginatedState<Entity>> get stateNotifier =>
-      autoDisposeStateNotifier ?? stateNotifierProvider!;
+      autoDisposeStateNotifierProvider ?? stateNotifierProvider!;
 
   // ignore: member-ordering
   bool _onScrollNotification(ScrollNotification scrollInfo, WidgetRef ref) {
@@ -190,8 +191,8 @@ class PaginatedListView<Entity, Param> extends ConsumerWidget {
 
   // ignore: member-ordering
   void _getNextPage(WidgetRef ref) {
-    if (autoDisposeStateNotifier != null) {
-      ref.read(autoDisposeStateNotifier!.notifier).getNextPage();
+    if (autoDisposeStateNotifierProvider != null) {
+      ref.read(autoDisposeStateNotifierProvider!.notifier).getNextPage();
     } else {
       ref.read(stateNotifierProvider!.notifier).getNextPage();
     }
@@ -199,8 +200,8 @@ class PaginatedListView<Entity, Param> extends ConsumerWidget {
 
   // ignore: member-ordering
   void _refresh(WidgetRef ref) {
-    if (autoDisposeStateNotifier != null) {
-      ref.read(autoDisposeStateNotifier!.notifier).refresh();
+    if (autoDisposeStateNotifierProvider != null) {
+      ref.read(autoDisposeStateNotifierProvider!.notifier).refresh();
     } else {
       ref.read(stateNotifierProvider!.notifier).refresh();
     }
