@@ -2,7 +2,7 @@
 
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:q_architecture/q_architecture.dart';
-import 'package:q_architecture/src/domain/notifiers/base_notifier.dart';
+import 'package:q_architecture/src/domain/mixins/base_notifier_mixin.dart';
 
 import 'base_state.dart';
 
@@ -12,7 +12,12 @@ typedef BaseStateNotifierProvider<Notifier extends StateNotifier<BaseState<T>>,
 
 abstract class BaseStateNotifier<DataState>
     extends SimpleStateNotifier<BaseState<DataState>>
-    with BaseNotifierController<DataState> {
+    with BaseNotifierMixin<DataState> {
   @override
-  BaseStateNotifier(Ref ref) : super(ref, const BaseState.initial());
+  BaseStateNotifier(Ref ref) : super(ref, const BaseState.initial()) {
+    initWithRefAndGetOrUpdateState(ref, ({newState}) {
+      if (newState != null) state = newState;
+      return state;
+    });
+  }
 }
