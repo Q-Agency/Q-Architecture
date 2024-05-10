@@ -245,7 +245,7 @@ abstract class TestRepository {
   ]);
 }
 
-class TestNotifier extends PaginatedNotifier<String, Object> {
+class TestNotifier extends PaginatedStateNotifier<String, Object> {
   final TestRepository _testRepository;
   TestNotifier(this._testRepository, Ref ref)
       : super(ref, const PaginatedState.loading());

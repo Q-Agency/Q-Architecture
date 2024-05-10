@@ -1,13 +1,14 @@
 # Q-Architecture
 
-A set of reusable classes that should speed up your development time and reduce unnecessary boilerplate code. Powered by [riverpod](https://github.com/rrousselGit/riverpod).
+A set of reusable classes that should speed up your development time and reduce
+unnecessary boilerplate code. Powered by
+[riverpod](https://github.com/rrousselGit/riverpod).
 
 ## Get started
 
 - Create your abstract repository and implement it
 
 ```dart
-
 final repositoryProvider = Provider<YourRepository>(
       (_) => YourRepositoryImplementation(),
 );
@@ -29,14 +30,19 @@ class YourRepositoryImplementation implements YourRepository {
 }
 ```
 
-- Create your StateNotifier which extends BaseNotifier and add method to call your
-  YourRepository.getYourString() method
+- Create your StateNotifier which extends BaseNotifier and add method to call
+  your YourRepository.getYourString() method
 
 ```dart
-class YourStateNotifier extends BaseStateNotifier<String> {
-  final YourRepository _yourRepository;
+class YourStateNotifier extends BaseNotifier<String> {
+  late YourRepository _yourRepository;
 
   YourStateNotifier(this._yourRepository, super.ref);
+
+  @override
+  void prepareForBuild() {
+    _yourRepository = ref.watch(repositoryProvider);
+  }
 
   Future getYourString() =>
       execute(
@@ -48,42 +54,42 @@ class YourStateNotifier extends BaseStateNotifier<String> {
 }
 ```
 
-- Create provider for YourStateNotifier using [BaseStateNotifierProvider](#basestatenotifierprovider).
+- Create provider for YourStateNotifier.
 
 ```dart
-
-final yourNotifierProvider = BaseStateNotifierProvider<YourStateNotifier, String>(
-      (ref) => YourStateNotifier(ref.watch(repositoryProvider), ref),
-); 
+final yourNotifierProvider = NotifierProvider<YourStateNotifier, BaseState<String>>(
+  () => YourStateNotifier()
+);
 ```
 
-- In your widget call your notifier getYourString() method through your provider and watch for the
-  changes
+- In your widget call your notifier getYourString() method through your provider
+  and watch for the changes
 
 ```
-    ref.read(yourNotifierProvider.notifier).getYourString();
-    final state = ref.watch(yourNotifierProvider);
-    switch (state) {
-      Data(data: final sentence) => sentence,
-      Loading() => 'Loading',
-      Initial() => 'Initial',
-      Error(failure: final failure) => failure.toString(),
-    },
+ref.read(yourNotifierProvider.notifier).getYourString();
+final state = ref.watch(yourNotifierProvider);
+switch (state) {
+  Data(data: final sentence) => sentence,
+  Loading() => 'Loading',
+  Initial() => 'Initial',
+  Error(failure: final failure) => failure.toString(),
+},
 ```
 
-That is all you need to get you started, to find out more, head over to the table of contents.
+That is all you need to get you started, to find out more, head over to the
+table of contents.
 
 ## Table of contents
 
-- [Example - BaseStateNotifier](#example---basestatenotifier)
-    - [ExampleStateNotifier](#examplestatenotifier)
-    - [ExamplePage](#examplepage)
-- [Example - SimpleStateNotifier](#example---simplestatenotifier)
-    - [ExampleSimpleStateNotifier](#examplesimplestatenotifier)
-    - [ExampleSimplePage](#examplesimplepage)
+- [Example - BaseNotifier](#example---basenotifier)
+  - [ExampleNotifier](#examplenotifier)
+  - [ExamplePage](#examplepage)
+- [Example - SimpleNotifier](#example---simplenotifier)
+  - [ExampleSimpleNotifier](#examplesimplenotifier)
+  - [ExampleSimplePage](#examplesimplepage)
 - [BaseState<State>](#basestatestate)
-- [SimpleStateNotifier](#simplestatenotifier)
-- [BaseStateNotifier](#basestatenotifier)
+- [SimpleNotifier](#simplenotifier)
+- [BaseNotifier](#basenotifier)
 - [PaginatedStreamNotifier and PaginatedNotifier](#paginatedstreamnotifier-and-paginatednotifier)
 - [Global loading](#global-loading)
 - [Global failure](#global-failure)
@@ -91,142 +97,141 @@ That is all you need to get you started, to find out more, head over to the tabl
 - [BaseWidget](#basewidget)
 - [ErrorToFailureMixin](#errortofailuremixin)
 
-## Example - BaseStateNotifier
+## Example - BaseNotifier
 
-BaseStateNotifier is a generic notifier which every notifier should extend to avoid writing 
-repetitive code and access global loading and failure handling.
+BaseNotifier is a generic notifier which every notifier should extend to avoid
+writing repetitive code and access global loading and failure handling.
 
-### ExampleStateNotifier
+### ExampleNotifier
 
- ```dart
-
-final exampleNotifierProvider = BaseStateNotifierProvider<ExampleStateNotifier, String>(
-      (ref) => ExampleStateNotifier(ref.watch(exampleRepositoryProvider), ref),
+```dart
+final exampleNotifierProvider = NotifierProvider<ExampleStateNotifier, BaseState<String>>(
+     () => ExampleNotifier(),
 );
 
-class ExampleStateNotifier extends BaseStateNotifier<String> {
-  final ExampleRepository _exampleRepository;
+class ExampleNotifier extends BaseNotifier<String> {
+ final ExampleRepository _exampleRepository;
 
-  ExampleStateNotifier(this._exampleRepository, super.ref);
+ @override
+ void prepareForBuild() {
+   _exampleRepository = ref.watch(exampleRepositoryProvider);
+ }
 
-  Future getSomeStringFullExample() =>
-      execute(
-        //Function that is called. Needs to have the same success return type as State
-        _exampleRepository.getSomeString(),
+ Future getSomeStringFullExample() =>
+     execute(
+       //Function that is called. Needs to have the same success return type as State
+       _exampleRepository.getSomeString(),
 
-        //Set to true if you want to handle error globally (ex. Show error dialog above the entire app)
-        globalFailure: true,
+       //Set to true if you want to handle error globally (ex. Show error dialog above the entire app)
+       globalFailure: true,
 
-        //Set to true if you want to show BaseLoadingIndicator above the entire app
-        globalLoading: false,
+       //Set to true if you want to show BaseLoadingIndicator above the entire app
+       globalLoading: false,
 
-        //Set to true if you want to update state to BaseState.loading()
-        withLoadingState: true,
+       //Set to true if you want to update state to BaseState.loading()
+       withLoadingState: true,
 
-        //Do some actions with data
-        //If you return true, base state will be updated to BaseState.data(data)
-        //If you return false, depending on withLoadingState, if true it will be 
-        //updated to BaseState.initial() otherwise won't be updated at all
-        onDataReceived: (data) {
-          // Custom handle data
-          return true;
-        },
+       //Do some actions with data
+       //If you return true, base state will be updated to BaseState.data(data)
+       //If you return false, depending on withLoadingState, if true it will be 
+       //updated to BaseState.initial() otherwise won't be updated at all
+       onDataReceived: (data) {
+         // Custom handle data
+         return true;
+       },
 
-        //Do some actions with failure
-        //If you return true, base state will be updated to BaseState.error(failure)
-        //If you return false, depending on withLoadingState, if true it will be 
-        //updated to BaseState.initial() otherwise won't be updated at all
-        onFailureOccurred: (failure) {
-          // Custom handle data
-          return true;
-        },
-      );
+       //Do some actions with failure
+       //If you return true, base state will be updated to BaseState.error(failure)
+       //If you return false, depending on withLoadingState, if true it will be 
+       //updated to BaseState.initial() otherwise won't be updated at all
+       onFailureOccurred: (failure) {
+         // Custom handle data
+         return true;
+       },
+     );
 
-  //Example of the API request with global loading indicator
-  Future getSomeStringGlobalLoading() =>
-      execute(
-        _exampleRepository.getSomeString(),
-        globalLoading: true,
-        withLoadingState: false,
-      );
+ //Example of the API request with global loading indicator
+ Future getSomeStringGlobalLoading() =>
+     execute(
+       _exampleRepository.getSomeString(),
+       globalLoading: true,
+       withLoadingState: false,
+     );
 }
-
 ```
 
 ### ExamplePage
 
- ```dart
-
+```dart
 class ExamplePage extends ConsumerWidget {
-  static const routeName = '/';
+ static const routeName = '/';
 
-  const ExamplePage({Key? key}) : super(key: key);
+ const ExamplePage({Key? key}) : super(key: key);
 
-  @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    final state = ref.watch(exampleNotifierProvider);
-    return Scaffold(
-      body: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Text(
-              switch (state) {
-                Data(data: final sentence) => sentence,
-                Loading() => 'Loading',
-                Initial() => 'Initial',
-                Error(failure: final failure) => failure.toString(),
-              },
-            ),
-            TextButton(
-              onPressed: ref
-                  .read(exampleNotifierProvider.notifier)
-                  .getSomeStringFullExample,
-              child: const Text('Get string'),
-            ),
-            TextButton(
-              onPressed: ref
-                  .read(exampleNotifierProvider.notifier)
-                  .getSomeStringGlobalLoading,
-              child: const Text('Global loading example'),
-            ),
-            //Navigation example
-            TextButton(
-              onPressed: () => ref.pushNamed(ExamplePage2.routeName),
-              child: const Text('Navigate'),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
+ @override
+ Widget build(BuildContext context, WidgetRef ref) {
+   final state = ref.watch(exampleNotifierProvider);
+   return Scaffold(
+     body: Center(
+       child: Column(
+         mainAxisAlignment: MainAxisAlignment.center,
+         children: [
+           Text(
+             switch (state) {
+               Data(data: final sentence) => sentence,
+               Loading() => 'Loading',
+               Initial() => 'Initial',
+               Error(failure: final failure) => failure.toString(),
+             },
+           ),
+           TextButton(
+             onPressed: ref
+                 .read(exampleNotifierProvider.notifier)
+                 .getSomeStringFullExample,
+             child: const Text('Get string'),
+           ),
+           TextButton(
+             onPressed: ref
+                 .read(exampleNotifierProvider.notifier)
+                 .getSomeStringGlobalLoading,
+             child: const Text('Global loading example'),
+           ),
+           //Navigation example
+           TextButton(
+             onPressed: () => ref.pushNamed(ExamplePage2.routeName),
+             child: const Text('Navigate'),
+           ),
+         ],
+       ),
+     ),
+   );
+ }
 }
-
 ```
 
-## Example - SimpleStateNotifier
+## Example - SimpleNotifier
 
-If BaseStateNotifier restrain you in some way and its BaseState does not cover your use case, but
-you want to use some benefits of BaseNotifier, then SimpleStateNotifier is here for you.
+If BaseNotifier restrain you in some way and its BaseState does not cover your
+use case, but you want to use some benefits of BaseNotifier, then SimpleNotifier
+is here for you.
 
-### ExampleSimpleStateNotifier
+### ExampleSimpleNotifier
 
 ```dart
-final exampleSimpleStateNotifierProvider = StateNotifierProvider.autoDispose<
-    ExampleSimpleStateNotifier, ExampleSimpleState>(
-  (ref) {
-    return ExampleSimpleStateNotifier(
-      ref.watch(exampleRepositoryProvider),
-      ref,
-    );
-  },
+final exampleSimpleNotifierProvider = NotifierProvider.autoDispose<
+    ExampleSimpleNotifier, ExampleSimpleState>(
+  () => ExampleSimpleNotifier(),
 );
 
-class ExampleSimpleStateNotifier
-    extends SimpleStateNotifier<ExampleSimpleState> {
+class ExampleSimpleNotifier
+    extends AutoDisposeSimpleNotifier<ExampleSimpleState> {
   final ExampleRepository _exampleRepository;
-  ExampleSimpleStateNotifier(this._exampleRepository, Ref ref)
-      : super(ref, const ExampleSimpleState.initial());
+
+  @override
+  ExampleSimpleState prepareForBuild() {
+    _exampleRepository = ref.watch(exampleRepositoryProvider);
+    return const ExampleSimpleState.initial();
+  }
 
   /// Example method when you want to get state updates when calling some repository method
   Future<void> getSomeStringSimpleExample() async {
@@ -277,12 +282,12 @@ import 'package:equatable/equatable.dart';
 import '../entities/failure.dart';
 
 sealed class ExampleSimpleState extends Equatable {
-  const BaseState();
+  const ExampleSimpleState();
 
-  const factory BaseState.empty() = Empty;
-  const factory BaseState.fetching() = Fetching;
-  const factory BaseState.error(Failure failure) = Error;
-  const factory BaseState.success(String data) = Success;
+  const factory ExampleSimpleState.empty() = Empty;
+  const factory ExampleSimpleState.fetching() = Fetching;
+  const factory ExampleSimpleState.error(Failure failure) = Error;
+  const factory ExampleSimpleState.success(String data) = Success;
 }
 
 final class Empty extends ExampleSimpleState {
@@ -328,7 +333,7 @@ class ExampleSimplePage extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final state = ref.watch(exampleSimpleStateNotifierProvider);
+    final state = ref.watch(exampleSimpleNotifierProvider);
     return Scaffold(
       body: Column(
         mainAxisAlignment: MainAxisAlignment.center,
@@ -347,17 +352,17 @@ class ExampleSimplePage extends ConsumerWidget {
           TextButton(
             onPressed: () {
               ref
-                  .read(exampleSimpleStateNotifierProvider.notifier)
+                  .read(exampleSimpleNotifierProvider.notifier)
                   .getSomeStringSimpleExample();
               ref
-                  .read(exampleSimpleStateNotifierProvider.notifier)
+                  .read(exampleSimpleNotifierProvider.notifier)
                   .getSomeStringSimpleExample();
             },
             child: const Text('Simple state example with debounce'),
           ),
           TextButton(
             onPressed: ref
-                .read(exampleSimpleStateNotifierProvider.notifier)
+                .read(exampleSimpleNotifierProvider.notifier)
                 .getSomeStringSimpleExampleGlobalLoading,
             child: const Text('Global loading example'),
           ),
@@ -389,10 +394,10 @@ BaseState has 4 primary states:
 
 4. **error(Failure)**
 
-**State** has to be the same type as the return value from the function that is called
+**State** has to be the same type as the return value from the function that is
+called
 
 ```dart
-
 sealed class BaseState<State> extends Equatable {
   const BaseState();
 
@@ -435,84 +440,91 @@ final class Data<State> extends BaseState<State> {
 }
 ```
 
-## SimpleStateNotifier
+## SimpleNotifier
 
-Abstract StateNotifier class which provides some convenient methods to be used by subclassing it. It
-can be used when BaseState doesn't suit you and you need more states, this notifier has **showGlobalLoading**, 
-**clearGlobalLoading**, **setGlobalFailure**, **on**, **debounce**, **throttle** and **cancelThrottle** methods 
-that are marked as **@protected** so you can easily use them in your subclasses.
+Abstract Notifier class which provides some convenient methods to be used by
+subclassing it. It can be used when BaseState doesn't suit you and you need more
+states, this notifier has **showGlobalLoading**, **clearGlobalLoading**,
+**setGlobalFailure**, **on**, **debounce**, **throttle** and **cancelThrottle**
+methods that are marked as **@protected** so you can easily use them in your
+subclasses.
 
-* **showGlobalLoading** & **clearGlobalLoading** for handling global loading
+- **showGlobalLoading** & **clearGlobalLoading** for handling global loading
 
-* **setGlobalFailure** for handling global failure (will automatically call **clearGlobalLoading**
-  before showing global failure)
+- **setGlobalFailure** for handling global failure (will automatically call
+  **clearGlobalLoading** before showing global failure)
 
-* **on** for subscribing to another notifier's state changes so you can react appropriately
+- **on** for subscribing to another notifier's state changes so you can react
+  appropriately
 
-* **debounce** for waiting multiple method calls before only one method call can be executed
+- **debounce** for waiting multiple method calls before only one method call can
+  be executed
 
-* **throttle** for executing only first method call for some duration when there are multiple method calls
+- **throttle** for executing only first method call for some duration when there
+  are multiple method calls
 
-* **cancelThrottle** for canceling throttling if in progress
+- **cancelThrottle** for canceling throttling if in progress
 
-## BaseStateNotifier
+## BaseNotifier
 
-Abstract StateNotifier class which extends SimpleStateNotifier, uses BaseState as 
-its state and provides some convenient methods to be used by subclassing it.
+Abstract Notifier class which extends SimpleNotifier, uses BaseState as its
+state and provides some convenient methods to be used by subclassing it.
 
 ### Execute method
 
-The main **BaseStateNotifier** method which supports different options for handling the data,
-failures and loading.
+The main **BaseNotifier** method which supports different options for handling
+the data, failures and loading.
 
 ```dart
-  @protected
-  Future execute(EitherFailureOr<DataState> function, {
-    PreHandleData<DataState>? onDataReceived,
-    PreHandleFailure? onFailureOccurred,
-    bool withLoadingState = true,
-    bool globalLoading = false,
-    bool globalFailure = true,
-  });
+@protected
+Future execute(EitherFailureOr<DataState> function, {
+  PreHandleData<DataState>? onDataReceived,
+  PreHandleFailure? onFailureOccurred,
+  bool withLoadingState = true,
+  bool globalLoading = false,
+  bool globalFailure = true,
+});
 ```
 
-* **function** parameter receives method to execute with return value EitherFailureOr<DataState>.
+- **function** parameter receives method to execute with return value
+  EitherFailureOr<DataState>.
 
-* **withLoadingState** bool parameter says while calling and waiting **function** to finish, loading
-  state should be set.
+- **withLoadingState** bool parameter says while calling and waiting
+  **function** to finish, loading state should be set.
 
-* **globalLoading** bool parameter says while calling and waiting **function**
+- **globalLoading** bool parameter says while calling and waiting **function**
   to finish, loading over the the whole app should be shown.
 
-* **globalFailure** bool parameter says if **function** returns Failure, should it be shown globally
-  over the whole app or not. &nbsp;
+- **globalFailure** bool parameter says if **function** returns Failure, should
+  it be shown globally over the whole app or not. &nbsp;
 
-To filter and control which data will update the state, **onDataReceived** callback can be passed.
-Alternatively, if callback always return false, custom data handling can be implemented. &nbsp;
+To filter and control which data will update the state, **onDataReceived**
+callback can be passed. Alternatively, if callback always return false, custom
+data handling can be implemented. &nbsp;
 
-To filter and control which failure will update the state or be shown globally, **
-onFailureOccurred**
-callback can be passed. Similar to **onDataReceived** if always returned false, custom failure
-handling can be implemented.
+To filter and control which failure will update the state or be shown globally,
+** onFailureOccurred** callback can be passed. Similar to **onDataReceived** if
+always returned false, custom failure handling can be implemented.
 
 ### Execute streamed method
 
-Similar to **BaseStateNotifier**'s **execute** method is the **executeStreamed** method which in the core 
-performs the same job as the execute method with a slight difference in that it requires a **function** 
-parameter's return type to be of type **Stream** which allows us to return multiple results from the repository
-and by doing so we can use this functionality to create an easy to use caching mechanism by yielding
-cached data + network data.
+Similar to **BaseNotifier**'s **execute** method is the **executeStreamed**
+method which in the core performs the same job as the execute method with a
+slight difference in that it requires a **function** parameter's return type to
+be of type **Stream** which allows us to return multiple results from the
+repository and by doing so we can use this functionality to create an easy to
+use caching mechanism by yielding cached data + network data.
 
 ```
-  @protected
-  Future<void> executeStreamed(
-    StreamFailureOr<DataState> function, {
-    PreHandleData<DataState>? onDataReceived,
-    PreHandleFailure? onFailureOccurred,
-    bool withLoadingState = true,
-    bool globalLoading = false,
-    bool globalFailure = true,
-  });
+@protected
+Future<void> executeStreamed(
+  StreamFailureOr<DataState> function, {
+  PreHandleData<DataState>? onDataReceived,
+  PreHandleFailure? onFailureOccurred,
+  bool withLoadingState = true,
+  bool globalLoading = false,
+  bool globalFailure = true,
+});
 ```
 
 #### Example usage
@@ -520,53 +532,50 @@ cached data + network data.
 In your state notifier:
 
 ```
-  class ExampleStateNotifier extends BaseStateNotifier<String> {
-  //...
-  Future getSomeStringsStreamed() => executeStreamed(
-        _exampleRepository.getSomeStringsStreamed(),
-  );
+class ExampleNotifier extends BaseNotifier<String> {
+//...
+Future getSomeStringsStreamed() => executeStreamed(
+      _exampleRepository.getSomeStringsStreamed(),
+);
 ```
 
 In repository:
 
 ```
-  @override
-  StreamFailureOr<String> getSomeStringsStreamed() async* {
-    yield const Right('Some sentence from cache');
-    //...
-    yield const Right('Some sentence from network');
-  }
-```
-
-### BaseStateNotifierProvider
-
-Simple convenience typedef for providing your BaseStateNotifiers:
-
-```dart
-typedef BaseStateNotifierProvider<Notifier extends StateNotifier<BaseState<T>>,T>
-    = StateNotifierProvider<Notifier, BaseState<T>>;
+@override
+StreamFailureOr<String> getSomeStringsStreamed() async* {
+  yield const Right('Some sentence from cache');
+  //...
+  yield const Right('Some sentence from network');
+}
 ```
 
 ## PaginatedStreamNotifier and PaginatedNotifier
-Abstract StateNotifier classes to be used when you need to work with some kind of list
-you fetch from local or remote data source.
+
+Abstract Notifier classes to be used when you need to work with some kind of
+list you fetch from local or remote data source.
 
 ### PaginatedStreamNotifier
-PaginatedStreamNotifier extends SimpleStateNotifier, uses PaginatedState and provides
-`PaginatedStreamFailureOr<Entity> getListStreamOrFailure(int page, [Param? parameter])` 
-to be overridden by the notifier subclassing it. This notifier works with streams so 
-`getListStreamOrFailure` method if necessary can return first list fetched from local 
-data source and then from remote data source when retrieved. 
+
+PaginatedStreamNotifier extends SimpleNotifier, uses PaginatedState and provides
+`PaginatedStreamFailureOr<Entity> getListStreamOrFailure(int page, [Param? parameter])`
+to be overridden by the notifier subclassing it. This notifier works with
+streams so `getListStreamOrFailure` method if necessary can return first list
+fetched from local data source and then from remote data source when retrieved.
 
 ### PaginatedNotifier
-PaginatedNotifier extends PaginatedStreamNotifier and simplifies it in a way that class
-that extends it needs to override 
+
+PaginatedNotifier extends PaginatedStreamNotifier and simplifies it in a way
+that class that extends it needs to override
 `PaginatedEitherFailureOr<Entity> getListOrFailure(int page, [Param? parameter])`
 which returns a Future instead of Stream.
 
 ### PaginatedList
-Methods that need to be overridden by extending PaginatedStreamNotifier or PaginatedNotifier
-return PaginatedList object with few convenient field for handling infinite lists.
+
+Methods that need to be overridden by extending PaginatedStreamNotifier or
+PaginatedNotifier return PaginatedList object with few convenient field for
+handling infinite lists.
+
 ```dart
 class PaginatedList<T> extends Equatable {
   final List<T> data;
@@ -585,12 +594,13 @@ class PaginatedList<T> extends Equatable {
 ```
 
 ### PaginatedState
-Consists of 4 states, initial loading(), loadingMore() with List<T> parameter to 
-be shown while fetching next batch of items, loaded() with List<T> parameter to 
-show all the list data fetched upon that moment and error with List<T> and 
-Failure parameters if some error occurs while fetching new batch of items, list 
-parameter serves if you still want to show on the screen all the list data fetched
-until that moment.
+
+Consists of 4 states, initial loading(), loadingMore() with List<T> parameter to
+be shown while fetching next batch of items, loaded() with List<T> parameter to
+show all the list data fetched upon that moment and error with List<T> and
+Failure parameters if some error occurs while fetching new batch of items, list
+parameter serves if you still want to show on the screen all the list data
+fetched until that moment.
 
 ```dart
 sealed class PaginatedState<T> extends Equatable {
@@ -643,23 +653,24 @@ final class Loaded<T> extends PaginatedState<T> {
 ```
 
 ### PaginatedListView
-PaginatedListView widget can be used to easily work with PaginatedStreamNotifier 
-or PaginatedNotifier and display the data served through one of those two notifiers.
+
+PaginatedListView widget can be used to easily work with PaginatedStreamNotifier
+or PaginatedNotifier and display the data served through one of those two
+notifiers.
 
 ## Global loading
 
-**globalLoadingProvider** can be used to show the loading indicator without updating
-**BaseStateNotifier** state.
+**globalLoadingProvider** can be used to show the loading indicator without
+updating **BaseNotifier** state.
 
 ```dart
-
 final globalLoadingProvider = StateProvider<bool>((_) => false);
 ```
 
 ### Loading example
 
-**BaseLoadingIndicator** can be shown by setting **globalLoading** inside of execute method to
-**true**
+**BaseLoadingIndicator** can be shown by setting **globalLoading** inside of
+execute method to **true**
 
 ```dart
 //...
@@ -687,11 +698,10 @@ Future getSomeString() =>
 
 ## Global failure
 
-**globalFailureProvider** can be used to show the failure that happened in the application without
-updating **BaseStateNotifier** state.
+**globalFailureProvider** can be used to show the failure that happened in the
+application without updating **BaseNotifier** state.
 
 ```dart
-
 final globalFailureProvider = StateProvider<Failure?>((_) => null);
 ```
 
@@ -712,10 +722,11 @@ void globalFailureListener() {
 
 ### Failure example
 
-**globalFailureProvider** listener will be triggered by setting **globalFailure** inside of execute
-method to **true** when failure happens. If set to false, instead of updating globalFailureProvider,
-**BaseStateNotifier** state will be set to error so the failure can be shown directly on the screen,
-not in the overlay as a toast or a dialog.
+**globalFailureProvider** listener will be triggered by setting
+**globalFailure** inside of execute method to **true** when failure happens. If
+set to false, instead of updating globalFailureProvider, **BaseNotifier** state
+will be set to error so the failure can be shown directly on the screen, not in
+the overlay as a toast or a dialog.
 
 ```dart
 //...
@@ -727,19 +738,20 @@ Future getSomeString() =>
 //...
 ```
 
-
 ## Global info
 
-**globalInfoProvider** can be used to show any info by passing the info status with GlobalInfoStatus. GlobalInfoStatus contains values: info, warning, error, success.
-Pass the required info status, and message of info that will be presented to the user. To set GlobalInfo from any notifier,
-just call setGlobalInfo() function defined in SimpleStateNotifier.
+**globalInfoProvider** can be used to show any info by passing the info status
+with GlobalInfoStatus. GlobalInfoStatus contains values: info, warning, error,
+success. Pass the required info status, and message of info that will be
+presented to the user. To set GlobalInfo from any notifier, just call
+setGlobalInfo() function defined in SimpleNotifier.
 
-Suggestion: setGlobalInfo() can be called from onDataReceived() callback inside execute() function if there is a need to show alert directly from notifier, right after request.
-For any other usage outside of notifier, set the value of **globalInfoProvider** directly.
-
+Suggestion: setGlobalInfo() can be called from onDataReceived() callback inside
+execute() function if there is a need to show alert directly from notifier,
+right after request. For any other usage outside of notifier, set the value of
+**globalInfoProvider** directly.
 
 ```dart
-
 final globalInfoProvider = StateProvider<GlobalInfo?>((_) => null);
 ```
 
@@ -763,16 +775,15 @@ void globalInfoListener() {
 
 You can wrap the each widget in **BaseWidget** which listens to:
 
-* **globalFailureProvider**
+- **globalFailureProvider**
 
-* **globalLoadingProvider**.
+- **globalLoadingProvider**.
 
-* **globalInfoProvider**
+- **globalInfoProvider**
 
 You are required to pass in the **onFailure** and **onGlobalInfo** handlers.
 
 ```dart
-
 class BaseWidget extends ConsumerWidget {
   final Widget child;
   final Widget? loadingIndicator;
@@ -808,7 +819,8 @@ class BaseWidget extends ConsumerWidget {
 }
 ```
 
-You can simply wrap each widget with your version of the BaseWidget in the builder of your MaterialApp:
+You can simply wrap each widget with your version of the BaseWidget in the
+builder of your MaterialApp:
 
 ```dart
 ProviderScope(
@@ -824,13 +836,16 @@ ProviderScope(
 
 ## ErrorToFailureMixin
 
-This mixin should reduce the needed boilerplate code for appropriate error handling in repositories.
+This mixin should reduce the needed boilerplate code for appropriate error
+handling in repositories.
 
-It executes the received function within a try-catch block. If an error occurrs, the function calls the errorResolver to handle the cought exception.
+It executes the received function within a try-catch block. If an error occurs,
+the function calls the errorResolver to handle the caught exception.
 
 ### ErrorResolver
 
-Simple abstract interface witha a single method for resolving a thrown error into an appropriate Failure.
+Simple abstract interface with a single method for resolving a thrown error into
+an appropriate Failure.
 
 ```dart
 abstract interface class ErrorResolver {
@@ -840,7 +855,8 @@ abstract interface class ErrorResolver {
 
 ### ApiErrorResolver
 
-An implementation of the ErrorResolver interface that handles DioException errors by using the passed statusCodeToFailure map.
+An implementation of the ErrorResolver interface that handles DioException
+errors by using the passed statusCodeToFailure map.
 
 ```dart
 final class ApiErrorResolver implements ErrorResolver {

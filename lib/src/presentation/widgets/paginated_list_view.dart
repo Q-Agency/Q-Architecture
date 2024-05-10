@@ -3,15 +3,26 @@ import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:q_architecture/paginated_notifier.dart';
 import 'package:q_architecture/q_architecture.dart';
+import 'package:q_architecture/src/domain/mixins/paginated_stream_notifier_mixin.dart';
 
 class PaginatedListView<Entity, Param> extends ConsumerWidget {
   /// required [itemBuilder] used for displaying each item in the scroll view,
   /// provides [context], [item] object and its [index] within the list of items
   final Widget? Function(BuildContext context, Entity item, int index)
       itemBuilder;
-  final AutoDisposeStateNotifierProvider<PaginatedStreamNotifier<Entity, Param>,
+  final AutoDisposeNotifierProvider<
+      AutoDisposePaginatedStreamNotifier<Entity, Param>,
+      PaginatedState<Entity>>? autoDisposeStreamNotifierProvider;
+  final NotifierProvider<PaginatedStreamNotifier<Entity, Param>,
+      PaginatedState<Entity>>? streamNotifierProvider;
+  final AutoDisposeNotifierProvider<AutoDisposePaginatedNotifier<Entity, Param>,
+      PaginatedState<Entity>>? autoDisposeNotifierProvider;
+  final NotifierProvider<PaginatedNotifier<Entity, Param>,
+      PaginatedState<Entity>>? notifierProvider;
+  final AutoDisposeStateNotifierProvider<
+      PaginatedStreamStateNotifier<Entity, Param>,
       PaginatedState<Entity>>? autoDisposeStateNotifierProvider;
-  final StateNotifierProvider<PaginatedStreamNotifier<Entity, Param>,
+  final StateNotifierProvider<PaginatedStreamStateNotifier<Entity, Param>,
       PaginatedState<Entity>>? stateNotifierProvider;
 
   /// optional builder to customize displaying the refresh functionality on
@@ -76,6 +87,10 @@ class PaginatedListView<Entity, Param> extends ConsumerWidget {
   const PaginatedListView({
     required this.itemBuilder,
     required this.emptyListBuilder,
+    this.autoDisposeStreamNotifierProvider,
+    this.streamNotifierProvider,
+    this.autoDisposeNotifierProvider,
+    this.notifierProvider,
     this.autoDisposeStateNotifierProvider,
     this.stateNotifierProvider,
     this.refreshWidgetBuilder,
@@ -92,14 +107,11 @@ class PaginatedListView<Entity, Param> extends ConsumerWidget {
     this.scrollPhysics,
     this.scrollController,
     super.key,
-  }) : assert(
-          autoDisposeStateNotifierProvider != null ||
-              stateNotifierProvider != null,
-        );
+  });
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final paginatedState = ref.watch(stateNotifier);
+    final paginatedState = ref.watch(commonNotifierProvider);
     Widget getRefreshWidget({required Widget child}) =>
         refreshWidgetBuilder?.call(
           () async => _refresh(ref),
@@ -177,8 +189,41 @@ class PaginatedListView<Entity, Param> extends ConsumerWidget {
     };
   }
 
-  ProviderListenable<PaginatedState<Entity>> get stateNotifier =>
-      autoDisposeStateNotifierProvider ?? stateNotifierProvider!;
+  ProviderListenable<PaginatedState<Entity>> get commonNotifierProvider {
+    assert(
+      [
+            autoDisposeStreamNotifierProvider,
+            streamNotifierProvider,
+            autoDisposeNotifierProvider,
+            notifierProvider,
+            autoDisposeStateNotifierProvider,
+            stateNotifierProvider,
+          ].where((param) => param != null).length ==
+          1,
+      'Only one provider should be provided at a time.',
+    );
+    return autoDisposeStreamNotifierProvider ??
+        streamNotifierProvider ??
+        autoDisposeNotifierProvider ??
+        notifierProvider ??
+        autoDisposeStateNotifierProvider ??
+        stateNotifierProvider!;
+  }
+
+  Refreshable<PaginatedStreamNotifierMixin> get commonNotifier {
+    if (autoDisposeStreamNotifierProvider != null) {
+      return autoDisposeStreamNotifierProvider!.notifier;
+    }
+    if (streamNotifierProvider != null) return streamNotifierProvider!.notifier;
+    if (autoDisposeNotifierProvider != null) {
+      return autoDisposeNotifierProvider!.notifier;
+    }
+    if (notifierProvider != null) return notifierProvider!.notifier;
+    if (autoDisposeStateNotifierProvider != null) {
+      return autoDisposeStateNotifierProvider!.notifier;
+    }
+    return stateNotifierProvider!.notifier;
+  }
 
   // ignore: member-ordering
   bool _onScrollNotification(ScrollNotification scrollInfo, WidgetRef ref) {
@@ -190,22 +235,10 @@ class PaginatedListView<Entity, Param> extends ConsumerWidget {
   }
 
   // ignore: member-ordering
-  void _getNextPage(WidgetRef ref) {
-    if (autoDisposeStateNotifierProvider != null) {
-      ref.read(autoDisposeStateNotifierProvider!.notifier).getNextPage();
-    } else {
-      ref.read(stateNotifierProvider!.notifier).getNextPage();
-    }
-  }
+  void _getNextPage(WidgetRef ref) => ref.read(commonNotifier).getNextPage();
 
   // ignore: member-ordering
-  void _refresh(WidgetRef ref) {
-    if (autoDisposeStateNotifierProvider != null) {
-      ref.read(autoDisposeStateNotifierProvider!.notifier).refresh();
-    } else {
-      ref.read(stateNotifierProvider!.notifier).refresh();
-    }
-  }
+  void _refresh(WidgetRef ref) => ref.read(commonNotifier).refresh();
 }
 
 enum PaginatedListViewType { infiniteScroll, loadMoreButton }

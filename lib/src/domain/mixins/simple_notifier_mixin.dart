@@ -6,15 +6,15 @@ import 'package:q_architecture/q_architecture.dart';
 
 mixin SimpleNotifierMixin {
   late final Ref _ref;
-  bool _refInitialized = false;
+  bool _initialized = false;
   Timer? _debounceTimer;
   final Map<String, bool> _isThrottlingMap = {};
 
   @protected
   void initWithRef(Ref ref) {
-    if (_refInitialized) return;
+    if (_initialized) return;
     _ref = ref;
-    _refInitialized = true;
+    _initialized = true;
     _ref.onDispose(() => _debounceTimer?.cancel());
   }
 

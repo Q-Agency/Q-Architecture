@@ -8,11 +8,11 @@ import '../../../data/repositories/example_repository.dart';
 import '../example_filters/example_filters_provider.dart';
 
 final exampleNotifierProvider =
-    NotifierProvider<ExampleStateNotifier, BaseState<String>>(
-  () => ExampleStateNotifier(),
+    NotifierProvider<ExampleNotifier, BaseState<String>>(
+  () => ExampleNotifier(),
 );
 
-class ExampleStateNotifier extends BaseNotifier<String> {
+class ExampleNotifier extends BaseNotifier<String> {
   late ExampleRepository _exampleRepository;
 
   @override

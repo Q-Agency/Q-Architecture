@@ -6,12 +6,12 @@ import 'package:q_architecture/q_architecture.dart';
 import '../../../data/repositories/example_repository.dart';
 import 'example_simple_state.dart';
 
-final exampleSimpleStateNotifierProvider = NotifierProvider.autoDispose<
-    ExampleSimpleStateNotifier, ExampleSimpleState>(
-  () => ExampleSimpleStateNotifier(),
+final exampleSimpleNotifierProvider =
+    NotifierProvider.autoDispose<ExampleSimpleNotifier, ExampleSimpleState>(
+  () => ExampleSimpleNotifier(),
 );
 
-class ExampleSimpleStateNotifier
+class ExampleSimpleNotifier
     extends AutoDisposeSimpleNotifier<ExampleSimpleState> {
   late ExampleRepository _exampleRepository;
 
@@ -27,9 +27,7 @@ class ExampleSimpleStateNotifier
     state = const ExampleSimpleState.fetching();
     final result = await _exampleRepository.getSomeString();
     result.fold(
-      (failure) {
-        state = ExampleSimpleState.error(failure);
-      },
+      (failure) => state = ExampleSimpleState.error(failure),
       (data) {
         if (data.isEmpty) {
           state = const ExampleSimpleState.empty();
@@ -46,9 +44,7 @@ class ExampleSimpleStateNotifier
     showGlobalLoading();
     final result = await _exampleRepository.getSomeString();
     result.fold(
-      (failure) {
-        setGlobalFailure(failure);
-      },
+      setGlobalFailure,
       (data) {
         clearGlobalLoading();
         if (data.isEmpty) {

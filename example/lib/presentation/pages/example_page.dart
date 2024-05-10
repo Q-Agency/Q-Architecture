@@ -8,7 +8,7 @@ import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:q_architecture/base_state_notifier.dart';
 
 import '../../domain/notifiers/example_filters/example_filters_provider.dart';
-import '../../domain/notifiers/example_notifier/example_state_notifier.dart';
+import '../../domain/notifiers/example_notifier/example_notifier.dart';
 import 'pagination_example_page.dart';
 import 'pagination_stream_example_page.dart';
 
