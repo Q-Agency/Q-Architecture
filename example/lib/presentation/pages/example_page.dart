@@ -83,27 +83,3 @@ class ExamplePage extends ConsumerWidget {
     );
   }
 }
-
-class ExamplePage3 extends ConsumerWidget {
-  static const routeName = '${ExampleSimplePage.routeName}/page3';
-
-  const ExamplePage3({super.key});
-
-  @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    return Scaffold(
-      body: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: [
-          ElevatedButton(
-            onPressed: () {
-              Navigator.of(context).pop();
-            },
-            child: const Text('Go back!'),
-          ),
-        ],
-      ),
-    );
-  }
-}

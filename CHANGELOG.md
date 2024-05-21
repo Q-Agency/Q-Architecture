@@ -1,3 +1,17 @@
+## 1.0.0
+
+- Added SimpleNotifier and BaseNotifier classes (SimpleNotifier,
+  AutoDisposeSimpleNotifier, FamilySimpleNotifier and
+  AutoDisposeFamilySimpleNotifier and similar for BaseNotifier) which extend
+  Notifier, updated all the examples to use new Notifier classes instead of
+  StateNotifier which will be kept only for legacy purpose
+- BREAKING CHANGE: Renamed PaginatedNotifier and PaginatedStreamNotifier to
+  PaginatedStateNotifier and PaginatedStreamStateNotifier and created new
+  PaginatedNotifier and PaginatedStreamNotifier which are based on Notifier
+- updated examples to work with new Notifier subclasses
+- added FormWithOptionMapper for cases when additional data is needed when
+  mapping form data
+
 ## 0.1.9
 
 Renamed PaginatedListView parameter from autoDisposeStateNotifier to

@@ -1,6 +1,5 @@
 import 'package:example/domain/notifiers/example_simple_notifier/example_simple_notifier.dart';
 import 'package:example/domain/notifiers/example_simple_notifier/example_simple_state.dart';
-import 'package:example/presentation/pages/example_page.dart';
 import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
@@ -47,11 +46,6 @@ class ExampleSimplePage extends ConsumerWidget {
           ElevatedButton(
             onPressed: Navigator.of(context).pop,
             child: const Text('Go back!'),
-          ),
-          TextButton(
-            onPressed: () =>
-                Navigator.of(context).pushNamed(ExamplePage3.routeName),
-            child: const Text('Navigate'),
           ),
         ],
       ),
