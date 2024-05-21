@@ -5,7 +5,7 @@ import 'dart:math';
 import 'package:example/presentation/pages/example_simple_page.dart';
 import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
-import 'package:q_architecture/base_state_notifier.dart';
+import 'package:q_architecture/base_notifier.dart';
 
 import '../../domain/notifiers/example_filters/example_filters_provider.dart';
 import '../../domain/notifiers/example_notifier/example_notifier.dart';

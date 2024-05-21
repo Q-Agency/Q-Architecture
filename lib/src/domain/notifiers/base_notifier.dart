@@ -1,6 +1,6 @@
 import 'package:flutter/foundation.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
-import 'package:q_architecture/base_state_notifier.dart';
+import 'package:q_architecture/base_notifier.dart';
 import 'package:q_architecture/src/domain/mixins/base_notifier_mixin.dart';
 import 'package:q_architecture/src/domain/mixins/simple_notifier_mixin.dart';
 

@@ -13,8 +13,8 @@ mixin SimpleNotifierMixin {
   @protected
   void initWithRef(Ref ref) {
     if (_initialized) return;
-    _ref = ref;
     _initialized = true;
+    _ref = ref;
     _ref.onDispose(() => _debounceTimer?.cancel());
   }
 
@@ -66,9 +66,7 @@ mixin SimpleNotifierMixin {
   Future<void> debounce({
     Duration duration = const Duration(milliseconds: 500),
   }) async {
-    if (_debounceTimer?.isActive == true) {
-      _debounceTimer?.cancel();
-    }
+    if (_debounceTimer?.isActive == true) _debounceTimer?.cancel();
     final debounceCompleter = Completer();
     _debounceTimer = Timer(
       duration,

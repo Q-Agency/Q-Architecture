@@ -2,7 +2,7 @@
 import 'package:either_dart/either.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
-import 'package:q_architecture/base_state_notifier.dart';
+import 'package:q_architecture/base_notifier.dart';
 import 'package:q_architecture/q_architecture.dart';
 
 void main() {

@@ -7,7 +7,9 @@
   StateNotifier which will be kept only for legacy purpose
 - BREAKING CHANGE: Renamed PaginatedNotifier and PaginatedStreamNotifier to
   PaginatedStateNotifier and PaginatedStreamStateNotifier and created new
-  PaginatedNotifier and PaginatedStreamNotifier which are based on Notifier
+  PaginatedNotifier and PaginatedStreamNotifier which are based on Notifier,
+  renamed base_state_notifier to base_notifier for importing BaseNotifier and
+  BaseStateNotifier classes
 - updated examples to work with new Notifier subclasses
 - added FormWithOptionMapper for cases when additional data is needed when
   mapping form data

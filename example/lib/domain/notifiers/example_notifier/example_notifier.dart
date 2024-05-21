@@ -1,7 +1,7 @@
 // ignore_for_file: always_use_package_imports
 
 import 'package:hooks_riverpod/hooks_riverpod.dart';
-import 'package:q_architecture/base_state_notifier.dart';
+import 'package:q_architecture/base_notifier.dart';
 import 'package:q_architecture/q_architecture.dart';
 
 import '../../../data/repositories/example_repository.dart';
