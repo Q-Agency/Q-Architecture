@@ -30,14 +30,14 @@ class YourRepositoryImplementation implements YourRepository {
 }
 ```
 
-- Create your StateNotifier which extends BaseNotifier and add method to call
-  your YourRepository.getYourString() method
+- Create your Notifier which extends BaseNotifier and add method to call your
+  YourRepository.getYourString() method
 
 ```dart
-class YourStateNotifier extends BaseNotifier<String> {
+class YourNotifier extends BaseNotifier<String> {
   late YourRepository _yourRepository;
 
-  YourStateNotifier(this._yourRepository, super.ref);
+  YourNotifier(this._yourRepository, super.ref);
 
   @override
   void prepareForBuild() {
@@ -54,11 +54,11 @@ class YourStateNotifier extends BaseNotifier<String> {
 }
 ```
 
-- Create provider for YourStateNotifier.
+- Create provider for YourNotifier.
 
 ```dart
-final yourNotifierProvider = NotifierProvider<YourStateNotifier, BaseState<String>>(
-  () => YourStateNotifier()
+final yourNotifierProvider = NotifierProvider<YourNotifier, BaseState<String>>(
+  () => YourNotifier()
 );
 ```
 
@@ -110,7 +110,7 @@ final exampleNotifierProvider = NotifierProvider<ExampleStateNotifier, BaseState
 );
 
 class ExampleNotifier extends BaseNotifier<String> {
- final ExampleRepository _exampleRepository;
+ late ExampleRepository _exampleRepository;
 
  @override
  void prepareForBuild() {
