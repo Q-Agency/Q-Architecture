@@ -229,7 +229,7 @@ class PaginatedListView<Entity, Param> extends ConsumerWidget {
   bool _onScrollNotification(ScrollNotification scrollInfo, WidgetRef ref) {
     if (paginatedListViewType == PaginatedListViewType.infiniteScroll &&
         scrollInfo.shouldLoadMore) {
-      _getNextPage(ref);
+      WidgetsBinding.instance.addPostFrameCallback((_) => _getNextPage(ref));
     }
     return scrollInfo.depth == 0;
   }
