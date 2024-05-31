@@ -2,7 +2,7 @@
 
 A set of reusable classes that should speed up your development time and reduce
 unnecessary boilerplate code. Powered by
-[riverpod](https://github.com/rrousselGit/riverpod).
+[riverpod](https://pub.dev/packages/riverpod).
 
 ## Get started
 
