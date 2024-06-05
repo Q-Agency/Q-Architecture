@@ -1,20 +1,23 @@
 // ignore_for_file: always_use_package_imports
 
-import 'package:q_architecture/base_state_notifier.dart';
+import 'package:hooks_riverpod/hooks_riverpod.dart';
+import 'package:q_architecture/base_notifier.dart';
 import 'package:q_architecture/q_architecture.dart';
 
 import '../../../data/repositories/example_repository.dart';
 import '../example_filters/example_filters_provider.dart';
 
 final exampleNotifierProvider =
-    BaseStateNotifierProvider<ExampleStateNotifier, String>(
-  (ref) => ExampleStateNotifier(ref.watch(exampleRepositoryProvider), ref),
+    NotifierProvider<ExampleNotifier, BaseState<String>>(
+  () => ExampleNotifier(),
 );
 
-class ExampleStateNotifier extends BaseStateNotifier<String> {
-  final ExampleRepository _exampleRepository;
+class ExampleNotifier extends BaseNotifier<String> {
+  late ExampleRepository _exampleRepository;
 
-  ExampleStateNotifier(this._exampleRepository, super.ref) {
+  @override
+  void prepareForBuild() {
+    _exampleRepository = ref.watch(exampleRepositoryProvider);
     on(
       exampleFiltersProvider,
       (previous, next) => getSomeStringsStreamed(),

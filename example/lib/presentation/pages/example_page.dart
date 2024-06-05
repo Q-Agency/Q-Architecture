@@ -5,10 +5,10 @@ import 'dart:math';
 import 'package:example/presentation/pages/example_simple_page.dart';
 import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
-import 'package:q_architecture/base_state_notifier.dart';
+import 'package:q_architecture/base_notifier.dart';
 
 import '../../domain/notifiers/example_filters/example_filters_provider.dart';
-import '../../domain/notifiers/example_notifier/example_state_notifier.dart';
+import '../../domain/notifiers/example_notifier/example_notifier.dart';
 import 'pagination_example_page.dart';
 import 'pagination_stream_example_page.dart';
 
@@ -79,30 +79,6 @@ class ExamplePage extends ConsumerWidget {
             ),
           ],
         ),
-      ),
-    );
-  }
-}
-
-class ExamplePage3 extends ConsumerWidget {
-  static const routeName = '${ExampleSimplePage.routeName}/page3';
-
-  const ExamplePage3({super.key});
-
-  @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    return Scaffold(
-      body: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: [
-          ElevatedButton(
-            onPressed: () {
-              Navigator.of(context).pop();
-            },
-            child: const Text('Go back!'),
-          ),
-        ],
       ),
     );
   }

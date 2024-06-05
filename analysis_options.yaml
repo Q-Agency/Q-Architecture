@@ -65,6 +65,7 @@ analyzer:
     avoid_void_async: error
     prefer_void_to_null: error
     use_key_in_widget_constructors: error
+    invalid_override_of_non_virtual_member: error
 
   exclude:
     - "**/*.g.dart"

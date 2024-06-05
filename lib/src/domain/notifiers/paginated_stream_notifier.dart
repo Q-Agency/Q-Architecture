@@ -1,101 +1,53 @@
-import 'dart:async';
+// ignore_for_file: always_use_package_imports
 
-import 'package:either_dart/either.dart';
 import 'package:flutter/foundation.dart';
-import 'package:q_architecture/paginated_notifier.dart';
-import 'package:q_architecture/q_architecture.dart';
-
-typedef PaginatedStreamFailureOr<Entity>
-    = Stream<Either<Failure, PaginatedList<Entity>>>;
+import 'package:hooks_riverpod/hooks_riverpod.dart';
+import 'package:q_architecture/src/domain/mixins/paginated_stream_notifier_mixin.dart';
+import 'package:q_architecture/src/domain/mixins/simple_notifier_mixin.dart';
+import 'package:q_architecture/src/domain/notifiers/paginated_state.dart';
 
 abstract class PaginatedStreamNotifier<Entity, Param>
-    extends SimpleStateNotifier<PaginatedState<Entity>> {
-  final bool useGlobalFailure;
+    extends Notifier<PaginatedState<Entity>>
+    with SimpleNotifierMixin, PaginatedStreamNotifierMixin<Entity, Param> {
+  ({PaginatedState<Entity> initialState, bool useGlobalFailure})
+      prepareForBuild();
 
-  PaginatedList<Entity>? _lastPaginatedList;
-  Param? _parameter;
-  StreamSubscription? _listStreamSubscription;
-
-  PaginatedStreamNotifier(
-    super.ref,
-    super.initialState, {
-    this.useGlobalFailure = false,
-  });
-
+  /// do not override in child classes, use prepareForBuild instead
+  @nonVirtual
   @override
-  void dispose() {
-    _listStreamSubscription?.cancel();
-    super.dispose();
-  }
-
-  Future<void> getInitialList([Param? param]) async {
-    _parameter = param;
-    _resetPagination();
-    await _getListOn(
-      page: 1,
-      currentList: [],
-      parameter: _parameter,
+  PaginatedState<Entity> build() {
+    final data = prepareForBuild();
+    initWithRefUseGlobalFailureAndGetOrUpdateState(
+      ref,
+      data.useGlobalFailure,
+      ({newState}) {
+        if (newState != null) state = newState;
+        return state;
+      },
     );
+    return data.initialState;
   }
+}
 
-  Future<void> getNextPage() async {
-    if (_lastPaginatedList?.isLast ?? false) return;
-    if (state is PaginatedLoadingMore) return;
-    final currentList = switch (state) {
-      PaginatedLoaded<Entity>(list: final list) => list,
-      PaginatedError<Entity>(list: final list) => list,
-      _ => <Entity>[],
-    };
+abstract class AutoDisposePaginatedStreamNotifier<Entity, Param>
+    extends AutoDisposeNotifier<PaginatedState<Entity>>
+    with SimpleNotifierMixin, PaginatedStreamNotifierMixin<Entity, Param> {
+  ({PaginatedState<Entity> initialState, bool useGlobalFailure})
+      prepareForBuild();
 
-    state = PaginatedState.loadingMore(currentList);
-    final nextPage = (_lastPaginatedList?.page ?? 0) + 1;
-    await _getListOn(
-      page: nextPage,
-      parameter: _parameter,
-      currentList: currentList,
+  /// do not override in child classes, use prepareForBuild instead
+  @nonVirtual
+  @override
+  PaginatedState<Entity> build() {
+    final data = prepareForBuild();
+    initWithRefUseGlobalFailureAndGetOrUpdateState(
+      ref,
+      data.useGlobalFailure,
+      ({newState}) {
+        if (newState != null) state = newState;
+        return state;
+      },
     );
-  }
-
-  Future<void> refresh() => getInitialList(_parameter);
-
-  @protected
-  PaginatedStreamFailureOr<Entity> getListStreamOrFailure(
-    int page, [
-    Param? parameter,
-  ]);
-
-  Future<void> _getListOn({
-    required int page,
-    required List<Entity> currentList,
-    Param? parameter,
-  }) async {
-    var updatedList = currentList;
-    _listStreamSubscription?.cancel();
-    _listStreamSubscription =
-        getListStreamOrFailure(page, parameter).listen((result) {
-      result.fold(
-        (failure) {
-          if (useGlobalFailure) {
-            ref.read(globalFailureProvider.notifier).update((_) => failure);
-          }
-          state = PaginatedState.error(updatedList, failure);
-        },
-        (paginatedList) {
-          _lastPaginatedList = paginatedList;
-          updatedList = currentList + paginatedList.data;
-          state = PaginatedState.loaded(
-            updatedList,
-            isLastPage: paginatedList.isLast,
-          );
-        },
-      );
-    });
-    return _listStreamSubscription?.asFuture();
-  }
-
-  void _resetPagination() {
-    state = const PaginatedState.loading();
-    _lastPaginatedList = null;
-    _listStreamSubscription?.cancel();
+    return data.initialState;
   }
 }

@@ -1,6 +1,5 @@
+import 'package:example/domain/notifiers/example_simple_notifier/example_simple_notifier.dart';
 import 'package:example/domain/notifiers/example_simple_notifier/example_simple_state.dart';
-import 'package:example/domain/notifiers/example_simple_notifier/example_simple_state_notifier.dart';
-import 'package:example/presentation/pages/example_page.dart';
 import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
@@ -11,7 +10,7 @@ class ExampleSimplePage extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final state = ref.watch(exampleSimpleStateNotifierProvider);
+    final state = ref.watch(exampleSimpleNotifierProvider);
     return Scaffold(
       body: Column(
         mainAxisAlignment: MainAxisAlignment.center,
@@ -30,28 +29,23 @@ class ExampleSimplePage extends ConsumerWidget {
           TextButton(
             onPressed: () {
               ref
-                  .read(exampleSimpleStateNotifierProvider.notifier)
+                  .read(exampleSimpleNotifierProvider.notifier)
                   .getSomeStringSimpleExample();
               ref
-                  .read(exampleSimpleStateNotifierProvider.notifier)
+                  .read(exampleSimpleNotifierProvider.notifier)
                   .getSomeStringSimpleExample();
             },
             child: const Text('Simple state example with debounce'),
           ),
           TextButton(
             onPressed: ref
-                .read(exampleSimpleStateNotifierProvider.notifier)
+                .read(exampleSimpleNotifierProvider.notifier)
                 .getSomeStringSimpleExampleGlobalLoading,
             child: const Text('Global loading example'),
           ),
           ElevatedButton(
             onPressed: Navigator.of(context).pop,
             child: const Text('Go back!'),
-          ),
-          TextButton(
-            onPressed: () =>
-                Navigator.of(context).pushNamed(ExamplePage3.routeName),
-            child: const Text('Navigate'),
           ),
         ],
       ),

@@ -11,6 +11,7 @@ export 'src/domain/entities/enums/global_info_status.dart';
 export 'src/domain/entities/failure.dart';
 export 'src/domain/entities/global_info.dart';
 export 'src/domain/entities/paginated_list.dart';
+export 'src/domain/notifiers/simple_notifier.dart';
 export 'src/domain/notifiers/simple_state_notifier.dart';
 export 'src/domain/providers/global_failure_provider.dart';
 export 'src/domain/providers/global_info_provider.dart';
