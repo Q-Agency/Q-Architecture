@@ -11,6 +11,7 @@ typedef PreHandleFailure = bool Function(Failure failure);
 mixin BaseNotifierMixin<DataState> on SimpleNotifierMixin {
   late final BaseState<DataState> Function({BaseState<DataState>? newState})
       _getOrUpdateState;
+  bool _initialized = false;
 
   @protected
   void initWithRefAndGetOrUpdateState(
@@ -18,6 +19,8 @@ mixin BaseNotifierMixin<DataState> on SimpleNotifierMixin {
     BaseState<DataState> Function({BaseState<DataState>? newState})
         getOrUpdateState,
   ) {
+    if (_initialized) return;
+    _initialized = true;
     super.initWithRef(ref);
     _getOrUpdateState = getOrUpdateState;
   }

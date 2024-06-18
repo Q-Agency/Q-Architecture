@@ -1,3 +1,7 @@
+## 1.0.1
+
+Fix in BaseNotifierMixin initWithRefAndGetOrUpdateState method
+
 ## 1.0.0
 
 - Added SimpleNotifier and BaseNotifier classes (SimpleNotifier,
