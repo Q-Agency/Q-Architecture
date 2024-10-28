@@ -17,7 +17,7 @@ class ExamplePaginatedStreamNotifier
   @override
   ({PaginatedState<String> initialState, bool useGlobalFailure})
       prepareForBuild() {
-    _repository = ref.read(exampleRepositoryProvider);
+    _repository = ref.watch(exampleRepositoryProvider);
     getInitialList();
     return (
       initialState: const PaginatedState.loading(),

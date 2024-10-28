@@ -369,7 +369,7 @@ class TestNotifier extends PaginatedStreamNotifier<String, Object> {
   @override
   ({PaginatedState<String> initialState, bool useGlobalFailure})
       prepareForBuild() {
-    _testRepository = ref.read(testRepositoryProvider);
+    _testRepository = ref.watch(testRepositoryProvider);
     return (initialState: const PaginatedLoading(), useGlobalFailure: false);
   }
 

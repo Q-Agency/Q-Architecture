@@ -8,4 +8,5 @@ import '../entities/failure.dart';
 ///
 ///The entire app is wrapped in [BaseWidget] which listens to this provider and failure can be shown above entire
 ///app by simply setting [globalFailure] to true when calling [BaseStateNotifier.execute] method.
-final globalFailureProvider = StateProvider<Failure?>((_) => null);
+final globalFailureProvider =
+    StateProvider<Failure?>((_) => null, name: 'globalFailureProvider');

@@ -11,20 +11,17 @@ sealed class BaseState<State> extends Equatable {
   const factory BaseState.loading() = BaseLoading;
   const factory BaseState.error(Failure failure) = BaseError;
   const factory BaseState.data(State data) = BaseData;
+
+  @override
+  List<Object?> get props => [];
 }
 
 final class BaseInitial<State> extends BaseState<State> {
   const BaseInitial();
-
-  @override
-  List<Object?> get props => [];
 }
 
 final class BaseLoading<State> extends BaseState<State> {
   const BaseLoading();
-
-  @override
-  List<Object?> get props => [];
 }
 
 final class BaseError<State> extends BaseState<State> {
