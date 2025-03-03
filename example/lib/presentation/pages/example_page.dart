@@ -32,7 +32,7 @@ class ExamplePage extends ConsumerWidget {
                 BaseData(data: final sentence) => sentence,
                 BaseLoading() => 'Loading',
                 BaseInitial() => 'Initial',
-                BaseError(failure: final failure) => failure.toString(),
+                BaseError(:final failure) => failure.toString(),
               },
             ),
             TextButton(

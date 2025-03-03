@@ -22,7 +22,7 @@ class ExampleSimplePage extends ConsumerWidget {
               Empty() => 'Empty',
               Fetching() => 'Fetching',
               Success(sentence: final string) => string,
-              Error(failure: final failure) => failure.title,
+              Error(:final failure) => failure.title,
             },
             textAlign: TextAlign.center,
           ),

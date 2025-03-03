@@ -1,18 +1,10 @@
 import 'package:q_architecture/q_architecture.dart';
 
-const exampleApiErrorResolver = ApiErrorResolver(
-  statusCodeToFailure: {
-    404: UnauthorizedFailure(),
-  },
-);
-
 class CustomErrorResolver implements ErrorResolver {
   @override
   Failure resolve<T>(Object error, [StackTrace? stackTrace]) {
-    return Failure.generic();
+    final message = error is String ? error : error.toString();
+    return Failure.generic(
+        title: message, error: error, stackTrace: stackTrace);
   }
-}
-
-class UnauthorizedFailure extends Failure {
-  const UnauthorizedFailure() : super(title: 'Unauthorized user');
 }

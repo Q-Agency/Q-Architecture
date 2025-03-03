@@ -9,7 +9,7 @@ class ExampleUserResponse {
   final DateTime birthday;
   final String gender;
 
-  ExampleUserResponse(
+  const ExampleUserResponse(
     this.firstName,
     this.lastName,
     this.birthday,

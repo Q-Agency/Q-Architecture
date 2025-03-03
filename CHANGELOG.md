@@ -1,3 +1,7 @@
+## 1.0.2
+
+Updated pubspec.yaml dependencies
+
 ## 1.0.1
 
 Fix in BaseNotifierMixin initWithRefAndGetOrUpdateState method

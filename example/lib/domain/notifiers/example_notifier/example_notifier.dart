@@ -62,11 +62,13 @@ class ExampleNotifier extends BaseNotifier<String> {
         globalLoading: true,
         withLoadingState: false,
         onDataReceived: (_) {
-          setGlobalInfo(const GlobalInfo(
-            globalInfoStatus: GlobalInfoStatus.info,
-            title: 'test title of global info',
-            message: 'test message of global info',
-          ));
+          setGlobalInfo(
+            const GlobalInfo(
+              globalInfoStatus: GlobalInfoStatus.info,
+              title: 'test title of global info',
+              message: 'test message of global info',
+            ),
+          );
           return true;
         },
       );

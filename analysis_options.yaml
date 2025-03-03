@@ -44,6 +44,7 @@ linter:
     - constant_identifier_names
     - require_trailing_commas
     - file_names
+    - unnecessary_breaks
 
 analyzer:
   errors:
@@ -54,7 +55,6 @@ analyzer:
     sized_box_for_whitespace: error
     avoid_unnecessary_containers: error
     dead_code: error
-    unused_import: error
     duplicate_import: error
     avoid_print: error
     parameter_assignments: error

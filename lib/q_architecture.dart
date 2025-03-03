@@ -1,6 +1,3 @@
-library q_architecture;
-
-export 'src/data/api_error_resolver.dart';
 export 'src/data/mappers/entity_mapper.dart';
 export 'src/data/mappers/form_mapper.dart';
 export 'src/data/mappers/mappers.dart';

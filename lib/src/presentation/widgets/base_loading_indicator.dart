@@ -8,7 +8,7 @@ class BaseLoadingIndicator extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      color: Colors.black.withOpacity(0.5),
+      color: Colors.black.withValues(alpha: 0.5),
       height: double.infinity,
       width: double.infinity,
       child: Column(

@@ -50,7 +50,7 @@ class ExampleRepositoryImp
           final user = _userMapper(userResponse);
           return Right(user);
         },
-        errorResolver: exampleApiErrorResolver,
+        errorResolver: CustomErrorResolver(),
       );
 
   @override

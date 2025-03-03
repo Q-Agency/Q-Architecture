@@ -47,7 +47,7 @@ mixin SimpleNotifierMixin {
   ///Subscribe to another notifier's state changes
   @protected
   void on<U>(
-    AlwaysAliveProviderListenable<U> provider,
+    ProviderListenable<U> provider,
     void Function(U? previous, U next) invokeFunction, {
     bool Function(U? previous, U next)? skipUpdateCondition,
   }) =>
