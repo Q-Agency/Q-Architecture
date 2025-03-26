@@ -1,7 +1,9 @@
 ## 1.0.3
 
-Added Family notifiers for PaginatedNotifier and PaginatedStreamNotifier,
-updated PaginatedListView to work with paginated family notifiers
+- Added Family notifiers for PaginatedNotifier and PaginatedStreamNotifier,
+  updated PaginatedListView to work with paginated family notifiers
+- Marked BaseStateNotifier, SimpleStateNotifier, PaginatedStateNotifier and
+  PaginatedStreamStateNotifier as deprecated
 
 ## 1.0.2
 
