@@ -7,6 +7,7 @@ import 'package:q_architecture/src/domain/mixins/paginated_stream_notifier_mixin
 typedef PaginatedStreamFailureOr<Entity>
     = Stream<Either<Failure, PaginatedList<Entity>>>;
 
+@Deprecated('Use PaginatedStreamNotifier instead')
 abstract class PaginatedStreamStateNotifier<Entity, Param>
     extends SimpleStateNotifier<PaginatedState<Entity>>
     with PaginatedStreamNotifierMixin<Entity, Param> {

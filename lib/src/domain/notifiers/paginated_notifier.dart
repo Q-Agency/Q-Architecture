@@ -58,3 +58,51 @@ abstract class AutoDisposePaginatedNotifier<Entity, Param>
     return data.initialState;
   }
 }
+
+abstract class FamilyPaginatedNotifier<Entity, Param, Arg>
+    extends FamilyNotifier<PaginatedState<Entity>, Arg>
+    with
+        SimpleNotifierMixin,
+        PaginatedStreamNotifierMixin<Entity, Param>,
+        PaginatedNotifierMixin<Entity, Param> {
+  ({PaginatedState<Entity> initialState, bool useGlobalFailure})
+      prepareForBuild(Arg arg);
+
+  @override
+  PaginatedState<Entity> build(Arg arg) {
+    final data = prepareForBuild(arg);
+    initWithRefUseGlobalFailureAndGetOrUpdateState(
+      ref,
+      data.useGlobalFailure,
+      ({newState}) {
+        if (newState != null) state = newState;
+        return state;
+      },
+    );
+    return data.initialState;
+  }
+}
+
+abstract class AutoDisposeFamilyPaginatedNotifier<Entity, Param, Arg>
+    extends AutoDisposeFamilyNotifier<PaginatedState<Entity>, Arg>
+    with
+        SimpleNotifierMixin,
+        PaginatedStreamNotifierMixin<Entity, Param>,
+        PaginatedNotifierMixin<Entity, Param> {
+  ({PaginatedState<Entity> initialState, bool useGlobalFailure})
+      prepareForBuild(Arg arg);
+
+  @override
+  PaginatedState<Entity> build(Arg arg) {
+    final data = prepareForBuild(arg);
+    initWithRefUseGlobalFailureAndGetOrUpdateState(
+      ref,
+      data.useGlobalFailure,
+      ({newState}) {
+        if (newState != null) state = newState;
+        return state;
+      },
+    );
+    return data.initialState;
+  }
+}

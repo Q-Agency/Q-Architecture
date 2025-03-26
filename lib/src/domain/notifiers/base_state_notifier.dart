@@ -10,6 +10,7 @@ typedef BaseStateNotifierProvider<Notifier extends StateNotifier<BaseState<T>>,
         T>
     = StateNotifierProvider<Notifier, BaseState<T>>;
 
+@Deprecated('Use BaseNotifier instead')
 abstract class BaseStateNotifier<DataState>
     extends SimpleStateNotifier<BaseState<DataState>>
     with BaseNotifierMixin<DataState> {

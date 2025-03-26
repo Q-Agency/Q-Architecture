@@ -1,3 +1,8 @@
+## 1.0.3
+
+Added Family notifiers for PaginatedNotifier and PaginatedStreamNotifier,
+updated PaginatedListView to work with paginated family notifiers
+
 ## 1.0.2
 
 Updated pubspec.yaml dependencies

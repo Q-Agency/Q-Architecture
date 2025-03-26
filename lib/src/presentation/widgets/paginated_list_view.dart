@@ -5,7 +5,7 @@ import 'package:q_architecture/paginated_notifier.dart';
 import 'package:q_architecture/q_architecture.dart';
 import 'package:q_architecture/src/domain/mixins/paginated_stream_notifier_mixin.dart';
 
-class PaginatedListView<Entity, Param> extends ConsumerWidget {
+class PaginatedListView<Entity, Param, Arg> extends ConsumerWidget {
   /// required [itemBuilder] used for displaying each item in the scroll view,
   /// provides [context], [item] object and its [index] within the list of items
   final Widget? Function(BuildContext context, Entity item, int index)
@@ -13,10 +13,24 @@ class PaginatedListView<Entity, Param> extends ConsumerWidget {
   final AutoDisposeNotifierProvider<
       AutoDisposePaginatedStreamNotifier<Entity, Param>,
       PaginatedState<Entity>>? autoDisposeStreamNotifierProvider;
+  final AutoDisposeFamilyNotifierProvider<
+      AutoDisposeFamilyPaginatedStreamNotifier<Entity, Param, Arg>,
+      PaginatedState<Entity>,
+      Arg>? autoDisposeFamilyStreamNotifierProvider;
+  final NotifierFamilyProvider<
+      FamilyPaginatedStreamNotifier<Entity, Param, Arg>,
+      PaginatedState<Entity>,
+      Arg>? familyStreamNotifierProvider;
   final NotifierProvider<PaginatedStreamNotifier<Entity, Param>,
       PaginatedState<Entity>>? streamNotifierProvider;
   final AutoDisposeNotifierProvider<AutoDisposePaginatedNotifier<Entity, Param>,
       PaginatedState<Entity>>? autoDisposeNotifierProvider;
+  final AutoDisposeFamilyNotifierProvider<
+      AutoDisposeFamilyPaginatedNotifier<Entity, Param, Arg>,
+      PaginatedState<Entity>,
+      Arg>? autoDisposeFamilyNotifierProvider;
+  final NotifierFamilyProvider<FamilyPaginatedNotifier<Entity, Param, Arg>,
+      PaginatedState<Entity>, Arg>? familyNotifierProvider;
   final NotifierProvider<PaginatedNotifier<Entity, Param>,
       PaginatedState<Entity>>? notifierProvider;
   final AutoDisposeStateNotifierProvider<
@@ -88,9 +102,13 @@ class PaginatedListView<Entity, Param> extends ConsumerWidget {
     required this.itemBuilder,
     required this.emptyListBuilder,
     this.autoDisposeStreamNotifierProvider,
+    this.autoDisposeFamilyStreamNotifierProvider,
+    this.familyStreamNotifierProvider,
     this.streamNotifierProvider,
     this.autoDisposeNotifierProvider,
     this.notifierProvider,
+    this.autoDisposeFamilyNotifierProvider,
+    this.familyNotifierProvider,
     this.autoDisposeStateNotifierProvider,
     this.stateNotifierProvider,
     this.refreshWidgetBuilder,
@@ -193,9 +211,13 @@ class PaginatedListView<Entity, Param> extends ConsumerWidget {
     assert(
       [
             autoDisposeStreamNotifierProvider,
+            autoDisposeFamilyStreamNotifierProvider,
+            familyStreamNotifierProvider,
             streamNotifierProvider,
             autoDisposeNotifierProvider,
             notifierProvider,
+            autoDisposeFamilyNotifierProvider,
+            familyNotifierProvider,
             autoDisposeStateNotifierProvider,
             stateNotifierProvider,
           ].where((param) => param != null).length ==
@@ -203,9 +225,13 @@ class PaginatedListView<Entity, Param> extends ConsumerWidget {
       'Only one provider should be provided at a time.',
     );
     return autoDisposeStreamNotifierProvider ??
+        autoDisposeFamilyStreamNotifierProvider ??
+        familyStreamNotifierProvider ??
         streamNotifierProvider ??
         autoDisposeNotifierProvider ??
         notifierProvider ??
+        autoDisposeFamilyNotifierProvider ??
+        familyNotifierProvider ??
         autoDisposeStateNotifierProvider ??
         stateNotifierProvider!;
   }
@@ -214,13 +240,29 @@ class PaginatedListView<Entity, Param> extends ConsumerWidget {
     if (autoDisposeStreamNotifierProvider != null) {
       return autoDisposeStreamNotifierProvider!.notifier;
     }
-    if (streamNotifierProvider != null) return streamNotifierProvider!.notifier;
+    if (autoDisposeFamilyStreamNotifierProvider != null) {
+      return autoDisposeFamilyStreamNotifierProvider!.notifier;
+    }
+    if (familyStreamNotifierProvider != null) {
+      return familyStreamNotifierProvider!.notifier;
+    }
+    if (streamNotifierProvider != null) {
+      return streamNotifierProvider!.notifier;
+    }
     if (autoDisposeNotifierProvider != null) {
       return autoDisposeNotifierProvider!.notifier;
     }
-    if (notifierProvider != null) return notifierProvider!.notifier;
+    if (notifierProvider != null) {
+      return notifierProvider!.notifier;
+    }
+    if (autoDisposeFamilyNotifierProvider != null) {
+      return autoDisposeFamilyNotifierProvider!.notifier;
+    }
     if (autoDisposeStateNotifierProvider != null) {
       return autoDisposeStateNotifierProvider!.notifier;
+    }
+    if (familyNotifierProvider != null) {
+      return familyNotifierProvider!.notifier;
     }
     return stateNotifierProvider!.notifier;
   }

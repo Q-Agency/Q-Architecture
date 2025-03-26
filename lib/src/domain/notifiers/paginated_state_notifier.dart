@@ -6,6 +6,7 @@ import 'package:q_architecture/src/domain/mixins/paginated_notifier_mixin.dart';
 typedef PaginatedEitherFailureOr<Entity>
     = Future<Either<Failure, PaginatedList<Entity>>>;
 
+@Deprecated('Use PaginatedNotifier instead')
 abstract class PaginatedStateNotifier<Entity, Param>
     extends PaginatedStreamStateNotifier<Entity, Param>
     with PaginatedNotifierMixin<Entity, Param> {
