@@ -1,10 +1,9 @@
-// ignore_for_file: always_use_package_imports
 // ignore_for_file: avoid-dynamic
 
 import 'package:equatable/equatable.dart';
 import 'package:flutter/widgets.dart';
-
-import '../notifiers/base_state_notifier.dart';
+import 'package:q_architecture/q_architecture.dart';
+import 'package:q_architecture/src/domain/mixins/simple_notifier_mixin.dart';
 
 /// Failure class that represents some kind of error that occurs in the app and being passed to UI
 class Failure extends Equatable {
@@ -20,7 +19,7 @@ class Failure extends Equatable {
   /// stackTrace of the [error] that can be caught by some try catch block, also useful for debugging
   final StackTrace? stackTrace;
 
-  /// uniqueKey set by [BaseStateNotifier.setGlobalFailure] method to trigger [globalFailureProvider] each time
+  /// uniqueKey set by [SimpleNotifierMixin.setGlobalFailure] method to trigger [globalFailureProvider] each time
   final UniqueKey? uniqueKey;
 
   const Failure({

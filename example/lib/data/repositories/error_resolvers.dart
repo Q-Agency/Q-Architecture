@@ -5,6 +5,9 @@ class CustomErrorResolver implements ErrorResolver {
   Failure resolve<T>(Object error, [StackTrace? stackTrace]) {
     final message = error is String ? error : error.toString();
     return Failure.generic(
-        title: message, error: error, stackTrace: stackTrace);
+      title: message,
+      error: error,
+      stackTrace: stackTrace,
+    );
   }
 }

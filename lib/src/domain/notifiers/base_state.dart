@@ -1,8 +1,6 @@
-// ignore_for_file: always_use_package_imports
-
 import 'package:equatable/equatable.dart';
 
-import '../entities/failure.dart';
+import 'package:q_architecture/src/domain/entities/failure.dart';
 
 sealed class BaseState<State> extends Equatable {
   const BaseState();

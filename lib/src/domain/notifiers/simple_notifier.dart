@@ -1,5 +1,3 @@
-// ignore_for_file: always_use_package_imports
-
 import 'package:flutter/foundation.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:q_architecture/src/domain/mixins/simple_notifier_mixin.dart';

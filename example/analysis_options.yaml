@@ -22,8 +22,57 @@ linter:
   # `// ignore_for_file: name_of_lint` syntax on the line or in the file
   # producing the lint.
   rules:
-    # avoid_print: false  # Uncomment to disable the `avoid_print` rule
-    # prefer_single_quotes: true  # Uncomment to enable the `prefer_single_quotes` rule
+    - prefer_single_quotes
+    - cancel_subscriptions
+    - close_sinks
+    - eol_at_end_of_file
+    - sized_box_for_whitespace
+    - avoid_unnecessary_containers
+    - avoid_print
+    - parameter_assignments
+    - avoid_relative_lib_imports
+    - always_use_package_imports
+    - avoid_empty_else
+    - always_declare_return_types
+    - avoid_void_async
+    - prefer_void_to_null
+    - use_key_in_widget_constructors
+    - prefer_null_aware_method_calls
+    - unnecessary_await_in_return
+    - prefer_final_locals
+    - prefer_final_in_for_each
+    - constant_identifier_names
+    - require_trailing_commas
+    - file_names
+    - unnecessary_breaks
 
+analyzer:
+  errors:
+    prefer_single_quotes: error
+    cancel_subscriptions: error
+    close_sinks: error
+    eol_at_end_of_file: error
+    sized_box_for_whitespace: error
+    avoid_unnecessary_containers: error
+    dead_code: error
+    duplicate_import: error
+    avoid_print: error
+    parameter_assignments: error
+    avoid_relative_lib_imports: error
+    always_use_package_imports: error
+    avoid_empty_else: error
+    always_declare_return_types: error
+    avoid_void_async: error
+    prefer_void_to_null: error
+    use_key_in_widget_constructors: error
+    invalid_override_of_non_virtual_member: error
+
+  exclude:
+    - "**/*.g.dart"
+    - "**/*.gr.dart"
+    - "**/*.freezed.dart"
+    - "**/*.config.dart"
+    - "**/generated/**"
+    - "**/main_reusable_widgets.dart"
 # Additional information about this file can be found at
 # https://dart.dev/guides/language/analysis-options

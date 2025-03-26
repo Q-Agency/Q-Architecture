@@ -1,8 +1,5 @@
-// ignore_for_file: always_use_package_imports
-
 import 'package:equatable/equatable.dart';
-
-import 'example_gender.dart';
+import 'package:example/domain/entities/example_gender.dart';
 
 class ExampleUser extends Equatable {
   final String firstName;

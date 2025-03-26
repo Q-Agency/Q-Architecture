@@ -1,9 +1,6 @@
-// ignore_for_file: always_use_package_imports
-
+import 'package:example/data/repositories/example_repository.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:q_architecture/paginated_notifier.dart';
-
-import '../../../data/repositories/example_repository.dart';
 
 final paginatedNotifierProvider = NotifierProvider.autoDispose<
     ExamplePaginatedNotifier, PaginatedState<String>>(

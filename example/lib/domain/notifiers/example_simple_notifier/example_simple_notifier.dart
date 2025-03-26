@@ -1,10 +1,7 @@
-// ignore_for_file: always_use_package_imports
-
+import 'package:example/data/repositories/example_repository.dart';
+import 'package:example/domain/notifiers/example_simple_notifier/example_simple_state.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:q_architecture/q_architecture.dart';
-
-import '../../../data/repositories/example_repository.dart';
-import 'example_simple_state.dart';
 
 final exampleSimpleNotifierProvider =
     NotifierProvider.autoDispose<ExampleSimpleNotifier, ExampleSimpleState>(

@@ -134,7 +134,7 @@ mixin BaseNotifierMixin<DataState> on SimpleNotifierMixin {
   }
 
   ///Shows global loading if [globalLoading] == true
-  ///Set [withLoadingState] == true if you want to change [BaseStateNotifier] state to [BaseState.loading]
+  ///Set [withLoadingState] == true if you want to change [BaseNotifier] state to [BaseState.loading]
   void _setLoading(
     bool withLoadingState,
     bool globalLoading,
@@ -146,7 +146,7 @@ mixin BaseNotifierMixin<DataState> on SimpleNotifierMixin {
   }
 
   ///Clears global loading
-  ///Set [withLoadingState] == true if you want to reset [BaseStateNotifier] state to [BaseState.initial]
+  ///Set [withLoadingState] == true if you want to reset [BaseNotifier] state to [BaseState.initial]
   void _unsetLoading(
     bool withLoadingState,
   ) {

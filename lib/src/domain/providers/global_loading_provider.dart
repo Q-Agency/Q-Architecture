@@ -1,5 +1,3 @@
-// ignore_for_file: always_use_package_imports
-
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
 ///[globalLoadingProvider] can be used to show the loading indicator without updating [BaseStateNotifier]

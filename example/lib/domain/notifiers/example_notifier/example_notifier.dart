@@ -1,11 +1,8 @@
-// ignore_for_file: always_use_package_imports
-
+import 'package:example/data/repositories/example_repository.dart';
+import 'package:example/domain/notifiers/example_filters/example_filters_provider.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:q_architecture/base_notifier.dart';
 import 'package:q_architecture/q_architecture.dart';
-
-import '../../../data/repositories/example_repository.dart';
-import '../example_filters/example_filters_provider.dart';
 
 final exampleNotifierProvider =
     NotifierProvider<ExampleNotifier, BaseState<String>>(

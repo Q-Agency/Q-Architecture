@@ -1,5 +1,3 @@
-// ignore_for_file: always_use_package_imports
-
 import 'package:equatable/equatable.dart';
 import 'package:flutter/material.dart';
 import 'package:q_architecture/src/domain/entities/enums/global_info_status.dart';

@@ -1,9 +1,6 @@
-//ignore_for_file: always_use_package_imports
-
+import 'package:example/domain/entities/example_gender.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:q_architecture/q_architecture.dart';
-
-import '../../domain/entities/example_gender.dart';
 
 final exampleGenderMapperProvider =
     Provider<EntityMapper<ExampleGender, String>>(

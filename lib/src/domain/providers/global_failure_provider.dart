@@ -1,8 +1,6 @@
-// ignore_for_file: always_use_package_imports
-
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
-import '../entities/failure.dart';
+import 'package:q_architecture/src/domain/entities/failure.dart';
 
 ///[globalFailureProvider] can be used to show the failure without updating [BaseStateNotifier] state.
 ///

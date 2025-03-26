@@ -1,10 +1,7 @@
-// ignore_for_file: always_use_package_imports
-
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:q_architecture/q_architecture.dart';
 import 'package:q_architecture/src/domain/mixins/base_notifier_mixin.dart';
-
-import 'base_state.dart';
+import 'package:q_architecture/src/domain/notifiers/base_state.dart';
 
 typedef BaseStateNotifierProvider<Notifier extends StateNotifier<BaseState<T>>,
         T>

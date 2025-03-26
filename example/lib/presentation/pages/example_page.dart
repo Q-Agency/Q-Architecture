@@ -1,5 +1,3 @@
-// ignore_for_file: always_use_package_imports, prefer-single-widget-per-file
-
 import 'dart:math';
 
 import 'package:example/presentation/pages/example_simple_page.dart';
@@ -7,10 +5,10 @@ import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:q_architecture/base_notifier.dart';
 
-import '../../domain/notifiers/example_filters/example_filters_provider.dart';
-import '../../domain/notifiers/example_notifier/example_notifier.dart';
-import 'pagination_example_page.dart';
-import 'pagination_stream_example_page.dart';
+import 'package:example/domain/notifiers/example_filters/example_filters_provider.dart';
+import 'package:example/domain/notifiers/example_notifier/example_notifier.dart';
+import 'package:example/presentation/pages/pagination_example_page.dart';
+import 'package:example/presentation/pages/pagination_stream_example_page.dart';
 
 class ExamplePage extends ConsumerWidget {
   static const routeName = '/';
