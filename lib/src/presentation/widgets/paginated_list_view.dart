@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_hooks/flutter_hooks.dart';
-import 'package:hooks_riverpod/hooks_riverpod.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:q_architecture/paginated_notifier.dart';
 import 'package:q_architecture/q_architecture.dart';
 import 'package:q_architecture/src/domain/mixins/paginated_stream_notifier_mixin.dart';
@@ -149,7 +148,10 @@ class PaginatedListView<Entity, Param, Arg> extends ConsumerWidget {
                 !isLastPage
             ? loadMoreButtonBuilder!(() => _getNextPage(ref))
             : null;
-
+    final onFetchMore =
+        paginatedListViewType == PaginatedListViewType.infiniteScroll
+            ? () => _getNextPage(ref)
+            : null;
     return switch (paginatedState) {
       PaginatedLoadingMore<Entity>(list: final list) => _ListView(
           itemBuilder: itemBuilder,
@@ -166,6 +168,7 @@ class PaginatedListView<Entity, Param, Arg> extends ConsumerWidget {
           onNotification: (info) => _onScrollNotification(info, ref),
           scrollPhysics: scrollPhysics,
           scrollController: scrollController,
+          onFetchMore: onFetchMore,
         ),
       PaginatedLoaded(list: final list, isLastPage: final isLastPage) =>
         _ListView(
@@ -182,6 +185,7 @@ class PaginatedListView<Entity, Param, Arg> extends ConsumerWidget {
           loadMoreButtonBuilder: () => getLoadMoreButton(isLastPage),
           scrollPhysics: scrollPhysics,
           scrollController: scrollController,
+          onFetchMore: onFetchMore,
         ),
       PaginatedLoading() => loading ??
           const Center(
@@ -203,6 +207,7 @@ class PaginatedListView<Entity, Param, Arg> extends ConsumerWidget {
               loadMoreButtonBuilder: () => getLoadMoreButton(false),
               scrollPhysics: scrollPhysics,
               scrollController: scrollController,
+              onFetchMore: onFetchMore,
             ),
     };
   }
@@ -267,7 +272,6 @@ class PaginatedListView<Entity, Param, Arg> extends ConsumerWidget {
     return stateNotifierProvider!.notifier;
   }
 
-  // ignore: member-ordering
   bool _onScrollNotification(ScrollNotification scrollInfo, WidgetRef ref) {
     if (paginatedListViewType == PaginatedListViewType.infiniteScroll &&
         scrollInfo.shouldLoadMore) {
@@ -276,16 +280,14 @@ class PaginatedListView<Entity, Param, Arg> extends ConsumerWidget {
     return scrollInfo.depth == 0;
   }
 
-  // ignore: member-ordering
   void _getNextPage(WidgetRef ref) => ref.read(commonNotifier).getNextPage();
 
-  // ignore: member-ordering
   void _refresh(WidgetRef ref) => ref.read(commonNotifier).refresh();
 }
 
 enum PaginatedListViewType { infiniteScroll, loadMoreButton }
 
-class _ListView<Entity> extends HookWidget {
+class _ListView<Entity> extends StatefulWidget {
   final Widget? Function(BuildContext context, Entity item, int index)
       itemBuilder;
   final Widget Function({required Widget child}) refreshWidgetBuilder;
@@ -305,6 +307,7 @@ class _ListView<Entity> extends HookWidget {
   final Axis scrollDirection;
   final ScrollPhysics? scrollPhysics;
   final ScrollController? scrollController;
+  final VoidCallback? onFetchMore;
 
   const _ListView({
     required this.itemBuilder,
@@ -322,44 +325,87 @@ class _ListView<Entity> extends HookWidget {
     required this.scrollDirection,
     this.scrollPhysics,
     this.scrollController,
+    this.onFetchMore,
     super.key,
   });
 
   @override
+  State<_ListView<Entity>> createState() => _ListViewState<Entity>();
+}
+
+class _ListViewState<Entity> extends State<_ListView<Entity>> {
+  late ScrollController _scrollController;
+
+  @override
+  void initState() {
+    super.initState();
+    _scrollController = widget.scrollController ?? ScrollController();
+    // Schedule a check for scrollability after the first frame is rendered
+    WidgetsBinding.instance.addPostFrameCallback((_) => _checkIfScrollable());
+  }
+
+  @override
+  void didUpdateWidget(_ListView<Entity> oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    // Check scrollability when list changes
+    if (widget.list.length != oldWidget.list.length) {
+      WidgetsBinding.instance.addPostFrameCallback((_) => _checkIfScrollable());
+    }
+  }
+
+  void _checkIfScrollable() {
+    if (_scrollController.hasClients && !_scrollController.isScrollable) {
+      widget.onFetchMore?.call();
+    }
+  }
+
+  @override
+  void dispose() {
+    // Only dispose the controller if we created it
+    if (widget.scrollController == null) _scrollController.dispose();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
-    final controller = scrollController ?? useScrollController();
-    return list.isNotEmpty
+    return widget.list.isNotEmpty
         ? NotificationListener(
-            onNotification: onNotification,
-            child: refreshWidgetBuilder(
-              child: scrollbarWidgetBuilder(
-                controller: controller,
+            onNotification: widget.onNotification,
+            child: widget.refreshWidgetBuilder(
+              child: widget.scrollbarWidgetBuilder(
+                controller: _scrollController,
                 child: ListView.separated(
-                  controller: controller,
-                  physics: scrollPhysics,
-                  padding: listPadding,
-                  scrollDirection: scrollDirection,
+                  controller: _scrollController,
+                  physics: widget.scrollPhysics,
+                  padding: widget.listPadding,
+                  scrollDirection: widget.scrollDirection,
                   itemBuilder: (context, index) {
-                    if (index == list.length + 1) {
-                      return isLoading
-                          ? loading ??
+                    if (index == widget.list.length + 1) {
+                      return widget.isLoading
+                          ? widget.loading ??
                               const Center(child: CircularProgressIndicator())
                           : const SizedBox();
                     }
-                    if (index == list.length) {
-                      return loadMoreButtonBuilder?.call() ?? const SizedBox();
+                    if (index == widget.list.length) {
+                      return widget.loadMoreButtonBuilder?.call() ??
+                          const SizedBox();
                     }
-                    return itemBuilder(context, list[index], index);
+                    return widget.itemBuilder(
+                      context,
+                      widget.list[index],
+                      index,
+                    );
                   },
-                  itemCount: list.length + 2,
-                  separatorBuilder: (_, index) => index < list.length - 1
-                      ? separator ?? SizedBox(height: spacing ?? 10)
+                  itemCount: widget.list.length + 2,
+                  separatorBuilder: (_, index) => index < widget.list.length - 1
+                      ? widget.separator ??
+                          SizedBox(height: widget.spacing ?? 10)
                       : const SizedBox(),
                 ),
               ),
             ),
           )
-        : emptyListBuilder();
+        : widget.emptyListBuilder();
   }
 }
 
@@ -367,4 +413,8 @@ extension _PaginatedScrollNotification on ScrollNotification {
   static const _loadMoreScrollOffset = 50;
   bool get shouldLoadMore =>
       metrics.pixels >= metrics.maxScrollExtent - _loadMoreScrollOffset;
+}
+
+extension _PaginatedScrollController on ScrollController {
+  bool get isScrollable => position.maxScrollExtent > 0;
 }

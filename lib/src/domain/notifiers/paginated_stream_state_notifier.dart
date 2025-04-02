@@ -1,5 +1,5 @@
 import 'package:either_dart/either.dart';
-import 'package:hooks_riverpod/hooks_riverpod.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:q_architecture/paginated_notifier.dart';
 import 'package:q_architecture/q_architecture.dart';
 import 'package:q_architecture/src/domain/mixins/paginated_stream_notifier_mixin.dart';

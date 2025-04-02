@@ -1,4 +1,4 @@
-import 'package:hooks_riverpod/hooks_riverpod.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:q_architecture/q_architecture.dart';
 import 'package:q_architecture/src/domain/mixins/base_notifier_mixin.dart';
 import 'package:q_architecture/src/domain/notifiers/base_state.dart';

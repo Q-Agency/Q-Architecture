@@ -1,5 +1,4 @@
-import 'package:hooks_riverpod/hooks_riverpod.dart';
-
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:q_architecture/src/domain/entities/failure.dart';
 
 ///[globalFailureProvider] can be used to show the failure without updating [BaseStateNotifier] state.

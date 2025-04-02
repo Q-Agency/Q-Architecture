@@ -1,3 +1,8 @@
+## 1.0.4
+
+- Added loading more pages logic to PaginatedListView until it becomes
+  scrollable when PaginatedListViewType.infiniteScroll is chosen
+
 ## 1.0.3
 
 - Added Family notifiers for PaginatedNotifier and PaginatedStreamNotifier,

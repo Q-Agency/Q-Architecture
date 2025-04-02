@@ -1,7 +1,7 @@
 import 'dart:async';
 
 import 'package:flutter/foundation.dart';
-import 'package:hooks_riverpod/hooks_riverpod.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:q_architecture/paginated_notifier.dart';
 import 'package:q_architecture/q_architecture.dart';
 import 'package:q_architecture/src/domain/mixins/simple_notifier_mixin.dart';

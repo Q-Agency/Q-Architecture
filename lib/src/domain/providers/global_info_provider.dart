@@ -1,4 +1,4 @@
-import 'package:hooks_riverpod/hooks_riverpod.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:q_architecture/q_architecture.dart';
 
 ///[globalInfoProvider] can be used to show any info updating [BaseStateNotifier] state.

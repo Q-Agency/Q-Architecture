@@ -1,4 +1,4 @@
-import 'package:hooks_riverpod/hooks_riverpod.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:q_architecture/src/domain/mixins/simple_notifier_mixin.dart';
 
 @Deprecated('Use SimpleNotifier instead')
