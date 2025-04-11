@@ -1,6 +1,6 @@
 import 'package:either_dart/either.dart';
-import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:meta/meta.dart';
 import 'package:q_architecture/base_notifier.dart';
 import 'package:q_architecture/q_architecture.dart';
 import 'package:q_architecture/src/domain/mixins/simple_notifier_mixin.dart';
@@ -13,7 +13,7 @@ mixin BaseNotifierMixin<DataState> on SimpleNotifierMixin {
       _getOrUpdateState;
   bool _initialized = false;
 
-  @protected
+  @internal
   void initWithRefAndGetOrUpdateState(
     Ref ref,
     BaseState<DataState> Function({BaseState<DataState>? newState})

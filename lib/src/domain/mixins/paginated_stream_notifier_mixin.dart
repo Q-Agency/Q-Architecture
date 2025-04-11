@@ -1,7 +1,7 @@
 import 'dart:async';
 
-import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:meta/meta.dart';
 import 'package:q_architecture/paginated_notifier.dart';
 import 'package:q_architecture/q_architecture.dart';
 import 'package:q_architecture/src/domain/mixins/simple_notifier_mixin.dart';
@@ -16,10 +16,9 @@ mixin PaginatedStreamNotifierMixin<Entity, Param> on SimpleNotifierMixin {
   Param? _parameter;
   StreamSubscription? _listStreamSubscription;
 
-  @protected
-  void initWithRefUseGlobalFailureAndGetOrUpdateState(
+  @internal
+  void initWithRefAndGetOrUpdateState(
     Ref ref,
-    bool useGlobalFailure,
     PaginatedState<Entity> Function({PaginatedState<Entity>? newState})
         getOrUpdateState,
   ) {
@@ -27,9 +26,13 @@ mixin PaginatedStreamNotifierMixin<Entity, Param> on SimpleNotifierMixin {
     _initialized = true;
     super.initWithRef(ref);
     _ref = ref;
-    _useGlobalFailure = useGlobalFailure;
     _getOrUpdateState = getOrUpdateState;
     _ref.onDispose(() => _listStreamSubscription?.cancel());
+  }
+
+  @internal
+  void setUserGlobalFailure(bool useGlobalFailure) {
+    _useGlobalFailure = useGlobalFailure;
   }
 
   Future<void> getInitialList([Param? param]) async {

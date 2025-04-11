@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:meta/meta.dart';
 import 'package:q_architecture/q_architecture.dart';
 
 mixin SimpleNotifierMixin {
@@ -10,7 +11,7 @@ mixin SimpleNotifierMixin {
   Timer? _debounceTimer;
   final Map<String, bool> _isThrottlingMap = {};
 
-  @protected
+  @internal
   void initWithRef(Ref ref) {
     if (_initialized) return;
     _initialized = true;

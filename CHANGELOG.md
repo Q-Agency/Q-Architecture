@@ -1,3 +1,8 @@
+## 1.0.5
+
+- Fixed issue with ref in PaginatedNotifier and PaginatedStreamNotifier
+  prepareForBuild() methods
+
 ## 1.0.4
 
 - Added loading more pages logic to PaginatedListView until it becomes

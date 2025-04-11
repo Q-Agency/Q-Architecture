@@ -17,11 +17,12 @@ abstract class PaginatedStreamStateNotifier<Entity, Param>
     PaginatedState<Entity> initialState, {
     bool useGlobalFailure = false,
   }) : super(ref, initialState) {
-    initWithRefUseGlobalFailureAndGetOrUpdateState(ref, useGlobalFailure, ({
+    initWithRefAndGetOrUpdateState(ref, ({
       newState,
     }) {
       if (newState != null) state = newState;
       return state;
     });
+    setUserGlobalFailure(useGlobalFailure);
   }
 }

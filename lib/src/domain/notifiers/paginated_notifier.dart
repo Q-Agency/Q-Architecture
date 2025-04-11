@@ -18,15 +18,15 @@ abstract class PaginatedNotifier<Entity, Param>
   @nonVirtual
   @override
   PaginatedState<Entity> build() {
-    final data = prepareForBuild();
-    initWithRefUseGlobalFailureAndGetOrUpdateState(
+    initWithRefAndGetOrUpdateState(
       ref,
-      data.useGlobalFailure,
       ({newState}) {
         if (newState != null) state = newState;
         return state;
       },
     );
+    final data = prepareForBuild();
+    setUserGlobalFailure(data.useGlobalFailure);
     return data.initialState;
   }
 }
@@ -44,15 +44,15 @@ abstract class AutoDisposePaginatedNotifier<Entity, Param>
   @nonVirtual
   @override
   PaginatedState<Entity> build() {
-    final data = prepareForBuild();
-    initWithRefUseGlobalFailureAndGetOrUpdateState(
+    initWithRefAndGetOrUpdateState(
       ref,
-      data.useGlobalFailure,
       ({newState}) {
         if (newState != null) state = newState;
         return state;
       },
     );
+    final data = prepareForBuild();
+    setUserGlobalFailure(data.useGlobalFailure);
     return data.initialState;
   }
 }
@@ -68,15 +68,15 @@ abstract class FamilyPaginatedNotifier<Entity, Param, Arg>
 
   @override
   PaginatedState<Entity> build(Arg arg) {
-    final data = prepareForBuild(arg);
-    initWithRefUseGlobalFailureAndGetOrUpdateState(
+    initWithRefAndGetOrUpdateState(
       ref,
-      data.useGlobalFailure,
       ({newState}) {
         if (newState != null) state = newState;
         return state;
       },
     );
+    final data = prepareForBuild(arg);
+    setUserGlobalFailure(data.useGlobalFailure);
     return data.initialState;
   }
 }
@@ -92,15 +92,15 @@ abstract class AutoDisposeFamilyPaginatedNotifier<Entity, Param, Arg>
 
   @override
   PaginatedState<Entity> build(Arg arg) {
-    final data = prepareForBuild(arg);
-    initWithRefUseGlobalFailureAndGetOrUpdateState(
+    initWithRefAndGetOrUpdateState(
       ref,
-      data.useGlobalFailure,
       ({newState}) {
         if (newState != null) state = newState;
         return state;
       },
     );
+    final data = prepareForBuild(arg);
+    setUserGlobalFailure(data.useGlobalFailure);
     return data.initialState;
   }
 }
