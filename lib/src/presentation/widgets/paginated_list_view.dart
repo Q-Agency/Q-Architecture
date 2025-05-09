@@ -1,42 +1,12 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:q_architecture/paginated_notifier.dart';
 import 'package:q_architecture/q_architecture.dart';
-import 'package:q_architecture/src/domain/mixins/paginated_stream_notifier_mixin.dart';
 
-class PaginatedListView<Entity, Param, Arg> extends ConsumerWidget {
+class PaginatedListView<Entity, Param, Arg> extends StatelessWidget {
   /// required [itemBuilder] used for displaying each item in the scroll view,
   /// provides [context], [item] object and its [index] within the list of items
   final Widget? Function(BuildContext context, Entity item, int index)
       itemBuilder;
-  final AutoDisposeNotifierProvider<
-      AutoDisposePaginatedStreamNotifier<Entity, Param>,
-      PaginatedState<Entity>>? autoDisposeStreamNotifierProvider;
-  final AutoDisposeFamilyNotifierProvider<
-      AutoDisposeFamilyPaginatedStreamNotifier<Entity, Param, Arg>,
-      PaginatedState<Entity>,
-      Arg>? autoDisposeFamilyStreamNotifierProvider;
-  final NotifierFamilyProvider<
-      FamilyPaginatedStreamNotifier<Entity, Param, Arg>,
-      PaginatedState<Entity>,
-      Arg>? familyStreamNotifierProvider;
-  final NotifierProvider<PaginatedStreamNotifier<Entity, Param>,
-      PaginatedState<Entity>>? streamNotifierProvider;
-  final AutoDisposeNotifierProvider<AutoDisposePaginatedNotifier<Entity, Param>,
-      PaginatedState<Entity>>? autoDisposeNotifierProvider;
-  final AutoDisposeFamilyNotifierProvider<
-      AutoDisposeFamilyPaginatedNotifier<Entity, Param, Arg>,
-      PaginatedState<Entity>,
-      Arg>? autoDisposeFamilyNotifierProvider;
-  final NotifierFamilyProvider<FamilyPaginatedNotifier<Entity, Param, Arg>,
-      PaginatedState<Entity>, Arg>? familyNotifierProvider;
-  final NotifierProvider<PaginatedNotifier<Entity, Param>,
-      PaginatedState<Entity>>? notifierProvider;
-  final AutoDisposeStateNotifierProvider<
-      PaginatedStreamStateNotifier<Entity, Param>,
-      PaginatedState<Entity>>? autoDisposeStateNotifierProvider;
-  final StateNotifierProvider<PaginatedStreamStateNotifier<Entity, Param>,
-      PaginatedState<Entity>>? stateNotifierProvider;
+  final PaginatedStreamNotifier<Entity, Param> paginatedStreamNotifier;
 
   /// optional builder to customize displaying the refresh functionality on
   /// top of the scrollbar when scroll view is dragged all the way to the top,
@@ -100,16 +70,7 @@ class PaginatedListView<Entity, Param, Arg> extends ConsumerWidget {
   const PaginatedListView({
     required this.itemBuilder,
     required this.emptyListBuilder,
-    this.autoDisposeStreamNotifierProvider,
-    this.autoDisposeFamilyStreamNotifierProvider,
-    this.familyStreamNotifierProvider,
-    this.streamNotifierProvider,
-    this.autoDisposeNotifierProvider,
-    this.notifierProvider,
-    this.autoDisposeFamilyNotifierProvider,
-    this.familyNotifierProvider,
-    this.autoDisposeStateNotifierProvider,
-    this.stateNotifierProvider,
+    required this.paginatedStreamNotifier,
     this.refreshWidgetBuilder,
     this.scrollbarWidgetBuilder,
     this.onError,
@@ -127,162 +88,104 @@ class PaginatedListView<Entity, Param, Arg> extends ConsumerWidget {
   });
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    final paginatedState = ref.watch(commonNotifierProvider);
+  Widget build(BuildContext context) {
     Widget getRefreshWidget({required Widget child}) =>
         refreshWidgetBuilder?.call(
-          () async => _refresh(ref),
+          () async => _refresh(),
           child,
         ) ??
-        RefreshIndicator(onRefresh: () async => _refresh(ref), child: child);
+        RefreshIndicator(onRefresh: () async => _refresh(), child: child);
     Widget getScrollbarWidget({
       required ScrollController controller,
       required Widget child,
     }) =>
         scrollbarWidgetBuilder?.call(controller, child) ?? child;
-    Widget getListEmpty() => emptyListBuilder.call(() async => _refresh(ref));
+    Widget getListEmpty() => emptyListBuilder.call(() async => _refresh());
 
     Widget? getLoadMoreButton(bool isLastPage) =>
         paginatedListViewType == PaginatedListViewType.loadMoreButton &&
                 loadMoreButtonBuilder != null &&
                 !isLastPage
-            ? loadMoreButtonBuilder!(() => _getNextPage(ref))
+            ? loadMoreButtonBuilder!(() => _getNextPage())
             : null;
     final onFetchMore =
         paginatedListViewType == PaginatedListViewType.infiniteScroll
-            ? () => _getNextPage(ref)
+            ? () => _getNextPage()
             : null;
-    return switch (paginatedState) {
-      PaginatedLoadingMore<Entity>(list: final list) => _ListView(
-          itemBuilder: itemBuilder,
-          list: list,
-          isLoading: true,
-          loading: loadingMore,
-          listPadding: listPadding,
-          scrollDirection: scrollDirection,
-          spacing: spacing,
-          separator: separator,
-          refreshWidgetBuilder: getRefreshWidget,
-          scrollbarWidgetBuilder: getScrollbarWidget,
-          emptyListBuilder: getListEmpty,
-          onNotification: (info) => _onScrollNotification(info, ref),
-          scrollPhysics: scrollPhysics,
-          scrollController: scrollController,
-          onFetchMore: onFetchMore,
-        ),
-      PaginatedLoaded(list: final list, isLastPage: final isLastPage) =>
-        _ListView(
-          itemBuilder: itemBuilder,
-          list: list,
-          listPadding: listPadding,
-          scrollDirection: scrollDirection,
-          spacing: spacing,
-          separator: separator,
-          refreshWidgetBuilder: getRefreshWidget,
-          scrollbarWidgetBuilder: getScrollbarWidget,
-          emptyListBuilder: getListEmpty,
-          onNotification: (info) => _onScrollNotification(info, ref),
-          loadMoreButtonBuilder: () => getLoadMoreButton(isLastPage),
-          scrollPhysics: scrollPhysics,
-          scrollController: scrollController,
-          onFetchMore: onFetchMore,
-        ),
-      PaginatedLoading() => loading ??
-          const Center(
-            child: CircularProgressIndicator(),
+    return ValueListenableBuilder(
+      valueListenable: paginatedStreamNotifier,
+      builder: (context, value, child) => switch (value) {
+        PaginatedLoadingMore<Entity>(list: final list) => _ListView(
+            itemBuilder: itemBuilder,
+            list: list,
+            isLoading: true,
+            loading: loadingMore,
+            listPadding: listPadding,
+            scrollDirection: scrollDirection,
+            spacing: spacing,
+            separator: separator,
+            refreshWidgetBuilder: getRefreshWidget,
+            scrollbarWidgetBuilder: getScrollbarWidget,
+            emptyListBuilder: getListEmpty,
+            onNotification: (info) => _onScrollNotification(info),
+            scrollPhysics: scrollPhysics,
+            scrollController: scrollController,
+            onFetchMore: onFetchMore,
           ),
-      PaginatedError(list: final list, failure: final failure) =>
-        onError?.call(failure, list.isEmpty, () async => _refresh(ref)) ??
-            _ListView(
-              itemBuilder: itemBuilder,
-              list: list,
-              listPadding: listPadding,
-              scrollDirection: scrollDirection,
-              spacing: spacing,
-              separator: separator,
-              refreshWidgetBuilder: getRefreshWidget,
-              scrollbarWidgetBuilder: getScrollbarWidget,
-              emptyListBuilder: getListEmpty,
-              onNotification: (info) => _onScrollNotification(info, ref),
-              loadMoreButtonBuilder: () => getLoadMoreButton(false),
-              scrollPhysics: scrollPhysics,
-              scrollController: scrollController,
-              onFetchMore: onFetchMore,
+        PaginatedLoaded(list: final list, isLastPage: final isLastPage) =>
+          _ListView(
+            itemBuilder: itemBuilder,
+            list: list,
+            listPadding: listPadding,
+            scrollDirection: scrollDirection,
+            spacing: spacing,
+            separator: separator,
+            refreshWidgetBuilder: getRefreshWidget,
+            scrollbarWidgetBuilder: getScrollbarWidget,
+            emptyListBuilder: getListEmpty,
+            onNotification: (info) => _onScrollNotification(info),
+            loadMoreButtonBuilder: () => getLoadMoreButton(isLastPage),
+            scrollPhysics: scrollPhysics,
+            scrollController: scrollController,
+            onFetchMore: onFetchMore,
+          ),
+        PaginatedLoading() => loading ??
+            const Center(
+              child: CircularProgressIndicator(),
             ),
-    };
-  }
-
-  ProviderListenable<PaginatedState<Entity>> get commonNotifierProvider {
-    assert(
-      [
-            autoDisposeStreamNotifierProvider,
-            autoDisposeFamilyStreamNotifierProvider,
-            familyStreamNotifierProvider,
-            streamNotifierProvider,
-            autoDisposeNotifierProvider,
-            notifierProvider,
-            autoDisposeFamilyNotifierProvider,
-            familyNotifierProvider,
-            autoDisposeStateNotifierProvider,
-            stateNotifierProvider,
-          ].where((param) => param != null).length ==
-          1,
-      'Only one provider should be provided at a time.',
+        PaginatedError(list: final list, failure: final failure) =>
+          onError?.call(failure, list.isEmpty, () async => _refresh()) ??
+              _ListView(
+                itemBuilder: itemBuilder,
+                list: list,
+                listPadding: listPadding,
+                scrollDirection: scrollDirection,
+                spacing: spacing,
+                separator: separator,
+                refreshWidgetBuilder: getRefreshWidget,
+                scrollbarWidgetBuilder: getScrollbarWidget,
+                emptyListBuilder: getListEmpty,
+                onNotification: (info) => _onScrollNotification(info),
+                loadMoreButtonBuilder: () => getLoadMoreButton(false),
+                scrollPhysics: scrollPhysics,
+                scrollController: scrollController,
+                onFetchMore: onFetchMore,
+              ),
+      },
     );
-    return autoDisposeStreamNotifierProvider ??
-        autoDisposeFamilyStreamNotifierProvider ??
-        familyStreamNotifierProvider ??
-        streamNotifierProvider ??
-        autoDisposeNotifierProvider ??
-        notifierProvider ??
-        autoDisposeFamilyNotifierProvider ??
-        familyNotifierProvider ??
-        autoDisposeStateNotifierProvider ??
-        stateNotifierProvider!;
   }
 
-  Refreshable<PaginatedStreamNotifierMixin> get commonNotifier {
-    if (autoDisposeStreamNotifierProvider != null) {
-      return autoDisposeStreamNotifierProvider!.notifier;
-    }
-    if (autoDisposeFamilyStreamNotifierProvider != null) {
-      return autoDisposeFamilyStreamNotifierProvider!.notifier;
-    }
-    if (familyStreamNotifierProvider != null) {
-      return familyStreamNotifierProvider!.notifier;
-    }
-    if (streamNotifierProvider != null) {
-      return streamNotifierProvider!.notifier;
-    }
-    if (autoDisposeNotifierProvider != null) {
-      return autoDisposeNotifierProvider!.notifier;
-    }
-    if (notifierProvider != null) {
-      return notifierProvider!.notifier;
-    }
-    if (autoDisposeFamilyNotifierProvider != null) {
-      return autoDisposeFamilyNotifierProvider!.notifier;
-    }
-    if (autoDisposeStateNotifierProvider != null) {
-      return autoDisposeStateNotifierProvider!.notifier;
-    }
-    if (familyNotifierProvider != null) {
-      return familyNotifierProvider!.notifier;
-    }
-    return stateNotifierProvider!.notifier;
-  }
-
-  bool _onScrollNotification(ScrollNotification scrollInfo, WidgetRef ref) {
+  bool _onScrollNotification(ScrollNotification scrollInfo) {
     if (paginatedListViewType == PaginatedListViewType.infiniteScroll &&
         scrollInfo.shouldLoadMore) {
-      WidgetsBinding.instance.addPostFrameCallback((_) => _getNextPage(ref));
+      WidgetsBinding.instance.addPostFrameCallback((_) => _getNextPage());
     }
     return scrollInfo.depth == 0;
   }
 
-  void _getNextPage(WidgetRef ref) => ref.read(commonNotifier).getNextPage();
+  void _getNextPage() => paginatedStreamNotifier.getNextPage();
 
-  void _refresh(WidgetRef ref) => ref.read(commonNotifier).refresh();
+  void _refresh() => paginatedStreamNotifier.refresh();
 }
 
 enum PaginatedListViewType { infiniteScroll, loadMoreButton }

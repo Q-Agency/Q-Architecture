@@ -2,20 +2,10 @@ import 'dart:math';
 
 import 'package:either_dart/either.dart';
 import 'package:example/data/api_client.dart';
-import 'package:example/data/mappers/example_user_entity_mapper.dart';
 import 'package:example/data/models/example_user_response.dart';
 import 'package:example/data/repositories/error_resolvers.dart';
 import 'package:example/domain/entities/example_user.dart';
-import 'package:hooks_riverpod/hooks_riverpod.dart';
-import 'package:q_architecture/paginated_notifier.dart';
 import 'package:q_architecture/q_architecture.dart';
-
-final exampleRepositoryProvider = Provider<ExampleRepository>(
-  (ref) => ExampleRepositoryImp(
-    ref.watch(apiClientProvider),
-    ref.watch(exampleUserEntityMapperProvider),
-  ),
-);
 
 abstract class ExampleRepository {
   EitherFailureOr<ExampleUser> apiCallExample();
