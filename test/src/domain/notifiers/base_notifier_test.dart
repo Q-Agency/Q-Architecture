@@ -1,22 +1,20 @@
 // ignore_for_file: invalid_use_of_protected_member
 import 'package:either_dart/either.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:get_it/get_it.dart';
 import 'package:q_architecture/q_architecture.dart';
 
 void main() {
-  late ProviderContainer providerContainer;
   final Failure testGenericFailure =
       Failure.generic(title: 'Unknown error occurred');
-  final provider = NotifierProvider<TestNotifier, BaseState<String>>(
-    () => TestNotifier(),
-  );
-  final provider2 = NotifierProvider<TestNotifier, BaseState<String>>(
-    () => TestNotifier(),
-  );
+  late TestNotifier testNotifier;
+
+  setUpAll(() {
+    setupServiceLocator();
+  });
 
   setUp(() {
-    providerContainer = ProviderContainer();
+    testNotifier = TestNotifier();
   });
 
   EitherFailureOr<String> getSuccessfulResponse() async {
@@ -48,16 +46,13 @@ void main() {
       'should emit [loading, data] when successful response',
       () async {
         final states = <BaseState>[];
-        providerContainer.listen(
-          provider,
-          (_, state) => states.add(state),
+        testNotifier.listen(
+          (currentState, _) => states.add(currentState),
           fireImmediately: false,
         );
-        await providerContainer
-            .read(provider.notifier)
-            .execute(getSuccessfulResponse());
+        await testNotifier.execute(getSuccessfulResponse());
         expect(
-          [const BaseState<Never>.loading(), const BaseState.data('')],
+          [const BaseState<String>.loading(), const BaseState.data('')],
           states,
         );
       },
@@ -67,18 +62,17 @@ void main() {
       'should emit [data] and update globalLoadingProvider when successful response',
       () async {
         final states = <BaseState>[];
-        providerContainer.listen(
-          provider,
-          (_, state) => states.add(state),
+        testNotifier.listen(
+          (currentState, _) => states.add(currentState),
           fireImmediately: false,
         );
-        await providerContainer.read(provider.notifier).execute(
-              getSuccessfulResponse(),
-              withLoadingState: false,
-              globalLoading: true,
-            );
+        await testNotifier.execute(
+          getSuccessfulResponse(),
+          withLoadingState: false,
+          globalLoading: true,
+        );
         expect(
-          providerContainer.read(globalLoadingProvider.notifier).state,
+          GetIt.instance<GlobalLoadingNotifier>().value,
           false,
         );
         expect(
@@ -90,21 +84,21 @@ void main() {
 
     test('should emit [loading, error] when successful response', () async {
       final states = <BaseState>[];
-      providerContainer.listen(
-        provider,
-        (_, state) => states.add(state),
+      testNotifier.listen(
+        (currentState, _) => states.add(currentState),
         fireImmediately: false,
       );
-      await providerContainer
-          .read(provider.notifier)
-          .execute(getFailureResponse(), globalFailure: false);
+      await testNotifier.execute(
+        getFailureResponse(),
+        globalFailure: false,
+      );
       expect(
-        providerContainer.read(globalLoadingProvider.notifier).state,
+        GetIt.instance<GlobalLoadingNotifier>().value,
         false,
       );
       expect(
         [
-          const BaseState<Never>.loading(),
+          const BaseState<String>.loading(),
           BaseState<String>.error(testGenericFailure),
         ],
         states,
@@ -115,22 +109,19 @@ void main() {
         'should emit [loading, initial] and update global failure provider when failure response',
         () async {
       final states = <BaseState>[];
-      providerContainer.listen(
-        provider,
-        (_, state) => states.add(state),
+      testNotifier.listen(
+        (currentState, _) => states.add(currentState),
         fireImmediately: false,
       );
-      await providerContainer
-          .read(provider.notifier)
-          .execute(getFailureResponse());
+      await testNotifier.execute(getFailureResponse());
       expect(
-        providerContainer.read(globalFailureProvider)?.title,
+        GetIt.instance<GlobalFailureNotifier>().state?.title,
         testGenericFailure.title,
       );
       expect(
         [
-          const BaseState<Never>.loading(),
-          const BaseState<Never>.initial(),
+          const BaseState<String>.loading(),
+          const BaseState<String>.initial(),
         ],
         states,
       );
@@ -140,22 +131,21 @@ void main() {
         'should emit [] and update global failure provider and global loading provider when failure response',
         () async {
       final states = <BaseState>[];
-      providerContainer.listen(
-        provider,
-        (_, state) => states.add(state),
+      testNotifier.listen(
+        (currentState, _) => states.add(currentState),
         fireImmediately: false,
       );
-      await providerContainer.read(provider.notifier).execute(
-            getFailureResponse(),
-            withLoadingState: false,
-            globalLoading: true,
-          );
+      await testNotifier.execute(
+        getFailureResponse(),
+        withLoadingState: false,
+        globalLoading: true,
+      );
       expect(
-        providerContainer.read(globalLoadingProvider),
+        GetIt.instance<GlobalLoadingNotifier>().value,
         false,
       );
       expect(
-        providerContainer.read(globalFailureProvider)?.title,
+        GetIt.instance<GlobalFailureNotifier>().state?.title,
         testGenericFailure.title,
       );
       expect(
@@ -168,19 +158,18 @@ void main() {
         'should emit [error] and update global loading provider when failure response',
         () async {
       final states = <BaseState>[];
-      providerContainer.listen(
-        provider,
-        (_, state) => states.add(state),
+      testNotifier.listen(
+        (currentState, _) => states.add(currentState),
         fireImmediately: false,
       );
-      await providerContainer.read(provider.notifier).execute(
-            getFailureResponse(),
-            withLoadingState: false,
-            globalLoading: true,
-            globalFailure: false,
-          );
+      await testNotifier.execute(
+        getFailureResponse(),
+        withLoadingState: false,
+        globalLoading: true,
+        globalFailure: false,
+      );
       expect(
-        providerContainer.read(globalLoadingProvider),
+        GetIt.instance<GlobalLoadingNotifier>().value,
         false,
       );
       expect(
@@ -193,16 +182,16 @@ void main() {
         'should emit [loading, data] when successful response and onDataReceived true',
         () async {
       final states = <BaseState>[];
-      providerContainer.listen(
-        provider,
-        (_, state) => states.add(state),
+      testNotifier.listen(
+        (currentState, _) => states.add(currentState),
         fireImmediately: false,
       );
-      await providerContainer
-          .read(provider.notifier)
-          .execute(getSuccessfulResponse(), onDataReceived: (data) => true);
+      await testNotifier.execute(
+        getSuccessfulResponse(),
+        onDataReceived: (data) => true,
+      );
       expect(
-        [const BaseState<Never>.loading(), const BaseState.data('')],
+        [const BaseState<String>.loading(), const BaseState.data('')],
         states,
       );
     });
@@ -211,16 +200,19 @@ void main() {
       'should emit [loading, initial] when successful response and onDataReceived false',
       () async {
         final states = <BaseState>[];
-        providerContainer.listen(
-          provider,
-          (_, state) => states.add(state),
+        testNotifier.listen(
+          (currentState, _) => states.add(currentState),
           fireImmediately: false,
         );
-        await providerContainer
-            .read(provider.notifier)
-            .execute(getSuccessfulResponse(), onDataReceived: (data) => false);
+        await testNotifier.execute(
+          getSuccessfulResponse(),
+          onDataReceived: (data) => false,
+        );
         expect(
-          [const BaseState<Never>.loading(), const BaseState<Never>.initial()],
+          [
+            const BaseState<String>.loading(),
+            const BaseState<String>.initial(),
+          ],
           states,
         );
       },
@@ -230,16 +222,16 @@ void main() {
         'should emit [loading, initial] when failure response and onFailureOccurred false',
         () async {
       final states = <BaseState>[];
-      providerContainer.listen(
-        provider,
-        (_, state) => states.add(state),
+      testNotifier.listen(
+        (currentState, _) => states.add(currentState),
         fireImmediately: false,
       );
-      await providerContainer
-          .read(provider.notifier)
-          .execute(getFailureResponse(), onFailureOccurred: (failure) => false);
+      await testNotifier.execute(
+        getFailureResponse(),
+        onFailureOccurred: (failure) => false,
+      );
       expect(
-        [const BaseState<Never>.loading(), const BaseState<Never>.initial()],
+        [const BaseState<String>.loading(), const BaseState<String>.initial()],
         states,
       );
     });
@@ -248,19 +240,18 @@ void main() {
         'should emit [loading, error] when failure response and onFailureOccurred true',
         () async {
       final states = <BaseState>[];
-      providerContainer.listen(
-        provider,
-        (_, state) => states.add(state),
+      testNotifier.listen(
+        (currentState, _) => states.add(currentState),
         fireImmediately: false,
       );
-      await providerContainer.read(provider.notifier).execute(
-            getFailureResponse(),
-            onFailureOccurred: (failure) => true,
-            globalFailure: false,
-          );
+      await testNotifier.execute(
+        getFailureResponse(),
+        onFailureOccurred: (failure) => true,
+        globalFailure: false,
+      );
       expect(
         [
-          const BaseState<Never>.loading(),
+          const BaseState<String>.loading(),
           BaseState<String>.error(testGenericFailure),
         ],
         states,
@@ -271,16 +262,16 @@ void main() {
         'should emit [loading, initial] when failure response and onFailureOccurred false',
         () async {
       final states = <BaseState>[];
-      providerContainer.listen(
-        provider,
-        (_, state) => states.add(state),
+      testNotifier.listen(
+        (currentState, _) => states.add(currentState),
         fireImmediately: false,
       );
-      await providerContainer
-          .read(provider.notifier)
-          .execute(getFailureResponse(), onFailureOccurred: (failure) => false);
+      await testNotifier.execute(
+        getFailureResponse(),
+        onFailureOccurred: (failure) => false,
+      );
       expect(
-        [const BaseState<Never>.loading(), const BaseState<Never>.initial()],
+        [const BaseState<String>.loading(), const BaseState<String>.initial()],
         states,
       );
     });
@@ -290,17 +281,14 @@ void main() {
     test('should emit [loading, data, data] when successful response stream',
         () async {
       final states = <BaseState>[];
-      providerContainer.listen(
-        provider,
-        (_, state) => states.add(state),
+      testNotifier.listen(
+        (currentState, _) => states.add(currentState),
         fireImmediately: false,
       );
-      await providerContainer
-          .read(provider.notifier)
-          .executeStreamed(getSuccessfulResponseStream());
+      await testNotifier.executeStreamed(getSuccessfulResponseStream());
       expect(
         [
-          const BaseState<Never>.loading(),
+          const BaseState<String>.loading(),
           const BaseState.data('a'),
           const BaseState.data('b'),
         ],
@@ -312,16 +300,15 @@ void main() {
         'should emit [data, data] and update global loading provider when successful response stream',
         () async {
       final states = <BaseState>[];
-      providerContainer.listen(
-        provider,
-        (_, state) => states.add(state),
+      testNotifier.listen(
+        (currentState, _) => states.add(currentState),
         fireImmediately: false,
       );
-      await providerContainer.read(provider.notifier).executeStreamed(
-            getSuccessfulResponseStream(),
-            withLoadingState: false,
-            globalLoading: true,
-          );
+      await testNotifier.executeStreamed(
+        getSuccessfulResponseStream(),
+        withLoadingState: false,
+        globalLoading: true,
+      );
       expect(
         [
           const BaseState.data('a'),
@@ -333,18 +320,17 @@ void main() {
 
     test('should emit [loading, error] when failure response stream', () async {
       final states = <BaseState>[];
-      providerContainer.listen(
-        provider,
-        (_, state) => states.add(state),
+      testNotifier.listen(
+        (currentState, _) => states.add(currentState),
         fireImmediately: false,
       );
-      await providerContainer.read(provider.notifier).executeStreamed(
-            getFailureResponseStream(),
-            globalFailure: false,
-          );
+      await testNotifier.executeStreamed(
+        getFailureResponseStream(),
+        globalFailure: false,
+      );
       expect(
         [
-          const BaseState<Never>.loading(),
+          const BaseState<String>.loading(),
           BaseState<String>.error(testGenericFailure),
         ],
         states,
@@ -355,20 +341,17 @@ void main() {
         'should emit [loading, initial] and update global failure provider when failure response stream',
         () async {
       final states = <BaseState>[];
-      providerContainer.listen(
-        provider,
-        (_, state) => states.add(state),
+      testNotifier.listen(
+        (currentState, _) => states.add(currentState),
         fireImmediately: false,
       );
-      await providerContainer
-          .read(provider.notifier)
-          .executeStreamed(getFailureResponseStream());
+      await testNotifier.executeStreamed(getFailureResponseStream());
       expect(
-        providerContainer.read(globalFailureProvider)?.title,
+        GetIt.instance<GlobalFailureNotifier>().state?.title,
         testGenericFailure.title,
       );
       expect(
-        [const BaseState<Never>.loading(), const BaseState<Never>.initial()],
+        [const BaseState<String>.loading(), const BaseState<String>.initial()],
         states,
       );
     });
@@ -377,21 +360,18 @@ void main() {
         'should emit [loading, data] and update global failure provider when successful then failure response stream',
         () async {
       final states = <BaseState>[];
-      providerContainer.listen(
-        provider,
-        (_, state) => states.add(state),
+      testNotifier.listen(
+        (currentState, _) => states.add(currentState),
         fireImmediately: false,
       );
-      await providerContainer
-          .read(provider.notifier)
-          .executeStreamed(getSuccessThenFailureResponseStream());
+      await testNotifier.executeStreamed(getSuccessThenFailureResponseStream());
       expect(
-        providerContainer.read(globalFailureProvider)?.title,
+        GetIt.instance<GlobalFailureNotifier>().state?.title,
         testGenericFailure.title,
       );
       expect(
         [
-          const BaseState<Never>.loading(),
+          const BaseState<String>.loading(),
           const BaseState.data('a'),
         ],
         states,
@@ -402,18 +382,17 @@ void main() {
         'should emit [loading, data, error] when successful then failure response stream',
         () async {
       final states = <BaseState>[];
-      providerContainer.listen(
-        provider,
-        (_, state) => states.add(state),
+      testNotifier.listen(
+        (currentState, _) => states.add(currentState),
         fireImmediately: false,
       );
-      await providerContainer.read(provider.notifier).executeStreamed(
-            getSuccessThenFailureResponseStream(),
-            globalFailure: false,
-          );
+      await testNotifier.executeStreamed(
+        getSuccessThenFailureResponseStream(),
+        globalFailure: false,
+      );
       expect(
         [
-          const BaseState<Never>.loading(),
+          const BaseState<String>.loading(),
           const BaseState.data('a'),
           BaseState<String>.error(testGenericFailure),
         ],
@@ -426,55 +405,35 @@ void main() {
     test(
       'should set global loading provider to true',
       () {
-        providerContainer.read(provider.notifier).showGlobalLoading();
-        expect(providerContainer.read(globalLoadingProvider), true);
+        GetIt.instance<GlobalLoadingNotifier>().showGlobalLoading();
+        expect(GetIt.instance<GlobalLoadingNotifier>().value, true);
       },
     );
 
     test(
       'should set global loading provider to false',
       () async {
-        providerContainer.read(provider.notifier).showGlobalLoading();
+        GetIt.instance<GlobalLoadingNotifier>().showGlobalLoading();
         await 500.milliseconds;
-        providerContainer.read(provider.notifier).clearGlobalLoading();
+        GetIt.instance<GlobalLoadingNotifier>().clearGlobalLoading();
 
-        expect(providerContainer.read(globalLoadingProvider), false);
+        expect(GetIt.instance<GlobalLoadingNotifier>().value, false);
       },
     );
 
     test(
       'should set global loading provider',
       () {
-        providerContainer
-            .read(provider.notifier)
-            .setGlobalFailure(testGenericFailure);
+        GetIt.instance<GlobalFailureNotifier>().setGlobalFailure(
+          testGenericFailure,
+        );
         expect(
-          providerContainer.read(globalFailureProvider)?.title,
+          GetIt.instance<GlobalFailureNotifier>().state?.title,
           testGenericFailure.title,
         );
       },
     );
-
-    test('test on method', () {
-      providerContainer.read(provider.notifier).on(
-        provider2,
-        (previous, next) {
-          expect(next, const BaseState.data(''));
-        },
-        skipUpdateCondition: (previous, next) => switch (next) {
-          BaseLoading() => true,
-          _ => false,
-        },
-      );
-      providerContainer
-          .read(provider2.notifier)
-          .execute(getSuccessfulResponse());
-    });
   });
 }
 
-//ignore: prefer-match-file-name
-class TestNotifier extends BaseNotifier<String> {
-  @override
-  void prepareForBuild() {}
-}
+class TestNotifier extends BaseNotifier<String> {}

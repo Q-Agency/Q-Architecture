@@ -1,32 +1,24 @@
 //ignore_for_file: prefer-match-file-name
 
 import 'package:either_dart/either.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
 import 'package:q_architecture/q_architecture.dart';
 
 class MockTestRepository extends Mock implements TestRepository {}
 
-final testRepositoryProvider =
-    Provider<TestRepository>((ref) => throw UnimplementedError());
-
 void main() {
   late TestRepository testRepository;
-  late ProviderContainer providerContainer;
   final Failure testGenericFailure =
       Failure.generic(title: 'Unknown error occurred');
-  final testNotifierProvider =
-      NotifierProvider<TestNotifier, PaginatedState<String>>(
-    () => TestNotifier(),
-  );
+  late TestNotifier testNotifier;
+  setUpAll(() {
+    setupServiceLocator();
+  });
+
   setUp(() {
     testRepository = MockTestRepository();
-    providerContainer = ProviderContainer(
-      overrides: [
-        testRepositoryProvider.overrideWith((ref) => testRepository),
-      ],
-    );
+    testNotifier = TestNotifier(testRepository);
   });
 
   List<String> getList({required int page}) =>
@@ -55,17 +47,14 @@ void main() {
       when(() => testRepository.getListOrFailure(1))
           .thenAnswer((_) => getPageResponse(page: 1));
       final states = <PaginatedState>[];
-      providerContainer.listen(
-        testNotifierProvider,
-        (_, state) => states.add(state),
-        fireImmediately: false,
+      testNotifier.listen(
+        (currentState, _) => states.add(currentState),
+        fireImmediately: true,
       );
-      await providerContainer
-          .read(testNotifierProvider.notifier)
-          .getInitialList();
+      await testNotifier.getInitialList();
       expect(
         [
-          const PaginatedState<Never>.loading(),
+          PaginatedState<String>.loading(),
           PaginatedState.loaded(getList(page: 1), isLastPage: false),
         ],
         states,
@@ -78,17 +67,14 @@ void main() {
       when(() => testRepository.getListOrFailure(1))
           .thenAnswer((_) => getPageResponse(page: 1, shouldFail: true));
       final states = <PaginatedState>[];
-      providerContainer.listen(
-        testNotifierProvider,
-        (_, state) => states.add(state),
-        fireImmediately: false,
+      testNotifier.listen(
+        (currentState, _) => states.add(currentState),
+        fireImmediately: true,
       );
-      await providerContainer
-          .read(testNotifierProvider.notifier)
-          .getInitialList();
+      await testNotifier.getInitialList();
       expect(
         [
-          const PaginatedState<Never>.loading(),
+          const PaginatedState<String>.loading(),
           PaginatedState<String>.error(const [], testGenericFailure),
         ],
         states,
@@ -103,12 +89,11 @@ void main() {
       when(() => testRepository.getListOrFailure(1))
           .thenAnswer((_) => getPageResponse(page: 1));
       final states = <PaginatedState>[];
-      providerContainer.listen(
-        testNotifierProvider,
-        (_, state) => states.add(state),
+      testNotifier.listen(
+        (currentState, _) => states.add(currentState),
         fireImmediately: false,
       );
-      await providerContainer.read(testNotifierProvider.notifier).getNextPage();
+      await testNotifier.getNextPage();
       expect(
         [
           const PaginatedState<String>.loadingMore([]),
@@ -128,17 +113,15 @@ void main() {
       when(() => testRepository.getListOrFailure(2))
           .thenAnswer((_) => getPageResponse(page: 2));
       final states = <PaginatedState>[];
-      providerContainer.listen(
-        testNotifierProvider,
-        (_, state) => states.add(state),
-        fireImmediately: false,
+      testNotifier.listen(
+        (currentState, _) => states.add(currentState),
+        fireImmediately: true,
       );
-      final notifier = providerContainer.read(testNotifierProvider.notifier);
-      await notifier.getInitialList();
-      await notifier.getNextPage();
+      await testNotifier.getInitialList();
+      await testNotifier.getNextPage();
       expect(
         [
-          const PaginatedState<Never>.loading(),
+          const PaginatedState<String>.loading(),
           PaginatedState.loaded(getList(page: 1), isLastPage: false),
           PaginatedState.loadingMore(getList(page: 1)),
           PaginatedState.loaded(
@@ -158,18 +141,16 @@ void main() {
       when(() => testRepository.getListOrFailure(2))
           .thenAnswer((_) => getPageResponse(page: 2));
       final states = <PaginatedState>[];
-      providerContainer.listen(
-        testNotifierProvider,
-        (_, state) => states.add(state),
-        fireImmediately: false,
+      testNotifier.listen(
+        (currentState, _) => states.add(currentState),
+        fireImmediately: true,
       );
-      final notifier = providerContainer.read(testNotifierProvider.notifier);
-      await notifier.getInitialList();
-      await notifier.getNextPage();
-      await notifier.getNextPage();
+      await testNotifier.getInitialList();
+      await testNotifier.getNextPage();
+      await testNotifier.getNextPage();
       expect(
         [
-          const PaginatedState<Never>.loading(),
+          const PaginatedState<String>.loading(),
           PaginatedState.loaded(getList(page: 1), isLastPage: false),
           PaginatedState.loadingMore(getList(page: 1)),
           PaginatedState.loaded(
@@ -189,17 +170,15 @@ void main() {
       when(() => testRepository.getListOrFailure(2))
           .thenAnswer((_) => getPageResponse(page: 2, shouldFail: true));
       final states = <PaginatedState>[];
-      providerContainer.listen(
-        testNotifierProvider,
-        (_, state) => states.add(state),
-        fireImmediately: false,
+      testNotifier.listen(
+        (currentState, _) => states.add(currentState),
+        fireImmediately: true,
       );
-      final notifier = providerContainer.read(testNotifierProvider.notifier);
-      await notifier.getInitialList();
-      await notifier.getNextPage();
+      await testNotifier.getInitialList();
+      await testNotifier.getNextPage();
       expect(
         [
-          const PaginatedState<Never>.loading(),
+          const PaginatedState<String>.loading(),
           PaginatedState.loaded(getList(page: 1), isLastPage: false),
           PaginatedState.loadingMore(getList(page: 1)),
           PaginatedState.error(getList(page: 1), testGenericFailure),
@@ -224,19 +203,17 @@ void main() {
       when(() => testRepository.getListOrFailure(2))
           .thenAnswer((_) => getPageResponse(page: 2));
       final states = <PaginatedState>[];
-      providerContainer.listen(
-        testNotifierProvider,
-        (_, state) => states.add(state),
-        fireImmediately: false,
+      testNotifier.listen(
+        (currentState, _) => states.add(currentState),
+        fireImmediately: true,
       );
-      final notifier = providerContainer.read(testNotifierProvider.notifier);
-      await notifier.getInitialList();
-      await notifier.refresh();
+      await testNotifier.getInitialList();
+      await testNotifier.refresh();
       expect(
         [
-          const PaginatedState<Never>.loading(),
+          const PaginatedState<String>.loading(),
           PaginatedState<String>.error(const [], testGenericFailure),
-          const PaginatedState<Never>.loading(),
+          const PaginatedState<String>.loading(),
           PaginatedState<String>.loaded(getList(page: 1), isLastPage: false),
         ],
         states,
@@ -251,25 +228,23 @@ void main() {
       when(() => testRepository.getListOrFailure(2))
           .thenAnswer((_) => getPageResponse(page: 2));
       final states = <PaginatedState>[];
-      providerContainer.listen(
-        testNotifierProvider,
-        (_, state) => states.add(state),
-        fireImmediately: false,
+      testNotifier.listen(
+        (currentState, _) => states.add(currentState),
+        fireImmediately: true,
       );
-      final notifier = providerContainer.read(testNotifierProvider.notifier);
-      await notifier.getInitialList();
-      await notifier.getNextPage();
-      await notifier.refresh();
+      await testNotifier.getInitialList();
+      await testNotifier.getNextPage();
+      await testNotifier.refresh();
       expect(
         [
-          const PaginatedState<Never>.loading(),
+          const PaginatedState<String>.loading(),
           PaginatedState.loaded(getList(page: 1), isLastPage: false),
           PaginatedState.loadingMore(getList(page: 1)),
           PaginatedState.loaded(
             getList(page: 1) + getList(page: 2),
             isLastPage: true,
           ),
-          const PaginatedState<Never>.loading(),
+          const PaginatedState<String>.loading(),
           PaginatedState.loaded(getList(page: 1), isLastPage: false),
         ],
         states,
@@ -286,14 +261,9 @@ abstract class TestRepository {
 }
 
 class TestNotifier extends PaginatedNotifier<String, Object> {
-  late TestRepository _testRepository;
+  final TestRepository _testRepository;
 
-  @override
-  ({PaginatedState<String> initialState, bool useGlobalFailure})
-      prepareForBuild() {
-    _testRepository = ref.watch(testRepositoryProvider);
-    return (initialState: const PaginatedLoading(), useGlobalFailure: false);
-  }
+  TestNotifier(this._testRepository) : super(PaginatedLoading());
 
   @override
   PaginatedEitherFailureOr<String> getListOrFailure(
