@@ -1,8 +1,6 @@
 // ignore_for_file: avoid-dynamic
 
 import 'package:equatable/equatable.dart';
-import 'package:flutter/widgets.dart';
-import 'package:q_architecture/q_architecture.dart';
 
 /// Failure class that represents some kind of error that occurs in the app and being passed to UI
 class Failure extends Equatable {
@@ -19,7 +17,7 @@ class Failure extends Equatable {
   final StackTrace? stackTrace;
 
   /// uniqueKey set by [SimpleNotifierMixin.setGlobalFailure] method to trigger [globalFailureProvider] each time
-  final UniqueKey? uniqueKey;
+  final String? uniqueKey;
 
   const Failure({
     required this.title,
@@ -35,7 +33,7 @@ class Failure extends Equatable {
     bool isCritical = false,
     dynamic error,
     StackTrace? stackTrace,
-    UniqueKey? uniqueKey,
+    String? uniqueKey,
   }) =>
       Failure(
         title: title ?? 'Unknown error occurred',
@@ -50,7 +48,7 @@ class Failure extends Equatable {
     bool isCritical = false,
     dynamic error,
     StackTrace? stackTrace,
-    UniqueKey? uniqueKey,
+    String? uniqueKey,
   }) =>
       Failure(
         title: title ?? 'Permission denied',
@@ -65,7 +63,7 @@ class Failure extends Equatable {
     bool? isCritical,
     dynamic error,
     StackTrace? stackTrace,
-    UniqueKey? uniqueKey,
+    String? uniqueKey,
   }) =>
       Failure(
         title: title ?? this.title,

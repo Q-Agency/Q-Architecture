@@ -1,5 +1,7 @@
 import 'dart:async';
+import 'dart:math';
 
+import 'package:equatable/equatable.dart';
 import 'package:flutter/foundation.dart';
 import 'package:get_it/get_it.dart';
 import 'package:q_architecture/q_architecture.dart';
@@ -7,7 +9,7 @@ import 'package:q_architecture/q_architecture.dart';
 class SimpleNotifier<T> extends ChangeNotifier implements ValueListenable<T> {
   T _state;
   T? _previousState;
-  final List<VoidCallback> _listeners = [];
+  final List<_ListenerWrapper> _listenersWrappers = [];
   Timer? _debounceTimer;
   final Map<String, bool> _isThrottlingMap = {};
 
@@ -37,25 +39,50 @@ class SimpleNotifier<T> extends ChangeNotifier implements ValueListenable<T> {
   VoidCallback listen(
     void Function(T currentState, T? previousState) listener, {
     bool fireImmediately = false,
+    Object listenerId = '',
   }) {
-    void wrappedListener() => listener(_state, _previousState);
-    _listeners.add(wrappedListener);
-    addListener(wrappedListener);
-    if (fireImmediately) {
-      wrappedListener();
+    // Check if this exact listener is already registered
+    final existingListenerIndex = _listenersWrappers.indexWhere(
+      (wrapper) => wrapper.id == listenerId,
+    );
+    // If the listener is already registered, just return its removal function
+    if (existingListenerIndex != -1) {
+      return () => removeSpecificListener(listenerId);
     }
-    return () {
-      _listeners.remove(listener);
-      removeListener(wrappedListener);
-    };
+    // Create a wrapped function that calls the listener with state information
+    void wrappedListener() => listener(_state, _previousState);
+    // Create and store the wrapper
+    final wrapper = _ListenerWrapper(
+      id: listenerId,
+      call: wrappedListener,
+    );
+    // Add to our listeners list
+    _listenersWrappers.add(wrapper);
+    addListener(wrappedListener);
+
+    if (fireImmediately) wrappedListener();
+    // Return a function that removes this specific listener
+    return () => removeSpecificListener(listenerId);
+  }
+
+  /// Removes a specific listener by its ID
+  void removeSpecificListener(Object listenerId) {
+    final index = _listenersWrappers.indexWhere(
+      (wrapper) => wrapper.id == listenerId,
+    );
+    if (index != -1) {
+      final wrapper = _listenersWrappers[index];
+      _listenersWrappers.removeAt(index);
+      removeListener(wrapper.call);
+    }
   }
 
   /// Removes all listeners
   void removeAllListeners() {
-    for (final listener in _listeners) {
-      removeListener(listener);
+    for (final listener in _listenersWrappers) {
+      removeListener(listener.call);
     }
-    _listeners.clear();
+    _listenersWrappers.clear();
   }
 
   ///Show [BaseLoadingIndicator] above the entire app
@@ -72,7 +99,7 @@ class SimpleNotifier<T> extends ChangeNotifier implements ValueListenable<T> {
   void setGlobalFailure(Failure? failure) {
     clearGlobalLoading();
     GetIt.instance<GlobalFailureNotifier>().setFailure(
-      failure?.copyWith(uniqueKey: UniqueKey()),
+      failure?.copyWith(uniqueKey: getRandomStringWithTimestamp(10)),
     );
   }
 
@@ -80,7 +107,7 @@ class SimpleNotifier<T> extends ChangeNotifier implements ValueListenable<T> {
   void setGlobalInfo(GlobalInfo? globalInfo) {
     clearGlobalLoading();
     GetIt.instance<GlobalInfoNotifier>().setGlobalInfo(
-      globalInfo?.copyWith(uniqueKey: UniqueKey()),
+      globalInfo?.copyWith(uniqueKey: getRandomStringWithTimestamp(10)),
     );
   }
 
@@ -146,6 +173,31 @@ class SimpleNotifier<T> extends ChangeNotifier implements ValueListenable<T> {
   void cancelThrottle({String throttleIdentifier = ''}) =>
       _isThrottlingMap[throttleIdentifier] = false;
 
+  ///Generates a random string with a timestamp
+  @protected
+  String getRandomStringWithTimestamp(int length) {
+    const chars = 'abcdefghijklmnopqrstuvwxyz0123456789';
+    final random = Random();
+    final randomStr = String.fromCharCodes(
+      List.generate(
+        length,
+        (index) => chars.codeUnitAt(random.nextInt(chars.length)),
+      ),
+    );
+    final timestamp = DateTime.now().millisecondsSinceEpoch;
+    return '$randomStr$timestamp';
+  }
+
   @override
   String toString() => '${describeIdentity(this)}($state)';
+}
+
+class _ListenerWrapper extends Equatable {
+  final Object id;
+  final VoidCallback call;
+
+  const _ListenerWrapper({required this.id, required this.call});
+
+  @override
+  List<Object?> get props => [id, call];
 }
