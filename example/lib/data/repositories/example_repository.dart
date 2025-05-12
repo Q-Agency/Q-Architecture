@@ -54,9 +54,8 @@ class ExampleRepositoryImp
           await 3.seconds;
           if (Random().nextBool()) {
             return const Right('Some sentence');
-          } else {
-            throw Exception();
           }
+          throw Exception();
         },
         errorResolver: CustomErrorResolver(),
       );

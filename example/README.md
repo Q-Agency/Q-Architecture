@@ -1,18 +1,13 @@
 # Q-Architecture
 
 A set of reusable classes that should speed up your development time and reduce
-unnecessary boilerplate code. Powered by
-[riverpod](https://pub.dev/packages/riverpod).
+unnecessary boilerplate code.
 
 ## Get started
 
 - Create your abstract repository and implement it
 
 ```dart
-final repositoryProvider = Provider<YourRepository>(
-      (_) => YourRepositoryImplementation(),
-);
-
 abstract class YourRepository {
   EitherFailureOr<String> getYourString();
 }
@@ -23,11 +18,18 @@ class YourRepositoryImplementation implements YourRepository {
     await Future.delayed(const Duration(seconds: 3));
     if (Random().nextBool()) {
       return const Right('Your string');
-    } else {
-      return Left(Failure.generic());
     }
+    return Left(Failure.generic());
   }
 }
+```
+
+- Add YourRepository to setupGetIt() method.
+
+````dart
+getIt.registerSingleton<YourRepository>(
+  YourRepositoryImplementation(),
+);
 ```
 
 - Create your Notifier which extends BaseNotifier and add method to call your
@@ -35,14 +37,9 @@ class YourRepositoryImplementation implements YourRepository {
 
 ```dart
 class YourNotifier extends BaseNotifier<String> {
-  late YourRepository _yourRepository;
+  final YourRepository _yourRepository;
 
-  YourNotifier(this._yourRepository, super.ref);
-
-  @override
-  void prepareForBuild() {
-    _yourRepository = ref.watch(repositoryProvider);
-  }
+  YourNotifier(this._yourRepository);
 
   Future getYourString() =>
       execute(
@@ -52,28 +49,34 @@ class YourNotifier extends BaseNotifier<String> {
         globalFailure: false,
       );
 }
-```
+````
 
-- Create provider for YourNotifier.
+- Add YourNotifier to setupGetIt() method.
 
 ```dart
-final yourNotifierProvider = NotifierProvider<YourNotifier, BaseState<String>>(
-  () => YourNotifier()
+getIt.registerLazySingleton<YourNotifier>(
+  () => YourNotifier(getIt<YourRepository>()),
+  dispose: (instance) => instance.dispose(),
 );
 ```
 
-- In your widget call your notifier getYourString() method through your provider
-  and watch for the changes
+- In your widget call your notifier getYourString() method through your service
+  locator and watch the changes through ValueListenableBuilder widget
 
-```
-ref.read(yourNotifierProvider.notifier).getYourString();
-final state = ref.watch(yourNotifierProvider);
-switch (state) {
-  Data(data: final sentence) => sentence,
-  Loading() => 'Loading',
-  Initial() => 'Initial',
-  Error(failure: final failure) => failure.toString(),
-},
+```dart
+final yourNotifier = getIt<YourNotifier>();
+yourNotifier.getYourString();
+return ValueListenablebuilder(
+  valueListenable: yourNotifier,
+  builder: (context, state, child) => Text(
+    switch (state) {
+      Data(data: final sentence) => sentence,
+      Loading() => 'Loading',
+      Initial() => 'Initial',
+      Error(failure: final failure) => failure.toString(),
+    }
+  )
+)
 ```
 
 That is all you need to get you started, to find out more, head over to the
@@ -105,17 +108,17 @@ writing repetitive code and access global loading and failure handling.
 ### ExampleNotifier
 
 ```dart
-final exampleNotifierProvider = NotifierProvider<ExampleStateNotifier, BaseState<String>>(
-     () => ExampleNotifier(),
+// in service_locator.dart
+getIt.registerLazySingleton<ExampleNotifier>(
+  () => ExampleNotifier(getIt<ExampleRepository>()),
+  dispose: (instance) => instance.dispose(),
 );
 
+// in example_notifier.dart
 class ExampleNotifier extends BaseNotifier<String> {
- late ExampleRepository _exampleRepository;
+ final ExampleRepository _exampleRepository;
 
- @override
- void prepareForBuild() {
-   _exampleRepository = ref.watch(exampleRepositoryProvider);
- }
+ ExampleNotifier(this._exampleRepository);
 
  Future getSomeStringFullExample() =>
      execute(
@@ -130,7 +133,7 @@ class ExampleNotifier extends BaseNotifier<String> {
 
        //Set to true if you want to update state to BaseState.loading()
        withLoadingState: true,
-
+       
        //Do some actions with data
        //If you return true, base state will be updated to BaseState.data(data)
        //If you return false, depending on withLoadingState, if true it will be 
@@ -163,49 +166,136 @@ class ExampleNotifier extends BaseNotifier<String> {
 ### ExamplePage
 
 ```dart
-class ExamplePage extends ConsumerWidget {
- static const routeName = '/';
+class ExamplePage extends StatefulWidget {
+  static const routeName = '/example';
 
- const ExamplePage({Key? key}) : super(key: key);
+  const ExamplePage({super.key});
 
- @override
- Widget build(BuildContext context, WidgetRef ref) {
-   final state = ref.watch(exampleNotifierProvider);
-   return Scaffold(
-     body: Center(
-       child: Column(
-         mainAxisAlignment: MainAxisAlignment.center,
-         children: [
-           Text(
-             switch (state) {
-               Data(data: final sentence) => sentence,
-               Loading() => 'Loading',
-               Initial() => 'Initial',
-               Error(failure: final failure) => failure.toString(),
-             },
-           ),
-           TextButton(
-             onPressed: ref
-                 .read(exampleNotifierProvider.notifier)
-                 .getSomeStringFullExample,
-             child: const Text('Get string'),
-           ),
-           TextButton(
-             onPressed: ref
-                 .read(exampleNotifierProvider.notifier)
-                 .getSomeStringGlobalLoading,
-             child: const Text('Global loading example'),
-           ),
-           //Navigation example
-           TextButton(
-             onPressed: () => ref.pushNamed(ExamplePage2.routeName),
-             child: const Text('Navigate'),
-           ),
-         ],
-       ),
-     ),
-   );
- }
+  @override
+  State<ExamplePage> createState() => _ExamplePageState();
+}
+
+class _ExamplePageState extends State<ExamplePage> {
+  @override
+  void dispose() {
+    getIt.resetLazySingleton<ExampleNotifier>();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final exampleNotifier = getIt<ExampleNotifier>();
+    return Scaffold(
+      appBar: AppBar(title: Text('Example page')),
+      body: ListView(
+        children: [
+          spacing16,
+          ValueListenableBuilder(
+            valueListenable: exampleNotifier,
+            builder:
+                (context, state, child) => Text(
+                  switch (state) {
+                    BaseData(data: final sentence) => sentence,
+                    BaseLoading() => 'Loading',
+                    BaseInitial() => 'Initial',
+                    BaseError(:final failure) => failure.toString(),
+                  },
+                  style: context.appTextStyles.regular?.copyWith(
+                    color: context.appColors.secondary,
+                  ),
+                  textAlign: TextAlign.center,
+                ),
+          ),
+          spacing16,
+          TextButton(
+            onPressed: exampleNotifier.getSomeStringFullExample,
+            child: Text('Get string', style: context.appTextStyles.bold),
+          ),
+          spacing16,
+          TextButton(
+            onPressed: exampleNotifier.getSomeStringGlobalLoading,
+            child: Text(
+              'Global loading example',
+              style: context.appTextStyles.bold,
+            ),
+          ),
+          spacing16,
+          TextButton(
+            onPressed: getIt<ExampleNotifier>().getSomeStringsStreamed,
+            child: Text(
+              'Cache + Network loading example',
+              style: context.appTextStyles.bold,
+            ),
+          ),
+          spacing16,
+          TextButton(
+            onPressed:
+                () => getIt<ExampleFiltersNotifier>().update(
+                  'Random ${Random().nextInt(100)}',
+                ),
+            child: Text(
+              'Update filters (to trigger reload of data)',
+              style: context.appTextStyles.bold,
+            ),
+          ),
+          spacing16,
+          TextButton(
+            onPressed: () => QLogger.showLogger(context),
+            child: Text('Show log', style: context.appTextStyles.bold),
+          ),
+          spacing16,
+          TextButton(
+            onPressed:
+                () => context.pushNamed(
+                  context.getRouteNameFromCurrentLocation(
+                    ExampleSimplePage.routeName,
+                  ),
+                ),
+            child: Text(
+              'Go to example simple',
+              style: context.appTextStyles.bold,
+            ),
+          ),
+          spacing16,
+          TextButton(
+            onPressed:
+                () => context.pushNamed(
+                  context.getRouteNameFromCurrentLocation(
+                    FormExamplePage.routeName,
+                  ),
+                ),
+            child: Text(
+              'Go to form example',
+              style: context.appTextStyles.bold,
+            ),
+          ),
+          spacing16,
+          TextButton(
+            onPressed:
+                () => context.pushNamed(
+                  context.getRouteNameFromCurrentLocation(
+                    PaginationExamplePage.routeName,
+                  ),
+                ),
+            child: Text('Go to pagination', style: context.appTextStyles.bold),
+          ),
+          spacing16,
+          TextButton(
+            onPressed:
+                () => context.pushNamed(
+                  context.getRouteNameFromCurrentLocation(
+                    PaginationStreamExamplePage.routeName,
+                  ),
+                ),
+            child: Text(
+              'Go to stream pagination',
+              style: context.appTextStyles.bold,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
 }
 ```
 
@@ -218,38 +308,31 @@ is here for you.
 ### ExampleSimpleNotifier
 
 ```dart
-final exampleSimpleNotifierProvider = NotifierProvider.autoDispose<
-    ExampleSimpleNotifier, ExampleSimpleState>(
-  () => ExampleSimpleNotifier(),
+// in service_locator.dart
+getIt.registerLazySingleton<ExampleSimpleNotifier>(
+  () => ExampleSimpleNotifier(getIt<ExampleRepository>()),
+  dispose: (instance) => instance.dispose(),
 );
 
-class ExampleSimpleNotifier
-    extends AutoDisposeSimpleNotifier<ExampleSimpleState> {
+// in example_simple_notifier.dart
+class ExampleSimpleNotifier extends SimpleNotifier<ExampleSimpleState> {
   final ExampleRepository _exampleRepository;
 
-  @override
-  ExampleSimpleState prepareForBuild() {
-    _exampleRepository = ref.watch(exampleRepositoryProvider);
-    return const ExampleSimpleState.initial();
-  }
+  ExampleSimpleNotifier(this._exampleRepository)
+    : super(ExampleSimpleState.initial());
 
   /// Example method when you want to get state updates when calling some repository method
   Future<void> getSomeStringSimpleExample() async {
     await debounce();
-    state = const ExampleSimpleState.fetching();
+    state = ExampleSimpleState.fetching();
     final result = await _exampleRepository.getSomeOtherString();
-    result.fold(
-      (failure) {
-        state = ExampleSimpleState.error(failure);
-      },
-      (data) {
-        if (data.isEmpty) {
-          state = const ExampleSimpleState.empty();
-        } else {
-          state = ExampleSimpleState.success(data);
-        }
-      },
-    );
+    result.fold((failure) => state = ExampleSimpleState.error(failure), (data) {
+      if (data.isEmpty) {
+        state = ExampleSimpleState.empty();
+      } else {
+        state = ExampleSimpleState.success(data);
+      }
+    });
   }
 
   /// Example method when you want to use global loading and global failure methods
@@ -257,19 +340,14 @@ class ExampleSimpleNotifier
   Future<void> getSomeStringSimpleExampleGlobalLoading() async {
     showGlobalLoading();
     final result = await _exampleRepository.getSomeOtherString();
-    result.fold(
-      (failure) {
-        setGlobalFailure(failure);
-      },
-      (data) {
-        clearGlobalLoading();
-        if (data.isEmpty) {
-          state = const ExampleSimpleState.empty();
-        } else {
-          state = ExampleSimpleState.success(data);
-        }
-      },
-    );
+    result.fold(setGlobalFailure, (data) {
+      clearGlobalLoading();
+      if (data.isEmpty) {
+        state = ExampleSimpleState.empty();
+      } else {
+        state = ExampleSimpleState.success(data);
+      }
+    });
   }
 }
 ```
@@ -278,102 +356,126 @@ class ExampleSimpleNotifier
 
 ```dart
 import 'package:equatable/equatable.dart';
-
-import '../entities/failure.dart';
+import 'package:q_architecture/q_architecture.dart';
 
 sealed class ExampleSimpleState extends Equatable {
   const ExampleSimpleState();
 
-  const factory ExampleSimpleState.empty() = Empty;
-  const factory ExampleSimpleState.fetching() = Fetching;
-  const factory ExampleSimpleState.error(Failure failure) = Error;
-  const factory ExampleSimpleState.success(String data) = Success;
+  const factory ExampleSimpleState.initial() = ExampleSimpleStateInitial;
+
+  const factory ExampleSimpleState.empty() = ExampleSimpleStateEmpty;
+
+  const factory ExampleSimpleState.fetching() = ExampleSimpleStateFetching;
+
+  const factory ExampleSimpleState.success(String sentence) =
+  ExampleSimpleStateSuccess;
+
+  const factory ExampleSimpleState.error(Failure failure) =
+  ExampleSimpleStateError;
 }
 
-final class Empty extends ExampleSimpleState {
-  const Empty();
+final class ExampleSimpleStateInitial extends ExampleSimpleState {
+  const ExampleSimpleStateInitial();
 
   @override
   List<Object?> get props => [];
 }
 
-final class Fetching extends ExampleSimpleState {
-  const Fetching();
+final class ExampleSimpleStateEmpty extends ExampleSimpleState {
+  const ExampleSimpleStateEmpty();
 
   @override
   List<Object?> get props => [];
 }
 
-final class Error extends ExampleSimpleState {
-  final Failure failure;
-
-  const Error(this.failure);
+final class ExampleSimpleStateFetching extends ExampleSimpleState {
+  const ExampleSimpleStateFetching();
 
   @override
-  List<Object?> get props => [failure];
+  List<Object?> get props => [];
 }
 
-final class Success extends ExampleSimpleState {
+final class ExampleSimpleStateSuccess extends ExampleSimpleState {
   final String data;
 
-  const Data(this.data);
+  const ExampleSimpleStateSuccess(this.data);
 
   @override
   List<Object?> get props => [data];
+}
+
+final class ExampleSimpleStateError extends ExampleSimpleState {
+  final Failure failure;
+
+  const ExampleSimpleStateError(this.failure);
+
+  @override
+  List<Object?> get props => [failure];
 }
 ```
 
 ### ExampleSimplePage
 
 ```dart
-class ExampleSimplePage extends ConsumerWidget {
-  static const routeName = '/simple-page';
+class ExampleSimplePage extends StatefulWidget {
+  static const routeName = '/example-simple-page';
 
   const ExampleSimplePage({super.key});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    final state = ref.watch(exampleSimpleNotifierProvider);
+  State<ExampleSimplePage> createState() => _ExampleSimplePageState();
+}
+
+class _ExampleSimplePageState extends State<ExampleSimplePage> {
+  @override
+  void dispose() {
+    getIt.resetLazySingleton<ExampleSimpleNotifier>();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final exampleSimpleNotifier = getIt<ExampleSimpleNotifier>();
     return Scaffold(
-      body: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        crossAxisAlignment: CrossAxisAlignment.stretch,
+      appBar: AppBar(title: Text('Example simple page')),
+      body: ListView(
         children: [
-          Text(
-            switch (state) {
-              Initial() => 'Initial',
-              Empty() => 'Empty',
-              Fetching() => 'Fetching',
-              Success(sentence: final string) => string,
-              Error(failure: final failure) => failure.title,
+          spacing16,
+          ListenableBuilder(
+            listenable: exampleSimpleNotifier,
+            builder: (context, child) {
+              return Text(
+                switch (exampleSimpleNotifier.state) {
+                  ExampleSimpleStateInitial() => 'Initial',
+                  ExampleSimpleStateEmpty() => 'Empty',
+                  ExampleSimpleStateFetching() => 'Fetching',
+                  ExampleSimpleStateSuccess(data: final string) => string,
+                  ExampleSimpleStateError(:final failure) => failure.title,
+                },
+                textAlign: TextAlign.center,
+                style: context.appTextStyles.regular,
+              );
             },
-            textAlign: TextAlign.center,
           ),
+          spacing16,
           TextButton(
             onPressed: () {
-              ref
-                  .read(exampleSimpleNotifierProvider.notifier)
-                  .getSomeStringSimpleExample();
-              ref
-                  .read(exampleSimpleNotifierProvider.notifier)
-                  .getSomeStringSimpleExample();
+              exampleSimpleNotifier.getSomeStringSimpleExample();
+              exampleSimpleNotifier.getSomeStringSimpleExample();
             },
-            child: const Text('Simple state example with debounce'),
+            child: Text(
+              'Simple state example with debounce',
+              style: context.appTextStyles.bold,
+            ),
           ),
+          spacing16,
           TextButton(
-            onPressed: ref
-                .read(exampleSimpleNotifierProvider.notifier)
-                .getSomeStringSimpleExampleGlobalLoading,
-            child: const Text('Global loading example'),
-          ),
-          ElevatedButton(
-            onPressed: Navigator.of(context).pop,
-            child: const Text('Go back!'),
-          ),
-          TextButton(
-            onPressed: () =>
-                Navigator.of(context).pushNamed(ExamplePage3.routeName),
-            child: const Text('Navigate'),
+            onPressed:
+                exampleSimpleNotifier.getSomeStringSimpleExampleGlobalLoading,
+            child: Text(
+              'Global loading example',
+              style: context.appTextStyles.bold,
+            ),
           ),
         ],
       ),
@@ -442,9 +544,9 @@ final class Data<State> extends BaseState<State> {
 
 ## SimpleNotifier
 
-Abstract Notifier class which provides some convenient methods to be used by
-subclassing it. It can be used when BaseState doesn't suit you and you need more
-states, this notifier has **showGlobalLoading**, **clearGlobalLoading**,
+Abstract ChangeNotifier class which provides some convenient methods to be used
+by subclassing it. It can be used when BaseState doesn't suit you and you need
+more states, this notifier has **showGlobalLoading**, **clearGlobalLoading**,
 **setGlobalFailure**, **on**, **debounce**, **throttle** and **cancelThrottle**
 methods that are marked as **@protected** so you can easily use them in your
 subclasses.
@@ -453,9 +555,6 @@ subclasses.
 
 - **setGlobalFailure** for handling global failure (will automatically call
   **clearGlobalLoading** before showing global failure)
-
-- **on** for subscribing to another notifier's state changes so you can react
-  appropriately
 
 - **debounce** for waiting multiple method calls before only one method call can
   be executed
@@ -515,7 +614,7 @@ be of type **Stream** which allows us to return multiple results from the
 repository and by doing so we can use this functionality to create an easy to
 use caching mechanism by yielding cached data + network data.
 
-```
+```dart
 @protected
 Future<void> executeStreamed(
   StreamFailureOr<DataState> function, {
@@ -541,7 +640,7 @@ Future getSomeStringsStreamed() => executeStreamed(
 
 In repository:
 
-```
+```dart
 @override
 StreamFailureOr<String> getSomeStringsStreamed() async* {
   yield const Right('Some sentence from cache');
@@ -660,11 +759,15 @@ notifiers.
 
 ## Global loading
 
-**globalLoadingProvider** can be used to show the loading indicator without
+**GlobalLoadingNotifier** can be used to show the loading indicator without
 updating **BaseNotifier** state.
 
 ```dart
-final globalLoadingProvider = StateProvider<bool>((_) => false);
+class GlobalLoadingNotifier extends SimpleNotifier<bool> {
+  GlobalLoadingNotifier() : super(false);
+
+  void setGlobalLoading(bool value) => state = value;
+}
 ```
 
 ### Loading example
@@ -698,33 +801,36 @@ Future getSomeString() =>
 
 ## Global failure
 
-**globalFailureProvider** can be used to show the failure that happened in the
+**GlobalFailureNotifier** can be used to show the failure that happened in the
 application without updating **BaseNotifier** state.
 
 ```dart
-final globalFailureProvider = StateProvider<Failure?>((_) => null);
+class GlobalFailureNotifier extends SimpleNotifier<Failure?> {
+  GlobalFailureNotifier() : super(null);
+
+  void setFailure(Failure? failure) => state = failure;
+}
 ```
 
 ### Global failure listener
 
 ```dart
-void globalFailureListener() {
-  listen<Failure?>(globalFailureProvider, (_, failure) {
-    if (failure == null) return;
-    //Show global error
-    logError('''showing ${failure.isCritical ? '' : 'non-'}critical failure with title ${failure.title},
-          error: ${failure.error},
-          stackTrace: ${failure.stackTrace}
-      ''');
+GetIt.instance<GlobalFailureNotifier>()
+    .listen((currentState, previousState) {
+  if (currentState == null) return;
+  //Show global error
+  logError('''showing ${failure.isCritical ? '' : 'non-'}critical failure with title ${failure.title},
+        error: ${failure.error},
+        stackTrace: ${failure.stackTrace}
+    ''');
   });
-}
 ```
 
 ### Failure example
 
-**globalFailureProvider** listener will be triggered by setting
+**GlobalFailureNotifier** listener will be triggered by setting
 **globalFailure** inside of execute method to **true** when failure happens. If
-set to false, instead of updating globalFailureProvider, **BaseNotifier** state
+set to false, instead of updating GlobalFailureNotifier, **BaseNotifier** state
 will be set to error so the failure can be shown directly on the screen, not in
 the overlay as a toast or a dialog.
 
@@ -740,7 +846,7 @@ Future getSomeString() =>
 
 ## Global info
 
-**globalInfoProvider** can be used to show any info by passing the info status
+**GlobalInfoNotifier** can be used to show any info by passing the info status
 with GlobalInfoStatus. GlobalInfoStatus contains values: info, warning, error,
 success. Pass the required info status, and message of info that will be
 presented to the user. To set GlobalInfo from any notifier, just call
@@ -749,24 +855,28 @@ setGlobalInfo() function defined in SimpleNotifier.
 Suggestion: setGlobalInfo() can be called from onDataReceived() callback inside
 execute() function if there is a need to show alert directly from notifier,
 right after request. For any other usage outside of notifier, set the value of
-**globalInfoProvider** directly.
+**GlobalInfoNotifier** directly.
 
 ```dart
-final globalInfoProvider = StateProvider<GlobalInfo?>((_) => null);
+class GlobalInfoNotifier extends SimpleNotifier<GlobalInfo?> {
+  GlobalInfoNotifier() : super(null);
+
+  @override
+  void setGlobalInfo(GlobalInfo? globalInfo) => state = globalInfo;
+}
 ```
 
 ### GlobalInfo listener
 
 ```dart
-void globalInfoListener() {
-  listen<GlobalInfo?>(globalInfoProvider, (_, globalInfo) {
-    if (globalInfo == null) return;
-    //Show global error
-    logInfo(''' 
-        globalInfoStatus: ${globalInfo.globalInfoStatus}
-        title: ${globalInfo.title}, 
-        message: ${globalInfo.message},
-      ''');
+GetIt.instance<GlobalInfoNotifier>().listen((currentState, previousState) {
+  if (currentState == null) return;
+  //Show global error
+  logInfo(''' 
+      globalInfoStatus: ${globalInfo.globalInfoStatus}
+      title: ${globalInfo.title}, 
+      message: ${globalInfo.message},
+    ''');
   });
 }
 ```
@@ -775,44 +885,53 @@ void globalInfoListener() {
 
 You can wrap the each widget in **BaseWidget** which listens to:
 
-- **globalFailureProvider**
+- **GlobalFailureNotifier**
 
-- **globalLoadingProvider**.
+- **GlobalLoadingNotifier**.
 
-- **globalInfoProvider**
+- **GlobalInfoNotifier**
 
 You are required to pass in the **onFailure** and **onGlobalInfo** handlers.
 
 ```dart
-class BaseWidget extends ConsumerWidget {
+class BaseWidget extends StatelessWidget {
   final Widget child;
   final Widget? loadingIndicator;
-  final Function(Failure) onFailure;
-  final Function(GlobalInfo) onGlobalInfo;
+  final Function(Failure failure) onGlobalFailure;
+  final Function(GlobalInfo globalInfo) onGlobalInfo;
 
   const BaseWidget({
+    super.key,
     required this.child,
-    required this.onFailure,
+    required this.onGlobalFailure,
     required this.onGlobalInfo,
     this.loadingIndicator,
-    Key? key,
-  }) : super(key: key);
+  });
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    ref.listen<Failure?>(globalFailureProvider, (_, failure) {
-      if (failure == null) return;
-      onFailure(failure);
+  Widget build(BuildContext context) {
+    GetIt.instance<GlobalFailureNotifier>()
+        .listen((currentState, previousState) {
+      if (currentState == null) return;
+      onGlobalFailure(currentState);
     });
-    ref.listen<GlobalInfo?>(globalInfoProvider, (_, globalInfo) {
-      if (globalInfo == null) return;
-      onGlobalInfo(globalInfo);
+    GetIt.instance<GlobalInfoNotifier>().listen((currentState, previousState) {
+      if (currentState == null) return;
+      onGlobalInfo(currentState);
     });
-    final showLoading = ref.watch(globalLoadingProvider);
+    final globalLoadingNotifier = GetIt.instance<GlobalLoadingNotifier>();
     return Stack(
       children: [
         child,
-        if (showLoading) loadingIndicator ?? const BaseLoadingIndicator(),
+        ValueListenableBuilder(
+          valueListenable: globalLoadingNotifier,
+          builder: (context, value, child) {
+            if (value) {
+              return loadingIndicator ?? const BaseLoadingIndicator();
+            }
+            return SizedBox();
+          },
+        ),
       ],
     );
   }
@@ -823,15 +942,13 @@ You can simply wrap each widget with your version of the BaseWidget in the
 builder of your MaterialApp:
 
 ```dart
-ProviderScope(
-      child: MaterialApp(
-        title: 'Q Architecture',
-        builder: (context, child) => Material(
-          type: MaterialType.transparency,
-          child: MessageDisplayingBaseWidget(child: child),
-        ),
-      ),
-    );
+MaterialApp(
+  title: 'Q Architecture',
+  builder: (context, child) => Material(
+    type: MaterialType.transparency,
+    child: MessageDisplayingBaseWidget(child: child),
+  ),
+);
 ```
 
 ## ErrorToFailureMixin

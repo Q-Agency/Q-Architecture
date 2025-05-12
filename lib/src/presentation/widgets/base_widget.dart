@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:get_it/get_it.dart';
 import 'package:q_architecture/q_architecture.dart';
 
-class BaseWidget extends StatefulWidget {
+class BaseWidget extends StatelessWidget {
   final Widget child;
   final Widget? loadingIndicator;
   final Function(Failure failure) onGlobalFailure;
@@ -17,36 +17,25 @@ class BaseWidget extends StatefulWidget {
   });
 
   @override
-  State<BaseWidget> createState() => _BaseWidgetState();
-}
-
-class _BaseWidgetState extends State<BaseWidget> {
-  @override
-  void initState() {
-    super.initState();
-
+  Widget build(BuildContext context) {
     GetIt.instance<GlobalFailureNotifier>()
         .listen((currentState, previousState) {
       if (currentState == null) return;
-      widget.onGlobalFailure(currentState);
+      onGlobalFailure(currentState);
     });
     GetIt.instance<GlobalInfoNotifier>().listen((currentState, previousState) {
       if (currentState == null) return;
-      widget.onGlobalInfo(currentState);
+      onGlobalInfo(currentState);
     });
-  }
-
-  @override
-  Widget build(BuildContext context) {
     final globalLoadingNotifier = GetIt.instance<GlobalLoadingNotifier>();
     return Stack(
       children: [
-        widget.child,
+        child,
         ValueListenableBuilder(
           valueListenable: globalLoadingNotifier,
           builder: (context, value, child) {
             if (value) {
-              return widget.loadingIndicator ?? const BaseLoadingIndicator();
+              return loadingIndicator ?? const BaseLoadingIndicator();
             }
             return SizedBox();
           },
