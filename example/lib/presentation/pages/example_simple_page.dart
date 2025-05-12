@@ -17,7 +17,7 @@ class ExampleSimplePage extends StatefulWidget {
 class _ExampleSimplePageState extends State<ExampleSimplePage> {
   @override
   void dispose() {
-    getIt.unregister<ExampleSimpleNotifier>();
+    getIt.resetLazySingleton<ExampleSimpleNotifier>();
     super.dispose();
   }
 

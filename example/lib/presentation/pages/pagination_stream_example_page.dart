@@ -5,10 +5,23 @@ import 'package:example/service_locator.dart';
 import 'package:flutter/material.dart';
 import 'package:q_architecture/q_architecture.dart';
 
-class PaginationStreamExamplePage extends StatelessWidget {
+class PaginationStreamExamplePage extends StatefulWidget {
   static const routeName = '/pagination-stream-example-page';
 
   const PaginationStreamExamplePage({super.key});
+
+  @override
+  State<PaginationStreamExamplePage> createState() =>
+      _PaginationStreamExamplePageState();
+}
+
+class _PaginationStreamExamplePageState
+    extends State<PaginationStreamExamplePage> {
+  @override
+  void dispose() {
+    getIt.resetLazySingleton<ExamplePaginatedStreamNotifier>();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
