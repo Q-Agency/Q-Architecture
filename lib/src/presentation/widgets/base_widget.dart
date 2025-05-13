@@ -20,29 +20,33 @@ class BaseWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    GetIt.instance<GlobalFailureNotifier>()
-        .listen((currentState, previousState) {
-      if (currentState == null) return;
-      onGlobalFailure(currentState);
-    });
-    GetIt.instance<GlobalInfoNotifier>().listen((currentState, previousState) {
-      if (currentState == null) return;
-      onGlobalInfo(currentState);
-    });
-    final globalLoadingNotifier = GetIt.instance<GlobalLoadingNotifier>();
-    return Stack(
-      children: [
-        child,
-        ValueListenableBuilder(
-          valueListenable: globalLoadingNotifier,
-          builder: (context, value, child) {
-            if (value) {
-              return loadingIndicator ?? const BaseLoadingIndicator();
-            }
-            return SizedBox();
-          },
+    return SimpleNotifierListener(
+      simpleNotifier: GetIt.instance<GlobalFailureNotifier>(),
+      onChange: (currentState, previousState) {
+        if (currentState == null) return;
+        onGlobalFailure(currentState);
+      },
+      child: SimpleNotifierListener(
+        simpleNotifier: GetIt.instance<GlobalInfoNotifier>(),
+        onChange: (currentState, previousState) {
+          if (currentState == null) return;
+          onGlobalInfo(currentState);
+        },
+        child: Stack(
+          children: [
+            child,
+            ValueListenableBuilder(
+              valueListenable: GetIt.instance<GlobalLoadingNotifier>(),
+              builder: (context, value, child) {
+                if (value) {
+                  return loadingIndicator ?? const BaseLoadingIndicator();
+                }
+                return SizedBox();
+              },
+            ),
+          ],
         ),
-      ],
+      ),
     );
   }
 }

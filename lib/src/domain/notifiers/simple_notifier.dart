@@ -31,10 +31,12 @@ class SimpleNotifier<T> extends ChangeNotifier implements ValueListenable<T> {
   ///Gets the state
   T get state => _state;
 
-  @protected
+  ///Gets the previous state
+  T? get previousState => _previousState;
 
   ///Sets the state
   ///[newState] - the new state
+  @protected
   set state(T newState) {
     if (_state == newState) return;
     _previousState = _state;
@@ -59,32 +61,35 @@ class SimpleNotifier<T> extends ChangeNotifier implements ValueListenable<T> {
     final existingListenerIndex = _listenersWrappers.indexWhere(
       (wrapper) => wrapper.id == listenerId,
     );
-    // If the listener is already registered, just return its removal function
+    // If the listener is already registered, remove it
     if (existingListenerIndex != -1) {
-      return () => removeSpecificListener(listenerId);
+      removeSpecificListener(listenerIndex: existingListenerIndex);
     }
     // Create a wrapped function that calls the listener with state information
     void wrappedListener() => listener(_state, _previousState);
     // Create and store the wrapper
-    final wrapper = _ListenerWrapper(
-      id: listenerId,
-      call: wrappedListener,
-    );
+    final wrapper = _ListenerWrapper(id: listenerId, call: wrappedListener);
     // Add to our listeners list
     _listenersWrappers.add(wrapper);
     addListener(wrappedListener);
 
     if (fireImmediately) wrappedListener();
     // Return a function that removes this specific listener
-    return () => removeSpecificListener(listenerId);
+    return () => removeSpecificListener(listenerId: listenerId);
   }
 
   ///Removes a specific listener by its ID
   ///[listenerId] - the ID of the listener to remove
-  void removeSpecificListener(Object listenerId) {
-    final index = _listenersWrappers.indexWhere(
-      (wrapper) => wrapper.id == listenerId,
+  ///[listenerIndex] - the index of the listener to remove
+  void removeSpecificListener({Object? listenerId, int? listenerIndex}) {
+    assert(
+      listenerId != null || listenerIndex != null,
+      'listenerId or listenerIndex must be provided',
     );
+    final index = listenerIndex ??
+        _listenersWrappers.indexWhere(
+          (wrapper) => wrapper.id == listenerId,
+        );
     if (index != -1) {
       final wrapper = _listenersWrappers[index];
       _listenersWrappers.removeAt(index);
@@ -199,7 +204,6 @@ class SimpleNotifier<T> extends ChangeNotifier implements ValueListenable<T> {
 
   ///Generates a random string with a timestamp
   ///[length] - the length of the random string
-  @protected
   String getRandomStringWithTimestamp(int length) {
     const chars = 'abcdefghijklmnopqrstuvwxyz0123456789';
     final random = Random();
