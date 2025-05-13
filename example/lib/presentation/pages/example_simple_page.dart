@@ -1,5 +1,3 @@
-import 'dart:developer';
-
 import 'package:example/domain/notifiers/example_simple_notifier/example_simple_notifier.dart';
 import 'package:example/domain/notifiers/example_simple_notifier/example_simple_state.dart';
 import 'package:example/service_locator.dart';
@@ -31,19 +29,16 @@ class _ExampleSimplePageState extends State<ExampleSimplePage> {
         children: [
           ValueListenableBuilder(
             valueListenable: exampleSimpleNotifier,
-            builder: (context, value, child) {
-              log('state: $value');
-              return Text(
-                switch (value) {
-                  Initial() => 'Initial',
-                  Empty() => 'Empty',
-                  Fetching() => 'Fetching',
-                  Success(sentence: final string) => string,
-                  Error(:final failure) => failure.title,
-                },
-                textAlign: TextAlign.center,
-              );
-            },
+            builder: (context, value, child) => Text(
+              switch (value) {
+                Initial() => 'Initial',
+                Empty() => 'Empty',
+                Fetching() => 'Fetching',
+                Success(sentence: final string) => string,
+                Error(:final failure) => failure.title,
+              },
+              textAlign: TextAlign.center,
+            ),
           ),
           TextButton(
             onPressed: () {

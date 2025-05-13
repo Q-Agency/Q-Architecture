@@ -1,4 +1,4 @@
-//ignore_for_file: prefer-match-file-name
+// ignore_for_file: unused_result
 
 import 'package:either_dart/either.dart';
 import 'package:flutter_test/flutter_test.dart';

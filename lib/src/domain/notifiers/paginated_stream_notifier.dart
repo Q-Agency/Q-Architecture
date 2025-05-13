@@ -19,6 +19,8 @@ abstract class PaginatedStreamNotifier<Entity, Param>
     bool useGlobalFailure = false,
   }) : _useGlobalFailure = useGlobalFailure;
 
+  ///Gets the initial list
+  ///[param] - the optional parameter to get the initial list
   Future<void> getInitialList([Param? param]) async {
     _parameter = param;
     _resetPagination();
@@ -35,6 +37,7 @@ abstract class PaginatedStreamNotifier<Entity, Param>
     super.dispose();
   }
 
+  ///Gets the next page
   Future<void> getNextPage() async {
     if (_lastPaginatedList?.isLast ?? false) return;
     if (state is PaginatedLoadingMore) return;
@@ -53,8 +56,12 @@ abstract class PaginatedStreamNotifier<Entity, Param>
     );
   }
 
+  ///Refreshes the list to the initial state
   Future<void> refresh() => getInitialList(_parameter);
 
+  ///Gets the list stream or failure, needs to be implemented by the subclass
+  ///[page] - the page number
+  ///[parameter] - the optional parameter
   @protected
   PaginatedStreamFailureOr<Entity> getListStreamOrFailure(
     int page, [

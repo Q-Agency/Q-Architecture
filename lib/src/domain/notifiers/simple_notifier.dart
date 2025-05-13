@@ -4,6 +4,7 @@ import 'dart:math';
 import 'package:equatable/equatable.dart';
 import 'package:flutter/foundation.dart';
 import 'package:get_it/get_it.dart';
+import 'package:meta/meta.dart';
 import 'package:q_architecture/q_architecture.dart';
 
 class SimpleNotifier<T> extends ChangeNotifier implements ValueListenable<T> {
@@ -23,11 +24,17 @@ class SimpleNotifier<T> extends ChangeNotifier implements ValueListenable<T> {
   }
 
   @override
+
+  ///Gets the state
   T get value => state;
 
+  ///Gets the state
   T get state => _state;
 
   @protected
+
+  ///Sets the state
+  ///[newState] - the new state
   set state(T newState) {
     if (_state == newState) return;
     _previousState = _state;
@@ -35,7 +42,14 @@ class SimpleNotifier<T> extends ChangeNotifier implements ValueListenable<T> {
     notifyListeners();
   }
 
-  /// Adds a listener and returns a function that can be called to remove the listener
+  /// Adds a listener and returns a function that can be called to remove the listener.
+  /// The returned callback must be stored and called when the listener should be removed
+  /// to prevent memory leaks, especially if the notifier outlives the listening object.
+  /// Otherwise, listener can be removed by calling removeSpecificListener with the same listenerId
+  /// [listener] - the listener function that will be called when the state changes
+  /// [fireImmediately] - if true, the listener will be called immediately with the current state
+  /// [listenerId] - a unique identifier for the listener, if not provided, an empty string will be used
+  @useResult
   VoidCallback listen(
     void Function(T currentState, T? previousState) listener, {
     bool fireImmediately = false,
@@ -65,7 +79,8 @@ class SimpleNotifier<T> extends ChangeNotifier implements ValueListenable<T> {
     return () => removeSpecificListener(listenerId);
   }
 
-  /// Removes a specific listener by its ID
+  ///Removes a specific listener by its ID
+  ///[listenerId] - the ID of the listener to remove
   void removeSpecificListener(Object listenerId) {
     final index = _listenersWrappers.indexWhere(
       (wrapper) => wrapper.id == listenerId,
@@ -85,16 +100,18 @@ class SimpleNotifier<T> extends ChangeNotifier implements ValueListenable<T> {
     _listenersWrappers.clear();
   }
 
-  ///Show [BaseLoadingIndicator] above the entire app
+  ///Shows [BaseLoadingIndicator] above the entire app
   @protected
   void showGlobalLoading() =>
       GetIt.instance<GlobalLoadingNotifier>().setGlobalLoading(true);
 
-  ///Clear [BaseLoadingIndicator]
+  ///Clears [BaseLoadingIndicator]
   @protected
   void clearGlobalLoading() =>
       GetIt.instance<GlobalLoadingNotifier>().setGlobalLoading(false);
 
+  ///Sets a global failure
+  ///[failure] - the failure to set, can be null
   @protected
   void setGlobalFailure(Failure? failure) {
     clearGlobalLoading();
@@ -103,6 +120,8 @@ class SimpleNotifier<T> extends ChangeNotifier implements ValueListenable<T> {
     );
   }
 
+  ///Sets a global info
+  ///[globalInfo] - the info to set, can be null
   @protected
   void setGlobalInfo(GlobalInfo? globalInfo) {
     clearGlobalLoading();
@@ -112,6 +131,7 @@ class SimpleNotifier<T> extends ChangeNotifier implements ValueListenable<T> {
   }
 
   ///Wait to collect multiple method calls for certain duration before allowing only one method call to proceed
+  ///[duration] - the duration to wait before allowing only one method call to proceed
   @protected
   Future<void> debounce({
     Duration duration = const Duration(milliseconds: 500),
@@ -126,7 +146,10 @@ class SimpleNotifier<T> extends ChangeNotifier implements ValueListenable<T> {
   }
 
   ///Execute given function and then block further executing of the same function for certain duration.
-  ///[waitForFunction] if set to true it will wait if function finishes after provided duration delay, otherwise will finish immediately after given duration
+  ///[function] - the function to execute
+  ///[duration] - the duration to wait before allowing only one method call to proceed
+  ///[waitForFunction] - if set to true it will wait if function finishes after provided duration delay, otherwise will finish immediately after given duration
+  ///[throttleIdentifier] - a unique identifier for the throttle, if not provided, an empty string will be used
   @protected
   Future<void> throttle(
     Future<void> Function() function, {
@@ -169,11 +192,13 @@ class SimpleNotifier<T> extends ChangeNotifier implements ValueListenable<T> {
   }
 
   ///Cancels if throttling is in progress
+  ///[throttleIdentifier] - a unique identifier for the throttle, if not provided, an empty string will be used
   @protected
   void cancelThrottle({String throttleIdentifier = ''}) =>
       _isThrottlingMap[throttleIdentifier] = false;
 
   ///Generates a random string with a timestamp
+  ///[length] - the length of the random string
   @protected
   String getRandomStringWithTimestamp(int length) {
     const chars = 'abcdefghijklmnopqrstuvwxyz0123456789';

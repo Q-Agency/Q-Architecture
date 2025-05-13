@@ -1,9 +1,10 @@
+// ignore_for_file: unused_result
+
 import 'package:either_dart/either.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
 import 'package:q_architecture/q_architecture.dart';
 
-//ignore: prefer-match-file-name
 class MockTestRepository extends Mock implements TestRepository {}
 
 void main() {

@@ -1,3 +1,5 @@
+// ignore_for_file: unused_result
+
 import 'package:flutter/material.dart';
 import 'package:get_it/get_it.dart';
 import 'package:q_architecture/q_architecture.dart';

@@ -43,7 +43,6 @@ class BaseNotifier<DataState> extends SimpleNotifier<BaseState<DataState>> {
   /// Executes received stream [function] with additional parameters to control if loading state should be set while executing [function] by providing [withLoadingState] param.
   /// Usage is the same as the [execute] method with the main difference in number of [function] results (and consequently number of state updates) as it is a stream of data
   @protected
-  // ignore: avoid-redundant-async
   Future<void> executeStreamed(
     StreamFailureOr<DataState> function, {
     PreHandleData<DataState>? onDataReceived,

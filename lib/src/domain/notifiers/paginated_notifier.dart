@@ -12,6 +12,7 @@ abstract class PaginatedNotifier<Entity, Param>
     super.useGlobalFailure,
   });
 
+  ///Gets the list or failure, needs to be implemented by the subclass
   @protected
   PaginatedEitherFailureOr<Entity> getListOrFailure(
     int page, [
