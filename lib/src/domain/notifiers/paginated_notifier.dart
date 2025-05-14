@@ -10,6 +10,7 @@ abstract class PaginatedNotifier<Entity, Param>
   PaginatedNotifier(
     super.initialState, {
     super.useGlobalFailure,
+    super.autoDispose,
   });
 
   ///Gets the list or failure, needs to be implemented by the subclass

@@ -30,19 +30,26 @@ void setupServiceLocator() {
     dispose: (instance) => instance.dispose(),
   );
   getIt.registerLazySingleton<ExampleSimpleNotifier>(
-    () => ExampleSimpleNotifier(getIt<ExampleRepository>()),
+    () => ExampleSimpleNotifier(
+      getIt<ExampleRepository>(),
+      autoDispose: true,
+    ),
     dispose: (instance) => instance.dispose(),
   );
   getIt.registerLazySingleton<ExampleNotifier>(
-    () => ExampleNotifier(getIt<ExampleRepository>()),
+    () => ExampleNotifier(getIt<ExampleRepository>(), autoDispose: true),
     dispose: (instance) => instance.dispose(),
   );
   getIt.registerLazySingleton<ExamplePaginatedNotifier>(
-    () => ExamplePaginatedNotifier(getIt<ExampleRepository>()),
+    () =>
+        ExamplePaginatedNotifier(getIt<ExampleRepository>(), autoDispose: true),
     dispose: (instance) => instance.dispose(),
   );
   getIt.registerLazySingleton<ExamplePaginatedStreamNotifier>(
-    () => ExamplePaginatedStreamNotifier(getIt<ExampleRepository>()),
+    () => ExamplePaginatedStreamNotifier(
+      getIt<ExampleRepository>(),
+      autoDispose: true,
+    ),
     dispose: (instance) => instance.dispose(),
   );
 }

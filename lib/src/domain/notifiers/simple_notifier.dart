@@ -8,13 +8,27 @@ import 'package:meta/meta.dart';
 import 'package:q_architecture/q_architecture.dart';
 
 class SimpleNotifier<T> extends ChangeNotifier implements ValueListenable<T> {
+  ///The current state
   T _state;
+
+  ///The previous state, can be null
   T? _previousState;
+
   final List<_ListenerWrapper> _listenersWrappers = [];
   Timer? _debounceTimer;
   final Map<String, bool> _isThrottlingMap = {};
+  final bool _autoDispose;
 
-  SimpleNotifier(this._state);
+  /// Constructor for SimpleNotifier
+  ///
+  /// [state] - The initial state of the notifier
+  /// [autoDispose] - If true, the notifier will be disposed when all listeners are removed.
+  /// IMPORTANT: When using autoDispose=true, this SimpleNotifier subclass
+  /// MUST be registered as a lazySingleton in GetIt, otherwise an exception
+  /// will be thrown when attempting to reset the lazy singleton.
+  SimpleNotifier(T state, {bool autoDispose = false})
+      : _state = state,
+        _autoDispose = autoDispose;
 
   @override
   void dispose() {
@@ -24,8 +38,15 @@ class SimpleNotifier<T> extends ChangeNotifier implements ValueListenable<T> {
   }
 
   @override
+  void removeListener(VoidCallback listener) {
+    super.removeListener(listener);
+    if (_autoDispose && !hasListeners) {
+      GetIt.instance.resetLazySingleton(instance: this);
+    }
+  }
 
   ///Gets the state
+  @override
   T get value => state;
 
   ///Gets the state
@@ -48,7 +69,7 @@ class SimpleNotifier<T> extends ChangeNotifier implements ValueListenable<T> {
   /// The returned callback must be stored and called when the listener should be removed
   /// to prevent memory leaks, especially if the notifier outlives the listening object.
   /// Otherwise, listener can be removed by calling removeSpecificListener with the same listenerId
-  /// [listener] - the listener function that will be called when the state changes
+  /// [listener] - the listener function that will be called when the state changes with the current and previous state
   /// [fireImmediately] - if true, the listener will be called immediately with the current state
   /// [listenerId] - a unique identifier for the listener, if not provided, an empty string will be used
   @useResult

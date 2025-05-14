@@ -17,6 +17,7 @@ abstract class PaginatedStreamNotifier<Entity, Param>
   PaginatedStreamNotifier(
     super.initialState, {
     bool useGlobalFailure = false,
+    super.autoDispose,
   }) : _useGlobalFailure = useGlobalFailure;
 
   ///Gets the initial list

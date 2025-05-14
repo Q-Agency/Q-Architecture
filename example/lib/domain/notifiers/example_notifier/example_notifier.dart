@@ -8,7 +8,7 @@ class ExampleNotifier extends BaseNotifier<String> {
   final ExampleRepository _exampleRepository;
   VoidCallback? _filtersListenerDisposer;
 
-  ExampleNotifier(this._exampleRepository) {
+  ExampleNotifier(this._exampleRepository, {super.autoDispose}) {
     _filtersListenerDisposer = getIt<ExampleFiltersNotifier>()
         .listen((currentState, previousState) => getSomeStringsStreamed());
   }

@@ -4,7 +4,7 @@ import 'package:q_architecture/q_architecture.dart';
 class ExamplePaginatedNotifier extends PaginatedNotifier<String, Object> {
   final ExampleRepository _repository;
 
-  ExamplePaginatedNotifier(this._repository)
+  ExamplePaginatedNotifier(this._repository, {super.autoDispose})
       : super(const PaginatedState.loading(), useGlobalFailure: true) {
     getInitialList();
   }

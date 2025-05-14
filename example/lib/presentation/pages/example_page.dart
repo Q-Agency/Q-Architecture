@@ -36,16 +36,14 @@ class _ExamplePageState extends State<ExamplePage> {
           children: [
             ValueListenableBuilder(
               valueListenable: exampleNotifier,
-              builder: (context, value, child) {
-                return Text(
-                  switch (value) {
-                    BaseData(data: final sentence) => sentence,
-                    BaseLoading() => 'Loading',
-                    BaseInitial() => 'Initial',
-                    BaseError(:final failure) => failure.toString(),
-                  },
-                );
-              },
+              builder: (context, value, child) => Text(
+                switch (value) {
+                  BaseData(data: final sentence) => sentence,
+                  BaseLoading() => 'Loading',
+                  BaseInitial() => 'Initial',
+                  BaseError(:final failure) => failure.toString(),
+                },
+              ),
             ),
             TextButton(
               onPressed: exampleNotifier.getSomeStringFullExample,

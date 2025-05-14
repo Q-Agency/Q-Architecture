@@ -5,7 +5,7 @@ class ExamplePaginatedStreamNotifier
     extends PaginatedStreamNotifier<String, Object> {
   final ExampleRepository _repository;
 
-  ExamplePaginatedStreamNotifier(this._repository)
+  ExamplePaginatedStreamNotifier(this._repository, {super.autoDispose})
       : super(PaginatedState.loading()) {
     getInitialList();
   }

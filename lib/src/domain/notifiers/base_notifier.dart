@@ -6,7 +6,7 @@ typedef PreHandleData<T> = bool Function(T data);
 typedef PreHandleFailure = bool Function(Failure failure);
 
 class BaseNotifier<DataState> extends SimpleNotifier<BaseState<DataState>> {
-  BaseNotifier() : super(BaseState.initial());
+  BaseNotifier({super.autoDispose}) : super(BaseState.initial());
 
   /// Executes received [function] with additional parameters to control if loading state should be set while executing [function] by providing [withLoadingState] param.
   ///

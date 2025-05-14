@@ -5,7 +5,7 @@ import 'package:q_architecture/q_architecture.dart';
 class ExampleSimpleNotifier extends SimpleNotifier<ExampleSimpleState> {
   final ExampleRepository _exampleRepository;
 
-  ExampleSimpleNotifier(this._exampleRepository)
+  ExampleSimpleNotifier(this._exampleRepository, {super.autoDispose})
       : super(const ExampleSimpleState.initial());
 
   /// Example method when you want to get state updates when calling some repository method

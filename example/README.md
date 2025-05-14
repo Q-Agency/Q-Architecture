@@ -5,6 +5,30 @@ unnecessary boilerplate code.
 
 ## Get started
 
+- To use Q-Architecture effectively, you must properly set up your service
+  locator with GetIt. Start by calling setupServiceLocator() during app
+  initialization to register global notifiers (GlobalInfoNotifier,
+  GlobalLoadingNotifier and GlobalFailureNotifier). Then register your
+  dependencies in logical layers:
+  1. Register repositories, services, and mappers as singletons:
+
+```dart
+getIt.registerSingleton<YourRepository>(YourRepositoryImplementation());
+getIt.registerSingleton<YourService>(YourServiceImplementation());
+getIt.registerSingleton<YourMapper>(YourMapperImplementation());
+```
+
+2. Register notifiers as lazy singletons with proper disposal and to be able to
+   use autoDispose option (additionally explained in
+   [SimpleNotifier](#simplenotifier) section):
+
+```dart
+getIt.registerLazySingleton<YourNotifier>(
+  () => YourNotifier(getIt<YourRepository>(), autoDispose: true),
+  dispose: (instance) => instance.dispose(),
+);
+```
+
 - Create your abstract repository and implement it
 
 ```dart
@@ -39,7 +63,7 @@ getIt.registerSingleton<YourRepository>(
 class YourNotifier extends BaseNotifier<String> {
   final YourRepository _yourRepository;
 
-  YourNotifier(this._yourRepository);
+  YourNotifier(this._yourRepository, {super.autoDispose});
 
   Future getYourString() =>
       execute(
@@ -55,7 +79,7 @@ class YourNotifier extends BaseNotifier<String> {
 
 ```dart
 getIt.registerLazySingleton<YourNotifier>(
-  () => YourNotifier(getIt<YourRepository>()),
+  () => YourNotifier(getIt<YourRepository>(), autoDispose: true),
   dispose: (instance) => instance.dispose(),
 );
 ```
@@ -110,7 +134,7 @@ writing repetitive code and access global loading and failure handling.
 ```dart
 // in service_locator.dart
 getIt.registerLazySingleton<ExampleNotifier>(
-  () => ExampleNotifier(getIt<ExampleRepository>()),
+  () => ExampleNotifier(getIt<ExampleRepository>(), autoDispose: true),
   dispose: (instance) => instance.dispose(),
 );
 
@@ -118,7 +142,7 @@ getIt.registerLazySingleton<ExampleNotifier>(
 class ExampleNotifier extends BaseNotifier<String> {
  final ExampleRepository _exampleRepository;
 
- ExampleNotifier(this._exampleRepository);
+ ExampleNotifier(this._exampleRepository, {super.autoDispose});
 
  Future getSomeStringFullExample() =>
      execute(
@@ -166,21 +190,10 @@ class ExampleNotifier extends BaseNotifier<String> {
 ### ExamplePage
 
 ```dart
-class ExamplePage extends StatefulWidget {
+class ExamplePage extends StatelessWidget {
   static const routeName = '/example';
 
   const ExamplePage({super.key});
-
-  @override
-  State<ExamplePage> createState() => _ExamplePageState();
-}
-
-class _ExamplePageState extends State<ExamplePage> {
-  @override
-  void dispose() {
-    getIt.resetLazySingleton<ExampleNotifier>();
-    super.dispose();
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -310,7 +323,7 @@ is here for you.
 ```dart
 // in service_locator.dart
 getIt.registerLazySingleton<ExampleSimpleNotifier>(
-  () => ExampleSimpleNotifier(getIt<ExampleRepository>()),
+  () => ExampleSimpleNotifier(getIt<ExampleRepository>(), autoDispose: true),
   dispose: (instance) => instance.dispose(),
 );
 
@@ -318,7 +331,7 @@ getIt.registerLazySingleton<ExampleSimpleNotifier>(
 class ExampleSimpleNotifier extends SimpleNotifier<ExampleSimpleState> {
   final ExampleRepository _exampleRepository;
 
-  ExampleSimpleNotifier(this._exampleRepository)
+  ExampleSimpleNotifier(this._exampleRepository, {super.autoDispose})
     : super(ExampleSimpleState.initial());
 
   /// Example method when you want to get state updates when calling some repository method
@@ -417,21 +430,10 @@ final class ExampleSimpleStateError extends ExampleSimpleState {
 ### ExampleSimplePage
 
 ```dart
-class ExampleSimplePage extends StatefulWidget {
+class ExampleSimplePage extends StatelessWidget {
   static const routeName = '/example-simple-page';
 
   const ExampleSimplePage({super.key});
-
-  @override
-  State<ExampleSimplePage> createState() => _ExampleSimplePageState();
-}
-
-class _ExampleSimplePageState extends State<ExampleSimplePage> {
-  @override
-  void dispose() {
-    getIt.resetLazySingleton<ExampleSimpleNotifier>();
-    super.dispose();
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -443,8 +445,7 @@ class _ExampleSimplePageState extends State<ExampleSimplePage> {
           spacing16,
           ListenableBuilder(
             listenable: exampleSimpleNotifier,
-            builder: (context, child) {
-              return Text(
+            builder: (context, child) => Text(
                 switch (exampleSimpleNotifier.state) {
                   ExampleSimpleStateInitial() => 'Initial',
                   ExampleSimpleStateEmpty() => 'Empty',
@@ -544,12 +545,31 @@ final class Data<State> extends BaseState<State> {
 
 ## SimpleNotifier
 
-Abstract ChangeNotifier class which provides some convenient methods to be used
-by subclassing it. It can be used when BaseState doesn't suit you and you need
-more states, this notifier has **showGlobalLoading**, **clearGlobalLoading**,
-**setGlobalFailure**, **on**, **debounce**, **throttle** and **cancelThrottle**
-methods that are marked as **@protected** so you can easily use them in your
-subclasses.
+Abstract SimpleNotifier class which extends ChangeNotifier class which provides
+some convenient methods to be used by subclassing it. It can be used when
+BaseState doesn't suit you and you need more states, this notifier has
+**showGlobalLoading**, **clearGlobalLoading**, **setGlobalFailure**,
+**debounce**, **throttle** and **cancelThrottle** methods that are marked as
+**@protected** so you can easily use them in your subclasses.
+
+**IMPORTANT**: always register your SimpleNotifier subclasses (including
+BaseNotifier as well) as lazy singletons in GetIt with **registerLazySingleton**
+to be able to use autoDispose feature when convenient.
+
+- in constructor receives the initial state of the notifier and optionally
+  **autoDispose** which defaults to false but if true, the notifier will be
+  disposed when all listeners are removed. IMPORTANT: When using
+  autoDispose=true, this SimpleNotifier subclass MUST be registered as a
+  lazySingleton in GetIt, otherwise an exception will be thrown when attempting
+  to reset the lazy singleton
+
+- **listen** adds a listener will be called when the state changes with the
+  current and previous state and returns a function that can be called to remove
+  the listener
+
+- **removeSpecificListener** removes a specific listener by its ID
+
+- **removeAllListeners** removes all listeners
 
 - **showGlobalLoading** & **clearGlobalLoading** for handling global loading
 
@@ -564,10 +584,14 @@ subclasses.
 
 - **cancelThrottle** for canceling throttling if in progress
 
+- **getRandomStringWithTimestamp** generates a random string with a timestamp
+
 ## BaseNotifier
 
-Abstract Notifier class which extends SimpleNotifier, uses BaseState as its
-state and provides some convenient methods to be used by subclassing it.
+Abstract BaseNotifier class which is built on top of SimpleNotifier and uses
+BaseState class as its state. It provides all convenient methods like
+SimpleNotifier and additionally execute method which will be explained in the
+next paragraph.
 
 ### Execute method
 
@@ -630,7 +654,7 @@ Future<void> executeStreamed(
 
 In your state notifier:
 
-```
+```dart
 class ExampleNotifier extends BaseNotifier<String> {
 //...
 Future getSomeStringsStreamed() => executeStreamed(
@@ -815,15 +839,14 @@ class GlobalFailureNotifier extends SimpleNotifier<Failure?> {
 ### Global failure listener
 
 ```dart
-GetIt.instance<GlobalFailureNotifier>()
-    .listen((currentState, previousState) {
-  if (currentState == null) return;
-  //Show global error
-  logError('''showing ${failure.isCritical ? '' : 'non-'}critical failure with title ${failure.title},
-        error: ${failure.error},
-        stackTrace: ${failure.stackTrace}
-    ''');
-  });
+SimpleNotifierListener(
+  simpleNotifier: GetIt.instance<GlobalFailureNotifier>(),
+  onChange: (currentState, previousState) {
+    if (currentState == null) return;
+    onGlobalFailure(currentState);
+  },
+  child: ...
+)
 ```
 
 ### Failure example
@@ -869,16 +892,14 @@ class GlobalInfoNotifier extends SimpleNotifier<GlobalInfo?> {
 ### GlobalInfo listener
 
 ```dart
-GetIt.instance<GlobalInfoNotifier>().listen((currentState, previousState) {
-  if (currentState == null) return;
-  //Show global error
-  logInfo(''' 
-      globalInfoStatus: ${globalInfo.globalInfoStatus}
-      title: ${globalInfo.title}, 
-      message: ${globalInfo.message},
-    ''');
-  });
-}
+SimpleNotifierListener(
+  simpleNotifier: GetIt.instance<GlobalInfoNotifier>(),
+  onChange: (currentState, previousState) {
+    if (currentState == null) return;
+    onGlobalInfo(currentState);
+  },
+  child: ...
+)
 ```
 
 ## BaseWidget
@@ -910,29 +931,33 @@ class BaseWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    GetIt.instance<GlobalFailureNotifier>()
-        .listen((currentState, previousState) {
-      if (currentState == null) return;
-      onGlobalFailure(currentState);
-    });
-    GetIt.instance<GlobalInfoNotifier>().listen((currentState, previousState) {
-      if (currentState == null) return;
-      onGlobalInfo(currentState);
-    });
-    final globalLoadingNotifier = GetIt.instance<GlobalLoadingNotifier>();
-    return Stack(
-      children: [
-        child,
-        ValueListenableBuilder(
-          valueListenable: globalLoadingNotifier,
-          builder: (context, value, child) {
-            if (value) {
-              return loadingIndicator ?? const BaseLoadingIndicator();
-            }
-            return SizedBox();
-          },
+    return SimpleNotifierListener(
+      simpleNotifier: GetIt.instance<GlobalFailureNotifier>(),
+      onChange: (currentState, previousState) {
+        if (currentState == null) return;
+        onGlobalFailure(currentState);
+      },
+      child: SimpleNotifierListener(
+        simpleNotifier: GetIt.instance<GlobalInfoNotifier>(),
+        onChange: (currentState, previousState) {
+          if (currentState == null) return;
+          onGlobalInfo(currentState);
+        },
+        child: Stack(
+          children: [
+            child,
+            ValueListenableBuilder(
+              valueListenable: GetIt.instance<GlobalLoadingNotifier>(),
+              builder: (context, value, child) {
+                if (value) {
+                  return loadingIndicator ?? const BaseLoadingIndicator();
+                }
+                return SizedBox();
+              },
+            ),
+          ],
         ),
-      ],
+      ),
     );
   }
 }
