@@ -34,10 +34,10 @@ class _ExamplePageState extends State<ExamplePage> {
           mainAxisAlignment: MainAxisAlignment.center,
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
-            ValueListenableBuilder(
-              valueListenable: exampleNotifier,
-              builder: (context, value, child) => Text(
-                switch (value) {
+            SimpleNotifierBuilder(
+              simpleNotifier: exampleNotifier,
+              builder: (context, currentState, previousState, child) => Text(
+                switch (currentState) {
                   BaseData(data: final sentence) => sentence,
                   BaseLoading() => 'Loading',
                   BaseInitial() => 'Initial',

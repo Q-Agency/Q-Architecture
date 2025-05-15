@@ -1,19 +1,27 @@
 import 'package:flutter/widgets.dart';
 import 'package:q_architecture/q_architecture.dart';
 
+/// A widget that listens to a [SimpleNotifier] and calls a listener when the state changes.
 class SimpleNotifierListener<T> extends StatefulWidget {
+  /// The [SimpleNotifier] instance to listen to.
+  final SimpleNotifier<T> simpleNotifier;
+
+  /// The listener to call when the state changes.
+  final void Function(T currentState, T? previousState) listener;
+
+  /// Whether to fire the listener immediately when the widget is built.
+  final bool fireImmediately;
+
+  /// The child to build.
+  final Widget child;
+
   const SimpleNotifierListener({
     super.key,
     required this.simpleNotifier,
-    required this.onChange,
+    required this.listener,
     this.fireImmediately = false,
     required this.child,
   });
-
-  final SimpleNotifier<T> simpleNotifier;
-  final void Function(T currentState, T? previousState) onChange;
-  final bool fireImmediately;
-  final Widget child;
 
   @override
   State<SimpleNotifierListener<T>> createState() =>
@@ -21,8 +29,6 @@ class SimpleNotifierListener<T> extends StatefulWidget {
 }
 
 class _SimpleNotifierListenerState<T> extends State<SimpleNotifierListener<T>> {
-  VoidCallback? _listenerDisposer;
-
   @override
   void initState() {
     super.initState();
@@ -42,16 +48,14 @@ class _SimpleNotifierListenerState<T> extends State<SimpleNotifierListener<T>> {
 
   @override
   void dispose() {
-    _listenerDisposer?.call();
+    widget.simpleNotifier.removeListener(_listener);
     super.dispose();
   }
 
-  void _listener() {
-    widget.onChange(
-      widget.simpleNotifier.state,
-      widget.simpleNotifier.previousState,
-    );
-  }
+  void _listener() => widget.listener(
+        widget.simpleNotifier.state,
+        widget.simpleNotifier.previousState,
+      );
 
   @override
   Widget build(BuildContext context) {

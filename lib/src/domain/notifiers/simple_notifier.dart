@@ -7,7 +7,7 @@ import 'package:get_it/get_it.dart';
 import 'package:meta/meta.dart';
 import 'package:q_architecture/q_architecture.dart';
 
-class SimpleNotifier<T> extends ChangeNotifier implements ValueListenable<T> {
+class SimpleNotifier<T> extends ChangeNotifier {
   ///The current state
   T _state;
 
@@ -44,10 +44,6 @@ class SimpleNotifier<T> extends ChangeNotifier implements ValueListenable<T> {
       GetIt.instance.resetLazySingleton(instance: this);
     }
   }
-
-  ///Gets the state
-  @override
-  T get value => state;
 
   ///Gets the state
   T get state => _state;

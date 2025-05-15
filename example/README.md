@@ -85,15 +85,15 @@ getIt.registerLazySingleton<YourNotifier>(
 ```
 
 - In your widget call your notifier getYourString() method through your service
-  locator and watch the changes through ValueListenableBuilder widget
+  locator and watch the changes through SimpleNotifierBuilder widget
 
 ```dart
 final yourNotifier = getIt<YourNotifier>();
 yourNotifier.getYourString();
-return ValueListenablebuilder(
-  valueListenable: yourNotifier,
-  builder: (context, state, child) => Text(
-    switch (state) {
+return SimpleNotifierBuilder(
+  simpleNotifier: yourNotifier,
+  builder: (context, currentState, previousState, child) => Text(
+    switch (currentState) {
       Data(data: final sentence) => sentence,
       Loading() => 'Loading',
       Initial() => 'Initial',
@@ -203,11 +203,11 @@ class ExamplePage extends StatelessWidget {
       body: ListView(
         children: [
           spacing16,
-          ValueListenableBuilder(
-            valueListenable: exampleNotifier,
+          SimpleNotifierBuilder(
+            notifier: exampleNotifier,
             builder:
-                (context, state, child) => Text(
-                  switch (state) {
+                (context, currentState, previousState, child) => Text(
+                  switch (currentState) {
                     BaseData(data: final sentence) => sentence,
                     BaseLoading() => 'Loading',
                     BaseInitial() => 'Initial',
@@ -946,10 +946,10 @@ class BaseWidget extends StatelessWidget {
         child: Stack(
           children: [
             child,
-            ValueListenableBuilder(
-              valueListenable: GetIt.instance<GlobalLoadingNotifier>(),
-              builder: (context, value, child) {
-                if (value) {
+            SimpleNotifierBuilder(
+              simpleNotifier: GetIt.instance<GlobalLoadingNotifier>(),
+              builder: (context, currentState, previousState, child) {
+                if (currentState) {
                   return loadingIndicator ?? const BaseLoadingIndicator();
                 }
                 return SizedBox();

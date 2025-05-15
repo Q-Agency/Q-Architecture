@@ -112,9 +112,10 @@ class PaginatedListView<Entity, Param, Arg> extends StatelessWidget {
         paginatedListViewType == PaginatedListViewType.infiniteScroll
             ? () => _getNextPage()
             : null;
-    return ValueListenableBuilder(
-      valueListenable: paginatedStreamNotifier,
-      builder: (context, value, child) => switch (value) {
+    return SimpleNotifierBuilder(
+      simpleNotifier: paginatedStreamNotifier,
+      builder: (context, currentState, previousState, child) =>
+          switch (currentState) {
         PaginatedLoadingMore<Entity>(list: final list) => _ListView(
             itemBuilder: itemBuilder,
             list: list,

@@ -22,23 +22,23 @@ class BaseWidget extends StatelessWidget {
   Widget build(BuildContext context) {
     return SimpleNotifierListener(
       simpleNotifier: GetIt.instance<GlobalFailureNotifier>(),
-      onChange: (currentState, previousState) {
+      listener: (currentState, previousState) {
         if (currentState == null) return;
         onGlobalFailure(currentState);
       },
       child: SimpleNotifierListener(
         simpleNotifier: GetIt.instance<GlobalInfoNotifier>(),
-        onChange: (currentState, previousState) {
+        listener: (currentState, previousState) {
           if (currentState == null) return;
           onGlobalInfo(currentState);
         },
         child: Stack(
           children: [
             child,
-            ValueListenableBuilder(
-              valueListenable: GetIt.instance<GlobalLoadingNotifier>(),
-              builder: (context, value, child) {
-                if (value) {
+            SimpleNotifierBuilder(
+              simpleNotifier: GetIt.instance<GlobalLoadingNotifier>(),
+              builder: (context, currentState, previousState, child) {
+                if (currentState) {
                   return loadingIndicator ?? const BaseLoadingIndicator();
                 }
                 return SizedBox();

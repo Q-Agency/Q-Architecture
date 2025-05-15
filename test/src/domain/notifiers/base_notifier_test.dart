@@ -73,7 +73,7 @@ void main() {
           globalLoading: true,
         );
         expect(
-          GetIt.instance<GlobalLoadingNotifier>().value,
+          GetIt.instance<GlobalLoadingNotifier>().state,
           false,
         );
         expect(
@@ -94,7 +94,7 @@ void main() {
         globalFailure: false,
       );
       expect(
-        GetIt.instance<GlobalLoadingNotifier>().value,
+        GetIt.instance<GlobalLoadingNotifier>().state,
         false,
       );
       expect(
@@ -142,7 +142,7 @@ void main() {
         globalLoading: true,
       );
       expect(
-        GetIt.instance<GlobalLoadingNotifier>().value,
+        GetIt.instance<GlobalLoadingNotifier>().state,
         false,
       );
       expect(
@@ -170,7 +170,7 @@ void main() {
         globalFailure: false,
       );
       expect(
-        GetIt.instance<GlobalLoadingNotifier>().value,
+        GetIt.instance<GlobalLoadingNotifier>().state,
         false,
       );
       expect(
@@ -407,7 +407,7 @@ void main() {
       'should set global loading provider to true',
       () {
         GetIt.instance<GlobalLoadingNotifier>().showGlobalLoading();
-        expect(GetIt.instance<GlobalLoadingNotifier>().value, true);
+        expect(GetIt.instance<GlobalLoadingNotifier>().state, true);
       },
     );
 
@@ -418,7 +418,7 @@ void main() {
         await 500.milliseconds;
         GetIt.instance<GlobalLoadingNotifier>().clearGlobalLoading();
 
-        expect(GetIt.instance<GlobalLoadingNotifier>().value, false);
+        expect(GetIt.instance<GlobalLoadingNotifier>().state, false);
       },
     );
 
