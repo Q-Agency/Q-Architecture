@@ -1,5 +1,4 @@
 import 'package:equatable/equatable.dart';
-import 'package:flutter/material.dart';
 import 'package:q_architecture/src/domain/entities/enums/global_info_status.dart';
 
 /// GlobalInfo class that represents some kind of info that occurs in the app and being passed to UI
@@ -14,7 +13,7 @@ class GlobalInfo extends Equatable {
   final String? title;
 
   /// uniqueKey set by [BaseStateNotifier.setGlobalInfo] method to trigger [globalInfoProvider] each time
-  final UniqueKey? uniqueKey;
+  final String? uniqueKey;
 
   const GlobalInfo({
     required this.globalInfoStatus,
@@ -27,7 +26,7 @@ class GlobalInfo extends Equatable {
     GlobalInfoStatus? globalInfoStatus,
     String? title,
     String? message,
-    UniqueKey? uniqueKey,
+    String? uniqueKey,
   }) =>
       GlobalInfo(
         globalInfoStatus: globalInfoStatus ?? this.globalInfoStatus,

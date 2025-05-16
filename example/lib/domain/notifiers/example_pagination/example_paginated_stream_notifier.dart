@@ -1,25 +1,13 @@
 import 'package:example/data/repositories/example_repository.dart';
-import 'package:hooks_riverpod/hooks_riverpod.dart';
-import 'package:q_architecture/paginated_notifier.dart';
-
-final paginatedStreamNotifierProvider = NotifierProvider.autoDispose<
-    ExamplePaginatedStreamNotifier, PaginatedState<String>>(
-  () => ExamplePaginatedStreamNotifier(),
-);
+import 'package:q_architecture/q_architecture.dart';
 
 class ExamplePaginatedStreamNotifier
-    extends AutoDisposePaginatedStreamNotifier<String, Object> {
-  late ExampleRepository _repository;
+    extends PaginatedStreamNotifier<String, Object> {
+  final ExampleRepository _repository;
 
-  @override
-  ({PaginatedState<String> initialState, bool useGlobalFailure})
-      prepareForBuild() {
-    _repository = ref.watch(exampleRepositoryProvider);
+  ExamplePaginatedStreamNotifier(this._repository, {super.autoDispose})
+      : super(PaginatedState.loading()) {
     getInitialList();
-    return (
-      initialState: const PaginatedState.loading(),
-      useGlobalFailure: false
-    );
   }
 
   @override

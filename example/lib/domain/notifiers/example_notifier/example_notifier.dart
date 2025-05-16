@@ -1,24 +1,22 @@
 import 'package:example/data/repositories/example_repository.dart';
-import 'package:example/domain/notifiers/example_filters/example_filters_provider.dart';
-import 'package:hooks_riverpod/hooks_riverpod.dart';
-import 'package:q_architecture/base_notifier.dart';
+import 'package:example/domain/notifiers/example_filters/example_filters_notifier.dart';
+import 'package:example/service_locator.dart';
+import 'package:flutter/foundation.dart';
 import 'package:q_architecture/q_architecture.dart';
 
-final exampleNotifierProvider =
-    NotifierProvider<ExampleNotifier, BaseState<String>>(
-  () => ExampleNotifier(),
-);
-
 class ExampleNotifier extends BaseNotifier<String> {
-  late ExampleRepository _exampleRepository;
+  final ExampleRepository _exampleRepository;
+  VoidCallback? _filtersListenerDisposer;
+
+  ExampleNotifier(this._exampleRepository, {super.autoDispose}) {
+    _filtersListenerDisposer = getIt<ExampleFiltersNotifier>()
+        .listen((currentState, previousState) => getSomeStringsStreamed());
+  }
 
   @override
-  void prepareForBuild() {
-    _exampleRepository = ref.watch(exampleRepositoryProvider);
-    on(
-      exampleFiltersProvider,
-      (previous, next) => getSomeStringsStreamed(),
-    );
+  void dispose() {
+    _filtersListenerDisposer?.call();
+    super.dispose();
   }
 
   Future getSomeStringFullExample() => execute(

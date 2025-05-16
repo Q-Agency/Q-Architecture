@@ -14,7 +14,7 @@ dependencies:
   equatable: ^2.0.7
   flutter:
     sdk: flutter
-  flutter_riverpod: ^2.6.1
+  get_it: ^8.0.3
   meta: ^1.16.0
 
 dev_dependencies:
