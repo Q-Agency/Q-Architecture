@@ -13,47 +13,49 @@ class ExampleSimplePage extends StatelessWidget {
   Widget build(BuildContext context) {
     final exampleSimpleNotifier = getIt<ExampleSimpleNotifier>();
     return Scaffold(
-      body: SimpleNotifierListener(
-        simpleNotifier: exampleSimpleNotifier,
-        listener: (currentState, previousState) {
-          debugPrint('currentState: $currentState');
-          debugPrint('previousState: $previousState');
-        },
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
-            SimpleNotifierBuilder(
-              simpleNotifier: exampleSimpleNotifier,
-              builder: (context, currentState, previousState, child) => Text(
-                switch (currentState) {
-                  Initial() => 'Initial',
-                  Empty() => 'Empty',
-                  Fetching() => 'Fetching',
-                  Success(sentence: final string) => string,
-                  Error(:final failure) => failure.title,
-                },
-                textAlign: TextAlign.center,
-              ),
+      body: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          SimpleNotifierConsumer(
+            simpleNotifier: exampleSimpleNotifier,
+            listener: (context, currentState, previousState) {
+              debugPrint(
+                'currentState: $currentState, previousState: $previousState',
+              );
+            },
+            builder: (context, currentState, previousState, child) => Column(
+              children: [
+                Text(
+                  switch (currentState) {
+                    Initial() => 'Initial',
+                    Empty() => 'Empty',
+                    Fetching() => 'Fetching',
+                    Success(sentence: final string) => string,
+                    Error(:final failure) => failure.title,
+                  },
+                  textAlign: TextAlign.center,
+                ),
+              ],
             ),
-            TextButton(
-              onPressed: () {
-                exampleSimpleNotifier.getSomeStringSimpleExample();
-                exampleSimpleNotifier.getSomeStringSimpleExample();
-              },
-              child: const Text('Simple state example with debounce'),
-            ),
-            TextButton(
-              onPressed:
-                  exampleSimpleNotifier.getSomeStringSimpleExampleGlobalLoading,
-              child: const Text('Global loading example'),
-            ),
-            ElevatedButton(
-              onPressed: Navigator.of(context).pop,
-              child: const Text('Go back!'),
-            ),
-          ],
-        ),
+          ),
+          TextButton(
+            onPressed: () {
+              exampleSimpleNotifier.getSomeStringSimpleExample();
+              exampleSimpleNotifier.getSomeStringSimpleExample();
+            },
+            child: const Text('Simple state example with debounce'),
+          ),
+          TextButton(
+            onPressed:
+                exampleSimpleNotifier.getSomeStringSimpleExampleGlobalLoading,
+            child: const Text('Global loading example'),
+          ),
+          ElevatedButton(
+            onPressed: Navigator.of(context).pop,
+            child: const Text('Go back!'),
+          ),
+        ],
       ),
     );
   }

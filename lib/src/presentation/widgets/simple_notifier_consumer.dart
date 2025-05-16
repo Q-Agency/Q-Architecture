@@ -1,10 +1,13 @@
 import 'package:flutter/widgets.dart';
 import 'package:q_architecture/q_architecture.dart';
 
-/// A widget that builds a widget when a [SimpleNotifier] changes state.
-class SimpleNotifierBuilder<T> extends StatefulWidget {
+class SimpleNotifierConsumer<T> extends StatefulWidget {
   /// The [SimpleNotifier] instance to listen to.
   final SimpleNotifier<T> simpleNotifier;
+
+  /// The listener to call when the state changes.
+  final void Function(BuildContext context, T currentState, T? previousState)
+      listener;
 
   /// The builder function.
   final Widget Function(
@@ -23,35 +26,33 @@ class SimpleNotifierBuilder<T> extends StatefulWidget {
   /// would be no useful [child].
   final Widget? child;
 
-  const SimpleNotifierBuilder({
+  const SimpleNotifierConsumer({
     super.key,
     required this.simpleNotifier,
+    required this.listener,
     required this.builder,
     this.child,
   });
 
   @override
-  State<SimpleNotifierBuilder<T>> createState() =>
-      _SimpleNotifierBuilderState<T>();
+  State<SimpleNotifierConsumer<T>> createState() =>
+      _SimpleNotifierConsumerState<T>();
 }
 
-class _SimpleNotifierBuilderState<T> extends State<SimpleNotifierBuilder<T>> {
+class _SimpleNotifierConsumerState<T> extends State<SimpleNotifierConsumer<T>> {
   late SimpleNotifier<T> _simpleNotifier;
-  late T _state;
 
   @override
   void initState() {
     super.initState();
     _simpleNotifier = widget.simpleNotifier;
-    _state = _simpleNotifier.state;
   }
 
   @override
-  void didUpdateWidget(SimpleNotifierBuilder<T> oldWidget) {
+  void didUpdateWidget(SimpleNotifierConsumer<T> oldWidget) {
     super.didUpdateWidget(oldWidget);
     if (oldWidget.simpleNotifier != widget.simpleNotifier) {
       _simpleNotifier = widget.simpleNotifier;
-      _state = _simpleNotifier.state;
     }
   }
 
@@ -60,23 +61,18 @@ class _SimpleNotifierBuilderState<T> extends State<SimpleNotifierBuilder<T>> {
     super.didChangeDependencies();
     if (widget.simpleNotifier != _simpleNotifier) {
       _simpleNotifier = widget.simpleNotifier;
-      _state = _simpleNotifier.state;
     }
   }
 
   @override
   Widget build(BuildContext context) {
-    return SimpleNotifierListener(
-      simpleNotifier: widget.simpleNotifier,
-      listener: (context, currentState, previousState) {
-        setState(() => _state = currentState);
+    return SimpleNotifierBuilder(
+      simpleNotifier: _simpleNotifier,
+      builder: (context, currentState, previousState, child) {
+        widget.listener(context, currentState, previousState);
+        return widget.builder(context, currentState, previousState, child);
       },
-      child: widget.builder(
-        context,
-        _state,
-        widget.simpleNotifier.previousState,
-        widget.child,
-      ),
+      child: widget.child,
     );
   }
 }

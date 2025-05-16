@@ -117,6 +117,7 @@ table of contents.
 - [BaseState<State>](#basestatestate)
 - [SimpleNotifier](#simplenotifier)
 - [BaseNotifier](#basenotifier)
+- [SimpleNotifierWidgets](#sim)
 - [PaginatedStreamNotifier and PaginatedNotifier](#paginatedstreamnotifier-and-paginatednotifier)
 - [Global loading](#global-loading)
 - [Global failure](#global-failure)
@@ -431,7 +432,7 @@ final class ExampleSimpleStateError extends ExampleSimpleState {
 
 ```dart
 class ExampleSimplePage extends StatelessWidget {
-  static const routeName = '/example-simple-page';
+  static const routeName = '/simple-page';
 
   const ExampleSimplePage({super.key});
 
@@ -439,44 +440,47 @@ class ExampleSimplePage extends StatelessWidget {
   Widget build(BuildContext context) {
     final exampleSimpleNotifier = getIt<ExampleSimpleNotifier>();
     return Scaffold(
-      appBar: AppBar(title: Text('Example simple page')),
-      body: ListView(
+      body: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          spacing16,
-          ListenableBuilder(
-            listenable: exampleSimpleNotifier,
-            builder: (context, child) => Text(
-                switch (exampleSimpleNotifier.state) {
-                  ExampleSimpleStateInitial() => 'Initial',
-                  ExampleSimpleStateEmpty() => 'Empty',
-                  ExampleSimpleStateFetching() => 'Fetching',
-                  ExampleSimpleStateSuccess(data: final string) => string,
-                  ExampleSimpleStateError(:final failure) => failure.title,
-                },
-                textAlign: TextAlign.center,
-                style: context.appTextStyles.regular,
+          SimpleNotifierConsumer(
+            simpleNotifier: exampleSimpleNotifier,
+            listener: (context, currentState, previousState) {
+              debugPrint(
+                'currentState: $currentState, previousState: $previousState',
               );
             },
+            builder: (context, currentState, previousState, child) => Column(
+              children: [
+                Text(
+                  switch (currentState) {
+                    Initial() => 'Initial',
+                    Empty() => 'Empty',
+                    Fetching() => 'Fetching',
+                    Success(sentence: final string) => string,
+                    Error(:final failure) => failure.title,
+                  },
+                  textAlign: TextAlign.center,
+                ),
+              ],
+            ),
           ),
-          spacing16,
           TextButton(
             onPressed: () {
               exampleSimpleNotifier.getSomeStringSimpleExample();
               exampleSimpleNotifier.getSomeStringSimpleExample();
             },
-            child: Text(
-              'Simple state example with debounce',
-              style: context.appTextStyles.bold,
-            ),
+            child: const Text('Simple state example with debounce'),
           ),
-          spacing16,
           TextButton(
             onPressed:
                 exampleSimpleNotifier.getSomeStringSimpleExampleGlobalLoading,
-            child: Text(
-              'Global loading example',
-              style: context.appTextStyles.bold,
-            ),
+            child: const Text('Global loading example'),
+          ),
+          ElevatedButton(
+            onPressed: Navigator.of(context).pop,
+            child: const Text('Go back!'),
           ),
         ],
       ),
@@ -672,6 +676,14 @@ StreamFailureOr<String> getSomeStringsStreamed() async* {
   yield const Right('Some sentence from network');
 }
 ```
+
+## SimpleNotifier widgets
+
+### SimpleNotifierBuilder
+
+### SimpleNotifierListener
+
+### SimpleNotifierConsumer
 
 ## PaginatedStreamNotifier and PaginatedNotifier
 

@@ -24,4 +24,5 @@ export 'src/presentation/widgets/base_loading_indicator.dart';
 export 'src/presentation/widgets/base_widget.dart';
 export 'src/presentation/widgets/paginated_list_view.dart';
 export 'src/presentation/widgets/simple_notifier_builder.dart';
+export 'src/presentation/widgets/simple_notifier_consumer.dart';
 export 'src/presentation/widgets/simple_notifier_listener.dart';

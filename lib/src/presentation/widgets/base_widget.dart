@@ -22,13 +22,13 @@ class BaseWidget extends StatelessWidget {
   Widget build(BuildContext context) {
     return SimpleNotifierListener(
       simpleNotifier: GetIt.instance<GlobalFailureNotifier>(),
-      listener: (currentState, previousState) {
+      listener: (context, currentState, previousState) {
         if (currentState == null) return;
         onGlobalFailure(currentState);
       },
       child: SimpleNotifierListener(
         simpleNotifier: GetIt.instance<GlobalInfoNotifier>(),
-        listener: (currentState, previousState) {
+        listener: (context, currentState, previousState) {
           if (currentState == null) return;
           onGlobalInfo(currentState);
         },

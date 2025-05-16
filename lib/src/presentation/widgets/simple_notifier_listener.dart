@@ -7,7 +7,8 @@ class SimpleNotifierListener<T> extends StatefulWidget {
   final SimpleNotifier<T> simpleNotifier;
 
   /// The listener to call when the state changes.
-  final void Function(T currentState, T? previousState) listener;
+  final void Function(BuildContext context, T currentState, T? previousState)
+      listener;
 
   /// Whether to fire the listener immediately when the widget is built.
   final bool fireImmediately;
@@ -29,9 +30,11 @@ class SimpleNotifierListener<T> extends StatefulWidget {
 }
 
 class _SimpleNotifierListenerState<T> extends State<SimpleNotifierListener<T>> {
+  late SimpleNotifier<T> _simpleNotifier;
   @override
   void initState() {
     super.initState();
+    _simpleNotifier = widget.simpleNotifier;
     widget.simpleNotifier.addListener(_listener);
     if (widget.fireImmediately) _listener();
   }
@@ -41,20 +44,30 @@ class _SimpleNotifierListenerState<T> extends State<SimpleNotifierListener<T>> {
     super.didUpdateWidget(oldWidget);
     if (oldWidget.simpleNotifier != widget.simpleNotifier) {
       oldWidget.simpleNotifier.removeListener(_listener);
-      widget.simpleNotifier.addListener(_listener);
+      _simpleNotifier = widget.simpleNotifier;
+      _simpleNotifier.addListener(_listener);
       if (widget.fireImmediately) _listener();
     }
   }
 
   @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    if (widget.simpleNotifier != _simpleNotifier) {
+      _simpleNotifier = widget.simpleNotifier;
+    }
+  }
+
+  @override
   void dispose() {
-    widget.simpleNotifier.removeListener(_listener);
+    _simpleNotifier.removeListener(_listener);
     super.dispose();
   }
 
   void _listener() => widget.listener(
-        widget.simpleNotifier.state,
-        widget.simpleNotifier.previousState,
+        context,
+        _simpleNotifier.state,
+        _simpleNotifier.previousState,
       );
 
   @override
