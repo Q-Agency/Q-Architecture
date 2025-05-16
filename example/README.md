@@ -117,7 +117,7 @@ table of contents.
 - [BaseState<State>](#basestatestate)
 - [SimpleNotifier](#simplenotifier)
 - [BaseNotifier](#basenotifier)
-- [SimpleNotifierWidgets](#simplenotifier-widgets)
+- [SimpleNotifier widgets](#simplenotifier-widgets)
 - [PaginatedStreamNotifier and PaginatedNotifier](#paginatedstreamnotifier-and-paginatednotifier)
 - [Global loading](#global-loading)
 - [Global failure](#global-failure)
