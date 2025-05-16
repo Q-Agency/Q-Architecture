@@ -117,7 +117,7 @@ table of contents.
 - [BaseState<State>](#basestatestate)
 - [SimpleNotifier](#simplenotifier)
 - [BaseNotifier](#basenotifier)
-- [SimpleNotifierWidgets](#sim)
+- [SimpleNotifierWidgets](#simplenotifier-widgets)
 - [PaginatedStreamNotifier and PaginatedNotifier](#paginatedstreamnotifier-and-paginatednotifier)
 - [Global loading](#global-loading)
 - [Global failure](#global-failure)
@@ -679,11 +679,41 @@ StreamFailureOr<String> getSomeStringsStreamed() async* {
 
 ## SimpleNotifier widgets
 
+SimpleNotifier widgets provide a convenient way to consume state changes from
+SimpleNotifier instances throughout your application. These widgets handle the
+subscription lifecycle automatically and deliver the current and previous states
+to your UI through builders, listeners, or a combination of both. They allow you
+to create reactive UIs that respond to state changes with minimal boilerplate
+code.
+
 ### SimpleNotifierBuilder
+
+SimpleNotifierBuilder is a widget that rebuilds its UI when a SimpleNotifier
+changes state. It takes a required simpleNotifier instance to listen to and a
+builder function that provides the current state, previous state, and an
+optional child widget. The builder pattern allows you to create reactive UI
+components that automatically update whenever the underlying state changes.
 
 ### SimpleNotifierListener
 
+SimpleNotifierListener is a widget that executes a callback function whenever a
+SimpleNotifier changes state. Unlike SimpleNotifierBuilder, it doesn't rebuild
+the UI but instead performs side effects like showing dialogs, navigating to
+different screens, or updating other parts of your application state. It takes a
+required simpleNotifier instance to listen to and a listener callback that
+receives the current state and previous state. This widget is particularly
+useful for handling events that should happen in response to state changes
+without directly affecting the widget's visual representation.
+
 ### SimpleNotifierConsumer
+
+SimpleNotifierConsumer combines the functionality of SimpleNotifierBuilder and
+SimpleNotifierListener into a single widget. It allows you to both execute side
+effects with a listener callback and rebuild the UI with a builder function in
+response to SimpleNotifier state changes. This widget is useful when you need to
+perform an action when the state changes (like showing a snackbar) while also
+updating the UI to reflect the new state. It simplifies your code by avoiding
+the need to nest SimpleNotifierBuilder and SimpleNotifierListener widgets.
 
 ## PaginatedStreamNotifier and PaginatedNotifier
 
