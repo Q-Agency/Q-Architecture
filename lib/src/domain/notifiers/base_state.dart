@@ -1,5 +1,4 @@
 import 'package:equatable/equatable.dart';
-
 import 'package:q_architecture/src/domain/entities/failure.dart';
 
 sealed class BaseState<State> extends Equatable {
