@@ -1,5 +1,5 @@
 import 'package:equatable/equatable.dart';
-import 'package:q_architecture/src/domain/entities/enums/global_info_status.dart';
+import 'package:q_architecture/q_architecture.dart';
 
 /// GlobalInfo class that represents some kind of info that occurs in the app and being passed to UI
 class GlobalInfo extends Equatable {
@@ -12,7 +12,7 @@ class GlobalInfo extends Equatable {
   /// GlobalInfo title that can be shown to user
   final String? title;
 
-  /// uniqueKey set by [BaseStateNotifier.setGlobalInfo] method to trigger [globalInfoProvider] each time
+  /// uniqueKey set by [BaseNotifier.setGlobalInfo] method to trigger [globalInfoProvider] each time
   final String? uniqueKey;
 
   const GlobalInfo({
