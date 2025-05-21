@@ -9,8 +9,9 @@ class MockTestRepository extends Mock implements TestRepository {}
 
 void main() {
   late TestRepository testRepository;
-  final Failure testGenericFailure =
-      Failure.generic(title: 'Unknown error occurred');
+  final Failure testGenericFailure = Failure.generic(
+    title: 'Unknown error occurred',
+  );
   late TestNotifier testNotifier;
   setUpAll(() {
     setupServiceLocator();
@@ -46,87 +47,85 @@ void main() {
 
   group('getInitialList()', () {
     test(
-        'should emit [Loading, Loaded, Loaded] when repository returns PaginatedList twice',
-        () async {
-      when(() => testRepository.getListStreamOrFailure(1))
-          .thenAnswer((_) => getPageResponse(page: 1));
-      final states = <PaginatedState>[];
-      testNotifier.listen(
-        (currentState, _) => states.add(currentState),
-        fireImmediately: true,
-      );
-      await testNotifier.getInitialList();
+      'should emit [Loading, Loaded, Loaded] when repository returns PaginatedList twice',
+      () async {
+        when(
+          () => testRepository.getListStreamOrFailure(1),
+        ).thenAnswer((_) => getPageResponse(page: 1));
+        final states = <PaginatedState>[];
+        testNotifier.listen(
+          (currentState, _) => states.add(currentState),
+          fireImmediately: true,
+        );
+        await testNotifier.getInitialList();
 
-      expect(
-        [
+        expect([
           const PaginatedState<String>.loading(),
           PaginatedState.loaded(getList(page: 1), isLastPage: false),
-        ],
-        states,
-      );
-    });
+        ], states);
+      },
+    );
 
     test(
-        'show emit [Loading, Loaded, Error] when repository returns PaginatedList and then Failure with list from first yield',
-        () async {
-      when(() => testRepository.getListStreamOrFailure(1))
-          .thenAnswer((_) => getPageResponse(page: 1, shouldFail: true));
-      final states = <PaginatedState>[];
-      testNotifier.listen(
-        (currentState, _) => states.add(currentState),
-        fireImmediately: true,
-      );
-      await testNotifier.getInitialList();
-      expect(
-        [
+      'show emit [Loading, Loaded, Error] when repository returns PaginatedList and then Failure with list from first yield',
+      () async {
+        when(
+          () => testRepository.getListStreamOrFailure(1),
+        ).thenAnswer((_) => getPageResponse(page: 1, shouldFail: true));
+        final states = <PaginatedState>[];
+        testNotifier.listen(
+          (currentState, _) => states.add(currentState),
+          fireImmediately: true,
+        );
+        await testNotifier.getInitialList();
+        expect([
           const PaginatedState<String>.loading(),
           PaginatedState.loaded(getList(page: 1), isLastPage: false),
           PaginatedState.error(getList(page: 1), testGenericFailure),
-        ],
-        states,
-      );
-    });
+        ], states);
+      },
+    );
   });
 
   group('getNextPage()', () {
     test(
-        'should emit [LoadingMore, Loaded, Loaded] when repository returns PaginatedList twice',
-        () async {
-      when(() => testRepository.getListStreamOrFailure(1))
-          .thenAnswer((_) => getPageResponse(page: 1));
-      final states = <PaginatedState>[];
-      testNotifier.listen(
-        (currentState, _) => states.add(currentState),
-        fireImmediately: false,
-      );
-      await testNotifier.getNextPage();
-      expect(
-        [
+      'should emit [LoadingMore, Loaded, Loaded] when repository returns PaginatedList twice',
+      () async {
+        when(
+          () => testRepository.getListStreamOrFailure(1),
+        ).thenAnswer((_) => getPageResponse(page: 1));
+        final states = <PaginatedState>[];
+        testNotifier.listen(
+          (currentState, _) => states.add(currentState),
+          fireImmediately: false,
+        );
+        await testNotifier.getNextPage();
+        expect([
           const PaginatedState<String>.loadingMore([]),
           PaginatedState.loaded(getList(page: 1), isLastPage: false),
-        ],
-        states,
-      );
-    });
+        ], states);
+      },
+    );
   });
 
   group('getInitialList() and getNextPage() combined', () {
     test(
-        'should emit [Loading, Loaded, Loaded, LoadingMore, Loaded] when repository first returns PaginatedList twice and then another PaginatedList',
-        () async {
-      when(() => testRepository.getListStreamOrFailure(1))
-          .thenAnswer((_) => getPageResponse(page: 1));
-      when(() => testRepository.getListStreamOrFailure(2))
-          .thenAnswer((_) => getPageResponse(page: 2));
-      final states = <PaginatedState>[];
-      testNotifier.listen(
-        (currentState, _) => states.add(currentState),
-        fireImmediately: true,
-      );
-      await testNotifier.getInitialList();
-      await testNotifier.getNextPage();
-      expect(
-        [
+      'should emit [Loading, Loaded, Loaded, LoadingMore, Loaded] when repository first returns PaginatedList twice and then another PaginatedList',
+      () async {
+        when(
+          () => testRepository.getListStreamOrFailure(1),
+        ).thenAnswer((_) => getPageResponse(page: 1));
+        when(
+          () => testRepository.getListStreamOrFailure(2),
+        ).thenAnswer((_) => getPageResponse(page: 2));
+        final states = <PaginatedState>[];
+        testNotifier.listen(
+          (currentState, _) => states.add(currentState),
+          fireImmediately: true,
+        );
+        await testNotifier.getInitialList();
+        await testNotifier.getNextPage();
+        expect([
           const PaginatedState<String>.loading(),
           PaginatedState.loaded(getList(page: 1), isLastPage: false),
           PaginatedState.loadingMore(getList(page: 1)),
@@ -134,28 +133,28 @@ void main() {
             getList(page: 1) + getList(page: 2),
             isLastPage: true,
           ),
-        ],
-        states,
-      );
-    });
+        ], states);
+      },
+    );
 
     test(
-        'should emit [Loading, Loaded, Loaded, LoadingMore, Loaded] when repository returns PaginatedList twice and then another PaginatedList (second getNextPage() will be ignored)',
-        () async {
-      when(() => testRepository.getListStreamOrFailure(1))
-          .thenAnswer((_) => getPageResponse(page: 1));
-      when(() => testRepository.getListStreamOrFailure(2))
-          .thenAnswer((_) => getPageResponse(page: 2));
-      final states = <PaginatedState>[];
-      testNotifier.listen(
-        (currentState, _) => states.add(currentState),
-        fireImmediately: true,
-      );
-      await testNotifier.getInitialList();
-      await testNotifier.getNextPage();
-      await testNotifier.getNextPage();
-      expect(
-        [
+      'should emit [Loading, Loaded, Loaded, LoadingMore, Loaded] when repository returns PaginatedList twice and then another PaginatedList (second getNextPage() will be ignored)',
+      () async {
+        when(
+          () => testRepository.getListStreamOrFailure(1),
+        ).thenAnswer((_) => getPageResponse(page: 1));
+        when(
+          () => testRepository.getListStreamOrFailure(2),
+        ).thenAnswer((_) => getPageResponse(page: 2));
+        final states = <PaginatedState>[];
+        testNotifier.listen(
+          (currentState, _) => states.add(currentState),
+          fireImmediately: true,
+        );
+        await testNotifier.getInitialList();
+        await testNotifier.getNextPage();
+        await testNotifier.getNextPage();
+        expect([
           const PaginatedState<String>.loading(),
           PaginatedState.loaded(getList(page: 1), isLastPage: false),
           PaginatedState.loadingMore(getList(page: 1)),
@@ -163,28 +162,28 @@ void main() {
             getList(page: 1) + getList(page: 2),
             isLastPage: true,
           ),
-        ],
-        states,
-      );
-    });
+        ], states);
+      },
+    );
 
     test(
-        'should emit [Loading, Loaded, LoadingMore, Loaded] when repository returns PaginatedList and then another PaginatedList (getNextPage() is called before getInitialList() finishes)',
-        () async {
-      when(() => testRepository.getListStreamOrFailure(1))
-          .thenAnswer((_) => getPageResponse(page: 1));
-      when(() => testRepository.getListStreamOrFailure(2))
-          .thenAnswer((_) => getPageResponse(page: 2));
-      final states = <PaginatedState>[];
-      testNotifier.listen(
-        (currentState, _) => states.add(currentState),
-        fireImmediately: true,
-      );
-      await testNotifier.getInitialList();
-      await 100.milliseconds;
-      await testNotifier.getNextPage();
-      expect(
-        [
+      'should emit [Loading, Loaded, LoadingMore, Loaded] when repository returns PaginatedList and then another PaginatedList (getNextPage() is called before getInitialList() finishes)',
+      () async {
+        when(
+          () => testRepository.getListStreamOrFailure(1),
+        ).thenAnswer((_) => getPageResponse(page: 1));
+        when(
+          () => testRepository.getListStreamOrFailure(2),
+        ).thenAnswer((_) => getPageResponse(page: 2));
+        final states = <PaginatedState>[];
+        testNotifier.listen(
+          (currentState, _) => states.add(currentState),
+          fireImmediately: true,
+        );
+        await testNotifier.getInitialList();
+        await 100.milliseconds;
+        await testNotifier.getNextPage();
+        expect([
           const PaginatedState<String>.loading(),
           PaginatedState.loaded(getList(page: 1), isLastPage: false),
           PaginatedState.loadingMore(getList(page: 1)),
@@ -192,52 +191,52 @@ void main() {
             getList(page: 1) + getList(page: 2),
             isLastPage: true,
           ),
-        ],
-        states,
-      );
-    });
+        ], states);
+      },
+    );
 
     test(
-        'show emit [Loading, Loaded, Loaded, LoadingMore, Error] when repository returns PaginatedList twice and then Failure',
-        () async {
-      when(() => testRepository.getListStreamOrFailure(1))
-          .thenAnswer((_) => getPageResponse(page: 1));
-      when(() => testRepository.getListStreamOrFailure(2))
-          .thenAnswer((_) => getPageResponse(page: 2, shouldFail: true));
-      final states = <PaginatedState>[];
-      testNotifier.listen(
-        (currentState, _) => states.add(currentState),
-        fireImmediately: true,
-      );
-      await testNotifier.getInitialList();
-      await testNotifier.getNextPage();
-      expect(
-        [
+      'show emit [Loading, Loaded, Loaded, LoadingMore, Error] when repository returns PaginatedList twice and then Failure',
+      () async {
+        when(
+          () => testRepository.getListStreamOrFailure(1),
+        ).thenAnswer((_) => getPageResponse(page: 1));
+        when(
+          () => testRepository.getListStreamOrFailure(2),
+        ).thenAnswer((_) => getPageResponse(page: 2, shouldFail: true));
+        final states = <PaginatedState>[];
+        testNotifier.listen(
+          (currentState, _) => states.add(currentState),
+          fireImmediately: true,
+        );
+        await testNotifier.getInitialList();
+        await testNotifier.getNextPage();
+        expect([
           const PaginatedState<String>.loading(),
           PaginatedState.loaded(getList(page: 1), isLastPage: false),
           PaginatedState.loadingMore(getList(page: 1)),
           PaginatedState.error(getList(page: 1), testGenericFailure),
-        ],
-        states,
-      );
-    });
+        ], states);
+      },
+    );
 
     test(
-        'show emit [Loading, Error, LoadingMore, Loaded] when repository returns PaginatedList, Failure with list from first yield and then second PaginatedList',
-        () async {
-      when(() => testRepository.getListStreamOrFailure(1))
-          .thenAnswer((_) => getPageResponse(page: 1, shouldFail: true));
-      when(() => testRepository.getListStreamOrFailure(2))
-          .thenAnswer((_) => getPageResponse(page: 2));
-      final states = <PaginatedState>[];
-      testNotifier.listen(
-        (currentState, _) => states.add(currentState),
-        fireImmediately: true,
-      );
-      await testNotifier.getInitialList();
-      await testNotifier.getNextPage();
-      expect(
-        [
+      'show emit [Loading, Error, LoadingMore, Loaded] when repository returns PaginatedList, Failure with list from first yield and then second PaginatedList',
+      () async {
+        when(
+          () => testRepository.getListStreamOrFailure(1),
+        ).thenAnswer((_) => getPageResponse(page: 1, shouldFail: true));
+        when(
+          () => testRepository.getListStreamOrFailure(2),
+        ).thenAnswer((_) => getPageResponse(page: 2));
+        final states = <PaginatedState>[];
+        testNotifier.listen(
+          (currentState, _) => states.add(currentState),
+          fireImmediately: true,
+        );
+        await testNotifier.getInitialList();
+        await testNotifier.getNextPage();
+        expect([
           const PaginatedState<String>.loading(),
           PaginatedState.loaded(getList(page: 1), isLastPage: false),
           PaginatedState.error(getList(page: 1), testGenericFailure),
@@ -246,63 +245,62 @@ void main() {
             getList(page: 1) + getList(page: 2),
             isLastPage: true,
           ),
-        ],
-        states,
-      );
-    });
+        ], states);
+      },
+    );
   });
 
   group('refresh()', () {
     test(
-        'show emit [Loading, Loaded, Error, Loading, Loaded] when repository returns PaginatedList then Failure and then first PaginatedList',
-        () async {
-      var counter = 0;
-      when(() => testRepository.getListStreamOrFailure(1)).thenAnswer((_) {
-        if (counter == 0) {
-          counter++;
-          return getPageResponse(page: 1, shouldFail: true);
-        }
-        return getPageResponse(page: 1);
-      });
-      when(() => testRepository.getListStreamOrFailure(2))
-          .thenAnswer((_) => getPageResponse(page: 2));
-      final states = <PaginatedState>[];
-      testNotifier.listen(
-        (currentState, _) => states.add(currentState),
-        fireImmediately: true,
-      );
-      await testNotifier.getInitialList();
-      await testNotifier.refresh();
-      expect(
-        [
+      'show emit [Loading, Loaded, Error, Loading, Loaded] when repository returns PaginatedList then Failure and then first PaginatedList',
+      () async {
+        var counter = 0;
+        when(() => testRepository.getListStreamOrFailure(1)).thenAnswer((_) {
+          if (counter == 0) {
+            counter++;
+            return getPageResponse(page: 1, shouldFail: true);
+          }
+          return getPageResponse(page: 1);
+        });
+        when(
+          () => testRepository.getListStreamOrFailure(2),
+        ).thenAnswer((_) => getPageResponse(page: 2));
+        final states = <PaginatedState>[];
+        testNotifier.listen(
+          (currentState, _) => states.add(currentState),
+          fireImmediately: true,
+        );
+        await testNotifier.getInitialList();
+        await testNotifier.refresh();
+        expect([
           const PaginatedState<String>.loading(),
           PaginatedState.loaded(getList(page: 1), isLastPage: false),
           PaginatedState.error(getList(page: 1), testGenericFailure),
           const PaginatedState<String>.loading(),
           PaginatedState.loaded(getList(page: 1), isLastPage: false),
-        ],
-        states,
-      );
-    });
+        ], states);
+      },
+    );
 
     test(
-        'should emit [Loading, Loaded, Loaded, LoadingMore, Loaded, Loading, Loaded, Loaded] when repository returns PaginatedList twice, then PaginatedList and then again PaginatedList twice',
-        () async {
-      when(() => testRepository.getListStreamOrFailure(1))
-          .thenAnswer((_) => getPageResponse(page: 1));
-      when(() => testRepository.getListStreamOrFailure(2))
-          .thenAnswer((_) => getPageResponse(page: 2));
-      final states = <PaginatedState>[];
-      testNotifier.listen(
-        (currentState, _) => states.add(currentState),
-        fireImmediately: true,
-      );
+      'should emit [Loading, Loaded, Loaded, LoadingMore, Loaded, Loading, Loaded, Loaded] when repository returns PaginatedList twice, then PaginatedList and then again PaginatedList twice',
+      () async {
+        when(
+          () => testRepository.getListStreamOrFailure(1),
+        ).thenAnswer((_) => getPageResponse(page: 1));
+        when(
+          () => testRepository.getListStreamOrFailure(2),
+        ).thenAnswer((_) => getPageResponse(page: 2));
+        final states = <PaginatedState>[];
+        testNotifier.listen(
+          (currentState, _) => states.add(currentState),
+          fireImmediately: true,
+        );
 
-      await testNotifier.getInitialList();
-      await testNotifier.getNextPage();
-      await testNotifier.refresh();
-      expect(
-        [
+        await testNotifier.getInitialList();
+        await testNotifier.getNextPage();
+        await testNotifier.refresh();
+        expect([
           const PaginatedState<String>.loading(),
           PaginatedState.loaded(getList(page: 1), isLastPage: false),
           PaginatedState.loadingMore(getList(page: 1)),
@@ -312,10 +310,9 @@ void main() {
           ),
           const PaginatedState<String>.loading(),
           PaginatedState.loaded(getList(page: 1), isLastPage: false),
-        ],
-        states,
-      );
-    });
+        ], states);
+      },
+    );
   });
 }
 
@@ -335,6 +332,5 @@ class TestNotifier extends PaginatedStreamNotifier<String, Object> {
   PaginatedStreamFailureOr<String> getListStreamOrFailure(
     int page, [
     Object? parameter,
-  ]) =>
-      _testRepository.getListStreamOrFailure(page, parameter);
+  ]) => _testRepository.getListStreamOrFailure(page, parameter);
 }

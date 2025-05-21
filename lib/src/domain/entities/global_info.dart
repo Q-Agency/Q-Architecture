@@ -27,21 +27,15 @@ class GlobalInfo extends Equatable {
     String? title,
     String? message,
     String? uniqueKey,
-  }) =>
-      GlobalInfo(
-        globalInfoStatus: globalInfoStatus ?? this.globalInfoStatus,
-        title: title ?? this.title,
-        message: message ?? this.message,
-        uniqueKey: uniqueKey ?? this.uniqueKey,
-      );
+  }) => GlobalInfo(
+    globalInfoStatus: globalInfoStatus ?? this.globalInfoStatus,
+    title: title ?? this.title,
+    message: message ?? this.message,
+    uniqueKey: uniqueKey ?? this.uniqueKey,
+  );
 
   @override
-  List<Object?> get props => [
-        globalInfoStatus,
-        title,
-        message,
-        uniqueKey,
-      ];
+  List<Object?> get props => [globalInfoStatus, title, message, uniqueKey];
 
   @override
   bool? get stringify => true;
