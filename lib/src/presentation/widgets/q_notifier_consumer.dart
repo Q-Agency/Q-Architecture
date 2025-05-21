@@ -1,13 +1,13 @@
 import 'package:flutter/widgets.dart';
 import 'package:q_architecture/q_architecture.dart';
 
-class SimpleNotifierConsumer<T> extends StatefulWidget {
-  /// The [SimpleNotifier] instance to listen to.
-  final SimpleNotifier<T> simpleNotifier;
+class QNotifierConsumer<T> extends StatefulWidget {
+  /// The [QNotifier] instance to listen to.
+  final QNotifier<T> qNotifier;
 
   /// The listener to call when the state changes.
   final void Function(BuildContext context, T currentState, T? previousState)
-      listener;
+  listener;
 
   /// The builder function.
   final Widget Function(
@@ -15,59 +15,59 @@ class SimpleNotifierConsumer<T> extends StatefulWidget {
     T currentState,
     T? previousState,
     Widget? child,
-  ) builder;
+  )
+  builder;
 
-  /// A [SimpleNotifier]-independent widget which is passed back to the [builder].
+  /// A [QNotifier]-independent widget which is passed back to the [builder].
   ///
   /// This argument is optional and can be null if the entire widget subtree the
-  /// [builder] builds depends on the state of the [SimpleNotifier]. For
-  /// example, in the case where the [SimpleNotifier] is a [String] and the
+  /// [builder] builds depends on the state of the [QNotifier]. For
+  /// example, in the case where the [QNotifier] is a [String] and the
   /// [builder] returns a [Text] widget with the current [String] value, there
   /// would be no useful [child].
   final Widget? child;
 
-  const SimpleNotifierConsumer({
+  const QNotifierConsumer({
     super.key,
-    required this.simpleNotifier,
+    required this.qNotifier,
     required this.listener,
     required this.builder,
     this.child,
   });
 
   @override
-  State<SimpleNotifierConsumer<T>> createState() =>
-      _SimpleNotifierConsumerState<T>();
+  State<QNotifierConsumer<T>> createState() => _QNotifierConsumerState<T>();
 }
 
-class _SimpleNotifierConsumerState<T> extends State<SimpleNotifierConsumer<T>> {
-  late SimpleNotifier<T> _simpleNotifier;
+class _QNotifierConsumerState<T> extends State<QNotifierConsumer<T>> {
+  late QNotifier<T> _qNotifier;
 
   @override
   void initState() {
     super.initState();
-    _simpleNotifier = widget.simpleNotifier;
+    _qNotifier = widget.qNotifier;
   }
 
   @override
-  void didUpdateWidget(SimpleNotifierConsumer<T> oldWidget) {
+  void didUpdateWidget(QNotifierConsumer<T> oldWidget) {
     super.didUpdateWidget(oldWidget);
-    if (oldWidget.simpleNotifier != widget.simpleNotifier) {
-      _simpleNotifier = widget.simpleNotifier;
+    if (oldWidget.qNotifier != widget.qNotifier) {
+      _qNotifier = widget.qNotifier;
     }
   }
 
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
-    if (widget.simpleNotifier != _simpleNotifier) {
-      _simpleNotifier = widget.simpleNotifier;
+    if (widget.qNotifier != _qNotifier) {
+      _qNotifier = widget.qNotifier;
     }
   }
 
   @override
   Widget build(BuildContext context) {
-    return SimpleNotifierBuilder(
-      simpleNotifier: _simpleNotifier,
+    return QNotifierBuilder(
+      qNotifier: _qNotifier,
       builder: (context, currentState, previousState, child) {
         widget.listener(context, currentState, previousState);
         return widget.builder(context, currentState, previousState, child);

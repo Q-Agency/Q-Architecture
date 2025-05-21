@@ -2,7 +2,7 @@ import 'package:example/data/repositories/example_repository.dart';
 import 'package:example/domain/notifiers/example_simple_notifier/example_simple_state.dart';
 import 'package:q_architecture/q_architecture.dart';
 
-class ExampleSimpleNotifier extends SimpleNotifier<ExampleSimpleState> {
+class ExampleSimpleNotifier extends QNotifier<ExampleSimpleState> {
   final ExampleRepository _exampleRepository;
 
   ExampleSimpleNotifier(this._exampleRepository, {super.autoDispose})

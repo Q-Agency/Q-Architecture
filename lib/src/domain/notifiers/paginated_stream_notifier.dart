@@ -4,11 +4,11 @@ import 'package:either_dart/either.dart';
 import 'package:meta/meta.dart';
 import 'package:q_architecture/q_architecture.dart';
 
-typedef PaginatedStreamFailureOr<Entity>
-    = Stream<Either<Failure, PaginatedList<Entity>>>;
+typedef PaginatedStreamFailureOr<Entity> =
+    Stream<Either<Failure, PaginatedList<Entity>>>;
 
 abstract class PaginatedStreamNotifier<Entity, Param>
-    extends SimpleNotifier<PaginatedState<Entity>> {
+    extends QNotifier<PaginatedState<Entity>> {
   final bool _useGlobalFailure;
   PaginatedList<Entity>? _lastPaginatedList;
   Param? _parameter;
@@ -25,11 +25,7 @@ abstract class PaginatedStreamNotifier<Entity, Param>
   Future<void> getInitialList([Param? param]) async {
     _parameter = param;
     _resetPagination();
-    await _getListOn(
-      page: 1,
-      currentList: [],
-      parameter: _parameter,
-    );
+    await _getListOn(page: 1, currentList: [], parameter: _parameter);
   }
 
   @override
@@ -76,8 +72,9 @@ abstract class PaginatedStreamNotifier<Entity, Param>
   }) async {
     var updatedList = currentList;
     _listStreamSubscription?.cancel();
-    _listStreamSubscription =
-        getListStreamOrFailure(page, parameter).listen((result) {
+    _listStreamSubscription = getListStreamOrFailure(page, parameter).listen((
+      result,
+    ) {
       result.fold(
         (failure) {
           if (_useGlobalFailure) {

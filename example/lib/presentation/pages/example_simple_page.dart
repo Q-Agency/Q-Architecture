@@ -17,8 +17,8 @@ class ExampleSimplePage extends StatelessWidget {
         mainAxisAlignment: MainAxisAlignment.center,
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          SimpleNotifierConsumer(
-            simpleNotifier: exampleSimpleNotifier,
+          QNotifierConsumer(
+            qNotifier: exampleSimpleNotifier,
             listener: (context, currentState, previousState) {
               debugPrint(
                 'currentState: $currentState, previousState: $previousState',

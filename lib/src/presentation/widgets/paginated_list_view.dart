@@ -5,23 +5,19 @@ class PaginatedListView<Entity, Param, Arg> extends StatelessWidget {
   /// required [itemBuilder] used for displaying each item in the scroll view,
   /// provides [context], [item] object and its [index] within the list of items
   final Widget? Function(BuildContext context, Entity item, int index)
-      itemBuilder;
+  itemBuilder;
   final PaginatedStreamNotifier<Entity, Param> paginatedStreamNotifier;
 
   /// optional builder to customize displaying the refresh functionality on
   /// top of the scrollbar when scroll view is dragged all the way to the top,
   /// defaults to RefreshIndicator
-  final Widget Function(
-    Future<void> Function() onRefresh,
-    Widget child,
-  )? refreshWidgetBuilder;
+  final Widget Function(Future<void> Function() onRefresh, Widget child)?
+  refreshWidgetBuilder;
 
   /// optional builder for displaying Scrollbar or some other custom
   /// scroll bar widget
-  final Widget Function(
-    ScrollController controller,
-    Widget child,
-  )? scrollbarWidgetBuilder;
+  final Widget Function(ScrollController controller, Widget child)?
+  scrollbarWidgetBuilder;
   final Widget Function(Future<void> Function() onRefresh) emptyListBuilder;
 
   /// optional [onError] callback, provides [failure], information if
@@ -31,7 +27,8 @@ class PaginatedListView<Entity, Param, Arg> extends StatelessWidget {
     Failure failure,
     bool listIsEmpty,
     Future<void> Function() onRefresh,
-  )? onError;
+  )?
+  onError;
 
   /// optional [loading] widget to be shown before first page is fetched,
   /// defaults to CircularProgressIndicator()
@@ -90,72 +87,46 @@ class PaginatedListView<Entity, Param, Arg> extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     Widget getRefreshWidget({required Widget child}) =>
-        refreshWidgetBuilder?.call(
-          () async => _refresh(),
-          child,
-        ) ??
+        refreshWidgetBuilder?.call(() async => _refresh(), child) ??
         RefreshIndicator(onRefresh: () async => _refresh(), child: child);
     Widget getScrollbarWidget({
       required ScrollController controller,
       required Widget child,
-    }) =>
-        scrollbarWidgetBuilder?.call(controller, child) ?? child;
+    }) => scrollbarWidgetBuilder?.call(controller, child) ?? child;
     Widget getListEmpty() => emptyListBuilder.call(() async => _refresh());
 
     Widget? getLoadMoreButton(bool isLastPage) =>
         paginatedListViewType == PaginatedListViewType.loadMoreButton &&
-                loadMoreButtonBuilder != null &&
-                !isLastPage
-            ? loadMoreButtonBuilder!(() => _getNextPage())
-            : null;
+            loadMoreButtonBuilder != null &&
+            !isLastPage
+        ? loadMoreButtonBuilder!(() => _getNextPage())
+        : null;
     final onFetchMore =
         paginatedListViewType == PaginatedListViewType.infiniteScroll
-            ? () => _getNextPage()
-            : null;
-    return SimpleNotifierBuilder(
-      simpleNotifier: paginatedStreamNotifier,
+        ? () => _getNextPage()
+        : null;
+    return QNotifierBuilder(
+      qNotifier: paginatedStreamNotifier,
       builder: (context, currentState, previousState, child) =>
           switch (currentState) {
-        PaginatedLoadingMore<Entity>(list: final list) => _ListView(
-            itemBuilder: itemBuilder,
-            list: list,
-            isLoading: true,
-            loading: loadingMore,
-            listPadding: listPadding,
-            scrollDirection: scrollDirection,
-            spacing: spacing,
-            separator: separator,
-            refreshWidgetBuilder: getRefreshWidget,
-            scrollbarWidgetBuilder: getScrollbarWidget,
-            emptyListBuilder: getListEmpty,
-            onNotification: (info) => _onScrollNotification(info),
-            scrollPhysics: scrollPhysics,
-            scrollController: scrollController,
-            onFetchMore: onFetchMore,
-          ),
-        PaginatedLoaded(list: final list, isLastPage: final isLastPage) =>
-          _ListView(
-            itemBuilder: itemBuilder,
-            list: list,
-            listPadding: listPadding,
-            scrollDirection: scrollDirection,
-            spacing: spacing,
-            separator: separator,
-            refreshWidgetBuilder: getRefreshWidget,
-            scrollbarWidgetBuilder: getScrollbarWidget,
-            emptyListBuilder: getListEmpty,
-            onNotification: (info) => _onScrollNotification(info),
-            loadMoreButtonBuilder: () => getLoadMoreButton(isLastPage),
-            scrollPhysics: scrollPhysics,
-            scrollController: scrollController,
-            onFetchMore: onFetchMore,
-          ),
-        PaginatedLoading() => loading ??
-            const Center(
-              child: CircularProgressIndicator(),
+            PaginatedLoadingMore<Entity>(list: final list) => _ListView(
+              itemBuilder: itemBuilder,
+              list: list,
+              isLoading: true,
+              loading: loadingMore,
+              listPadding: listPadding,
+              scrollDirection: scrollDirection,
+              spacing: spacing,
+              separator: separator,
+              refreshWidgetBuilder: getRefreshWidget,
+              scrollbarWidgetBuilder: getScrollbarWidget,
+              emptyListBuilder: getListEmpty,
+              onNotification: (info) => _onScrollNotification(info),
+              scrollPhysics: scrollPhysics,
+              scrollController: scrollController,
+              onFetchMore: onFetchMore,
             ),
-        PaginatedError(list: final list, failure: final failure) =>
-          onError?.call(failure, list.isEmpty, () async => _refresh()) ??
+            PaginatedLoaded(list: final list, isLastPage: final isLastPage) =>
               _ListView(
                 itemBuilder: itemBuilder,
                 list: list,
@@ -167,12 +138,32 @@ class PaginatedListView<Entity, Param, Arg> extends StatelessWidget {
                 scrollbarWidgetBuilder: getScrollbarWidget,
                 emptyListBuilder: getListEmpty,
                 onNotification: (info) => _onScrollNotification(info),
-                loadMoreButtonBuilder: () => getLoadMoreButton(false),
+                loadMoreButtonBuilder: () => getLoadMoreButton(isLastPage),
                 scrollPhysics: scrollPhysics,
                 scrollController: scrollController,
                 onFetchMore: onFetchMore,
               ),
-      },
+            PaginatedLoading() =>
+              loading ?? const Center(child: CircularProgressIndicator()),
+            PaginatedError(list: final list, failure: final failure) =>
+              onError?.call(failure, list.isEmpty, () async => _refresh()) ??
+                  _ListView(
+                    itemBuilder: itemBuilder,
+                    list: list,
+                    listPadding: listPadding,
+                    scrollDirection: scrollDirection,
+                    spacing: spacing,
+                    separator: separator,
+                    refreshWidgetBuilder: getRefreshWidget,
+                    scrollbarWidgetBuilder: getScrollbarWidget,
+                    emptyListBuilder: getListEmpty,
+                    onNotification: (info) => _onScrollNotification(info),
+                    loadMoreButtonBuilder: () => getLoadMoreButton(false),
+                    scrollPhysics: scrollPhysics,
+                    scrollController: scrollController,
+                    onFetchMore: onFetchMore,
+                  ),
+          },
     );
   }
 
@@ -193,12 +184,13 @@ enum PaginatedListViewType { infiniteScroll, loadMoreButton }
 
 class _ListView<Entity> extends StatefulWidget {
   final Widget? Function(BuildContext context, Entity item, int index)
-      itemBuilder;
+  itemBuilder;
   final Widget Function({required Widget child}) refreshWidgetBuilder;
   final Widget Function({
     required ScrollController controller,
     required Widget child,
-  }) scrollbarWidgetBuilder;
+  })
+  scrollbarWidgetBuilder;
   final Widget Function() emptyListBuilder;
   final Widget? Function()? loadMoreButtonBuilder;
   final List<Entity> list;
@@ -287,7 +279,7 @@ class _ListViewState<Entity> extends State<_ListView<Entity>> {
                     if (index == widget.list.length + 1) {
                       return widget.isLoading
                           ? widget.loading ??
-                              const Center(child: CircularProgressIndicator())
+                                const Center(child: CircularProgressIndicator())
                           : const SizedBox();
                     }
                     if (index == widget.list.length) {
@@ -303,7 +295,7 @@ class _ListViewState<Entity> extends State<_ListView<Entity>> {
                   itemCount: widget.list.length + 2,
                   separatorBuilder: (_, index) => index < widget.list.length - 1
                       ? widget.separator ??
-                          SizedBox(height: widget.spacing ?? 10)
+                            SizedBox(height: widget.spacing ?? 10)
                       : const SizedBox(),
                 ),
               ),

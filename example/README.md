@@ -19,8 +19,8 @@ getIt.registerSingleton<YourMapper>(YourMapperImplementation());
 ```
 
 2. Register notifiers as lazy singletons with proper disposal and to be able to
-   use autoDispose option (additionally explained in
-   [SimpleNotifier](#simplenotifier) section):
+   use autoDispose option (additionally explained in [QNotifier](#qnotifier)
+   section):
 
 ```dart
 getIt.registerLazySingleton<YourNotifier>(
@@ -85,13 +85,13 @@ getIt.registerLazySingleton<YourNotifier>(
 ```
 
 - In your widget call your notifier getYourString() method through your service
-  locator and watch the changes through SimpleNotifierBuilder widget
+  locator and watch the changes through QNotifierBuilder widget
 
 ```dart
 final yourNotifier = getIt<YourNotifier>();
 yourNotifier.getYourString();
-return SimpleNotifierBuilder(
-  simpleNotifier: yourNotifier,
+return QNotifierBuilder(
+  qNotifier: yourNotifier,
   builder: (context, currentState, previousState, child) => Text(
     switch (currentState) {
       Data(data: final sentence) => sentence,
@@ -111,13 +111,13 @@ table of contents.
 - [Example - BaseNotifier](#example---basenotifier)
   - [ExampleNotifier](#examplenotifier)
   - [ExamplePage](#examplepage)
-- [Example - SimpleNotifier](#example---simplenotifier)
+- [Example - Notifier](#example---qnotifier)
   - [ExampleSimpleNotifier](#examplesimplenotifier)
   - [ExampleSimplePage](#examplesimplepage)
 - [BaseState<State>](#basestatestate)
-- [SimpleNotifier](#simplenotifier)
+- [QNotifier](#qnotifier)
 - [BaseNotifier](#basenotifier)
-- [SimpleNotifier widgets](#simplenotifier-widgets)
+- [QNotifier widgets](#qnotifier-widgets)
 - [PaginatedStreamNotifier and PaginatedNotifier](#paginatedstreamnotifier-and-paginatednotifier)
 - [Global loading](#global-loading)
 - [Global failure](#global-failure)
@@ -204,7 +204,7 @@ class ExamplePage extends StatelessWidget {
       body: ListView(
         children: [
           spacing16,
-          SimpleNotifierBuilder(
+          QNotifierBuilder(
             notifier: exampleNotifier,
             builder:
                 (context, currentState, previousState, child) => Text(
@@ -313,11 +313,11 @@ class ExamplePage extends StatelessWidget {
 }
 ```
 
-## Example - SimpleNotifier
+## Example - QNotifier
 
 If BaseNotifier restrain you in some way and its BaseState does not cover your
-use case, but you want to use some benefits of BaseNotifier, then SimpleNotifier
-is here for you.
+use case, but you want to use some benefits of BaseNotifier, then QNotifier is
+here for you.
 
 ### ExampleSimpleNotifier
 
@@ -329,7 +329,7 @@ getIt.registerLazySingleton<ExampleSimpleNotifier>(
 );
 
 // in example_simple_notifier.dart
-class ExampleSimpleNotifier extends SimpleNotifier<ExampleSimpleState> {
+class ExampleSimpleNotifier extends QNotifier<ExampleSimpleState> {
   final ExampleRepository _exampleRepository;
 
   ExampleSimpleNotifier(this._exampleRepository, {super.autoDispose})
@@ -444,8 +444,8 @@ class ExampleSimplePage extends StatelessWidget {
         mainAxisAlignment: MainAxisAlignment.center,
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          SimpleNotifierConsumer(
-            simpleNotifier: exampleSimpleNotifier,
+          QNotifierConsumer(
+            qNotifier: exampleSimpleNotifier,
             listener: (context, currentState, previousState) {
               debugPrint(
                 'currentState: $currentState, previousState: $previousState',
@@ -547,23 +547,23 @@ final class Data<State> extends BaseState<State> {
 }
 ```
 
-## SimpleNotifier
+## QNotifier
 
-Abstract SimpleNotifier class which extends ChangeNotifier class which provides
-some convenient methods to be used by subclassing it. It can be used when
-BaseState doesn't suit you and you need more states, this notifier has
+Abstract QNotifier class which extends ChangeNotifier class which provides some
+convenient methods to be used by subclassing it. It can be used when BaseState
+doesn't suit you and you need more states, this notifier has
 **showGlobalLoading**, **clearGlobalLoading**, **setGlobalFailure**,
 **debounce**, **throttle** and **cancelThrottle** methods that are marked as
 **@protected** so you can easily use them in your subclasses.
 
-**IMPORTANT**: always register your SimpleNotifier subclasses (including
-BaseNotifier as well) as lazy singletons in GetIt with **registerLazySingleton**
-to be able to use autoDispose feature when convenient.
+**IMPORTANT**: always register your QNotifier subclasses (including BaseNotifier
+as well) as lazy singletons in GetIt with **registerLazySingleton** to be able
+to use autoDispose feature when convenient.
 
 - in constructor receives the initial state of the notifier and optionally
   **autoDispose** which defaults to false but if true, the notifier will be
   disposed when all listeners are removed. IMPORTANT: When using
-  autoDispose=true, this SimpleNotifier subclass MUST be registered as a
+  autoDispose=true, this QNotifier subclass MUST be registered as a
   lazySingleton in GetIt, otherwise an exception will be thrown when attempting
   to reset the lazy singleton
 
@@ -592,10 +592,9 @@ to be able to use autoDispose feature when convenient.
 
 ## BaseNotifier
 
-Abstract BaseNotifier class which is built on top of SimpleNotifier and uses
-BaseState class as its state. It provides all convenient methods like
-SimpleNotifier and additionally execute method which will be explained in the
-next paragraph.
+Abstract BaseNotifier class which is built on top of QNotifier and uses
+BaseState class as its state. It provides all convenient methods like QNotifier
+and additionally execute method which will be explained in the next paragraph.
 
 ### Execute method
 
@@ -677,43 +676,43 @@ StreamFailureOr<String> getSomeStringsStreamed() async* {
 }
 ```
 
-## SimpleNotifier widgets
+## QNotifier widgets
 
-SimpleNotifier widgets provide a convenient way to consume state changes from
-SimpleNotifier instances throughout your application. These widgets handle the
+QNotifier widgets provide a convenient way to consume state changes from
+QNotifier instances throughout your application. These widgets handle the
 subscription lifecycle automatically and deliver the current and previous states
 to your UI through builders, listeners, or a combination of both. They allow you
 to create reactive UIs that respond to state changes with minimal boilerplate
 code.
 
-### SimpleNotifierBuilder
+### QNotifierBuilder
 
-SimpleNotifierBuilder is a widget that rebuilds its UI when a SimpleNotifier
-changes state. It takes a required simpleNotifier instance to listen to and a
-builder function that provides the current state, previous state, and an
-optional child widget. The builder pattern allows you to create reactive UI
-components that automatically update whenever the underlying state changes.
+QNotifierBuilder is a widget that rebuilds its UI when a QNotifier changes
+state. It takes a required qNotifier instance to listen to and a builder
+function that provides the current state, previous state, and an optional child
+widget. The builder pattern allows you to create reactive UI components that
+automatically update whenever the underlying state changes.
 
-### SimpleNotifierListener
+### QNotifierListener
 
-SimpleNotifierListener is a widget that executes a callback function whenever a
-SimpleNotifier changes state. Unlike SimpleNotifierBuilder, it doesn't rebuild
-the UI but instead performs side effects like showing dialogs, navigating to
-different screens, or updating other parts of your application state. It takes a
-required simpleNotifier instance to listen to and a listener callback that
-receives the current state and previous state. This widget is particularly
-useful for handling events that should happen in response to state changes
-without directly affecting the widget's visual representation.
+QNotifierListener is a widget that executes a callback function whenever a
+QNotifier changes state. Unlike QNotifierBuilder, it doesn't rebuild the UI but
+instead performs side effects like showing dialogs, navigating to different
+screens, or updating other parts of your application state. It takes a required
+qNotifier instance to listen to and a listener callback that receives the
+current state and previous state. This widget is particularly useful for
+handling events that should happen in response to state changes without directly
+affecting the widget's visual representation.
 
-### SimpleNotifierConsumer
+### QNotifierConsumer
 
-SimpleNotifierConsumer combines the functionality of SimpleNotifierBuilder and
-SimpleNotifierListener into a single widget. It allows you to both execute side
+QNotifierConsumer combines the functionality of QNotifierBuilder and
+QNotifierListener into a single widget. It allows you to both execute side
 effects with a listener callback and rebuild the UI with a builder function in
-response to SimpleNotifier state changes. This widget is useful when you need to
+response to QNotifier state changes. This widget is useful when you need to
 perform an action when the state changes (like showing a snackbar) while also
 updating the UI to reflect the new state. It simplifies your code by avoiding
-the need to nest SimpleNotifierBuilder and SimpleNotifierListener widgets.
+the need to nest QNotifierBuilder and QNotifierListener widgets.
 
 ## PaginatedStreamNotifier and PaginatedNotifier
 
@@ -722,7 +721,7 @@ list you fetch from local or remote data source.
 
 ### PaginatedStreamNotifier
 
-PaginatedStreamNotifier extends SimpleNotifier, uses PaginatedState and provides
+PaginatedStreamNotifier extends QNotifier, uses PaginatedState and provides
 `PaginatedStreamFailureOr<Entity> getListStreamOrFailure(int page, [Param? parameter])`
 to be overridden by the notifier subclassing it. This notifier works with
 streams so `getListStreamOrFailure` method if necessary can return first list
@@ -829,7 +828,7 @@ notifiers.
 updating **BaseNotifier** state.
 
 ```dart
-class GlobalLoadingNotifier extends SimpleNotifier<bool> {
+class GlobalLoadingNotifier extends QNotifier<bool> {
   GlobalLoadingNotifier() : super(false);
 
   void setGlobalLoading(bool value) => state = value;
@@ -871,7 +870,7 @@ Future getSomeString() =>
 application without updating **BaseNotifier** state.
 
 ```dart
-class GlobalFailureNotifier extends SimpleNotifier<Failure?> {
+class GlobalFailureNotifier extends QNotifier<Failure?> {
   GlobalFailureNotifier() : super(null);
 
   void setFailure(Failure? failure) => state = failure;
@@ -881,8 +880,8 @@ class GlobalFailureNotifier extends SimpleNotifier<Failure?> {
 ### Global failure listener
 
 ```dart
-SimpleNotifierListener(
-  simpleNotifier: GetIt.instance<GlobalFailureNotifier>(),
+QNotifierListener(
+  qNotifier: GetIt.instance<GlobalFailureNotifier>(),
   onChange: (currentState, previousState) {
     if (currentState == null) return;
     onGlobalFailure(currentState);
@@ -915,7 +914,7 @@ Future getSomeString() =>
 with GlobalInfoStatus. GlobalInfoStatus contains values: info, warning, error,
 success. Pass the required info status, and message of info that will be
 presented to the user. To set GlobalInfo from any notifier, just call
-setGlobalInfo() function defined in SimpleNotifier.
+setGlobalInfo() function defined in QNotifier.
 
 Suggestion: setGlobalInfo() can be called from onDataReceived() callback inside
 execute() function if there is a need to show alert directly from notifier,
@@ -923,7 +922,7 @@ right after request. For any other usage outside of notifier, set the value of
 **GlobalInfoNotifier** directly.
 
 ```dart
-class GlobalInfoNotifier extends SimpleNotifier<GlobalInfo?> {
+class GlobalInfoNotifier extends QNotifier<GlobalInfo?> {
   GlobalInfoNotifier() : super(null);
 
   @override
@@ -934,8 +933,8 @@ class GlobalInfoNotifier extends SimpleNotifier<GlobalInfo?> {
 ### GlobalInfo listener
 
 ```dart
-SimpleNotifierListener(
-  simpleNotifier: GetIt.instance<GlobalInfoNotifier>(),
+QNotifierListener(
+  qNotifier: GetIt.instance<GlobalInfoNotifier>(),
   onChange: (currentState, previousState) {
     if (currentState == null) return;
     onGlobalInfo(currentState);
@@ -973,14 +972,14 @@ class BaseWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return SimpleNotifierListener(
-      simpleNotifier: GetIt.instance<GlobalFailureNotifier>(),
+    return QNotifierListener(
+      qNotifier: GetIt.instance<GlobalFailureNotifier>(),
       onChange: (currentState, previousState) {
         if (currentState == null) return;
         onGlobalFailure(currentState);
       },
-      child: SimpleNotifierListener(
-        simpleNotifier: GetIt.instance<GlobalInfoNotifier>(),
+      child: QNotifierListener(
+        qNotifier: GetIt.instance<GlobalInfoNotifier>(),
         onChange: (currentState, previousState) {
           if (currentState == null) return;
           onGlobalInfo(currentState);
@@ -988,8 +987,8 @@ class BaseWidget extends StatelessWidget {
         child: Stack(
           children: [
             child,
-            SimpleNotifierBuilder(
-              simpleNotifier: GetIt.instance<GlobalLoadingNotifier>(),
+            QNotifierBuilder(
+              qNotifier: GetIt.instance<GlobalLoadingNotifier>(),
               builder: (context, currentState, previousState, child) {
                 if (currentState) {
                   return loadingIndicator ?? const BaseLoadingIndicator();

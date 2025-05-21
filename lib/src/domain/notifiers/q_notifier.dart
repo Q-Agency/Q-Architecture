@@ -7,7 +7,7 @@ import 'package:get_it/get_it.dart';
 import 'package:meta/meta.dart';
 import 'package:q_architecture/q_architecture.dart';
 
-class SimpleNotifier<T> extends ChangeNotifier {
+class QNotifier<T> extends ChangeNotifier {
   ///The current state
   T _state;
 
@@ -19,16 +19,16 @@ class SimpleNotifier<T> extends ChangeNotifier {
   final Map<String, bool> _isThrottlingMap = {};
   final bool _autoDispose;
 
-  /// Constructor for SimpleNotifier
+  /// Constructor for QNotifier
   ///
   /// [state] - The initial state of the notifier
   /// [autoDispose] - If true, the notifier will be disposed when all listeners are removed.
-  /// IMPORTANT: When using autoDispose=true, this SimpleNotifier subclass
+  /// IMPORTANT: When using autoDispose=true, this QNotifier subclass
   /// MUST be registered as a lazySingleton in GetIt, otherwise an exception
   /// will be thrown when attempting to reset the lazy singleton.
-  SimpleNotifier(T state, {bool autoDispose = false})
-      : _state = state,
-        _autoDispose = autoDispose;
+  QNotifier(T state, {bool autoDispose = false})
+    : _state = state,
+      _autoDispose = autoDispose;
 
   @override
   void dispose() {
@@ -103,10 +103,9 @@ class SimpleNotifier<T> extends ChangeNotifier {
       listenerId != null || listenerIndex != null,
       'listenerId or listenerIndex must be provided',
     );
-    final index = listenerIndex ??
-        _listenersWrappers.indexWhere(
-          (wrapper) => wrapper.id == listenerId,
-        );
+    final index =
+        listenerIndex ??
+        _listenersWrappers.indexWhere((wrapper) => wrapper.id == listenerId);
     if (index != -1) {
       final wrapper = _listenersWrappers[index];
       _listenersWrappers.removeAt(index);
@@ -160,10 +159,7 @@ class SimpleNotifier<T> extends ChangeNotifier {
   }) async {
     if (_debounceTimer?.isActive == true) _debounceTimer?.cancel();
     final debounceCompleter = Completer();
-    _debounceTimer = Timer(
-      duration,
-      () => debounceCompleter.complete(),
-    );
+    _debounceTimer = Timer(duration, () => debounceCompleter.complete());
     await debounceCompleter.future;
   }
 

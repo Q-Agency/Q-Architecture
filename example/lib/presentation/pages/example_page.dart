@@ -34,8 +34,8 @@ class _ExamplePageState extends State<ExamplePage> {
           mainAxisAlignment: MainAxisAlignment.center,
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
-            SimpleNotifierBuilder(
-              simpleNotifier: exampleNotifier,
+            QNotifierBuilder(
+              qNotifier: exampleNotifier,
               builder: (context, currentState, previousState, child) => Text(
                 switch (currentState) {
                   BaseData(data: final sentence) => sentence,

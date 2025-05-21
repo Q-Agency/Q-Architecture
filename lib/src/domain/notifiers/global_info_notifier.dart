@@ -4,7 +4,7 @@ import 'package:q_architecture/q_architecture.dart';
 ///
 ///The entire app is wrapped in [BaseWidget] which listens to this provider and GlobalInfo can be shown above entire
 ///app by simply calling setGlobalInfo() inside execute > onDataReceived()
-class GlobalInfoNotifier extends SimpleNotifier<GlobalInfo?> {
+class GlobalInfoNotifier extends QNotifier<GlobalInfo?> {
   GlobalInfoNotifier() : super(null);
 
   @override

@@ -5,7 +5,7 @@ import 'package:q_architecture/q_architecture.dart';
 typedef PreHandleData<T> = bool Function(T data);
 typedef PreHandleFailure = bool Function(Failure failure);
 
-class BaseNotifier<DataState> extends SimpleNotifier<BaseState<DataState>> {
+class BaseNotifier<DataState> extends QNotifier<BaseState<DataState>> {
   BaseNotifier({super.autoDispose}) : super(BaseState.initial());
 
   /// Executes received [function] with additional parameters to control if loading state should be set while executing [function] by providing [withLoadingState] param.
@@ -107,9 +107,7 @@ class BaseNotifier<DataState> extends SimpleNotifier<BaseState<DataState>> {
     bool withLoadingState,
   ) {
     final shouldUpdateState = onDataReceived?.call(data) ?? true;
-    _unsetLoading(
-      shouldUpdateState ? false : withLoadingState,
-    );
+    _unsetLoading(shouldUpdateState ? false : withLoadingState);
     if (shouldUpdateState) {
       state = BaseState.data(data);
     }
@@ -117,10 +115,7 @@ class BaseNotifier<DataState> extends SimpleNotifier<BaseState<DataState>> {
 
   ///Shows global loading if [globalLoading] == true
   ///Set [withLoadingState] == true if you want to change [BaseNotifier] state to [BaseState.loading]
-  void _setLoading(
-    bool withLoadingState,
-    bool globalLoading,
-  ) {
+  void _setLoading(bool withLoadingState, bool globalLoading) {
     if (withLoadingState) {
       state = BaseState.loading();
     }
@@ -129,9 +124,7 @@ class BaseNotifier<DataState> extends SimpleNotifier<BaseState<DataState>> {
 
   ///Clears global loading
   ///Set [withLoadingState] == true if you want to reset [BaseNotifier] state to [BaseState.initial]
-  void _unsetLoading(
-    bool withLoadingState,
-  ) {
+  void _unsetLoading(bool withLoadingState) {
     final isAlreadyLoading = switch (state) {
       BaseLoading() => true,
       _ => false,

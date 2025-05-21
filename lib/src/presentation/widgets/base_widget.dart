@@ -20,14 +20,14 @@ class BaseWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return SimpleNotifierListener(
-      simpleNotifier: GetIt.instance<GlobalFailureNotifier>(),
+    return QNotifierListener(
+      qNotifier: GetIt.instance<GlobalFailureNotifier>(),
       listener: (context, currentState, previousState) {
         if (currentState == null) return;
         onGlobalFailure(currentState);
       },
-      child: SimpleNotifierListener(
-        simpleNotifier: GetIt.instance<GlobalInfoNotifier>(),
+      child: QNotifierListener(
+        qNotifier: GetIt.instance<GlobalInfoNotifier>(),
         listener: (context, currentState, previousState) {
           if (currentState == null) return;
           onGlobalInfo(currentState);
@@ -35,8 +35,8 @@ class BaseWidget extends StatelessWidget {
         child: Stack(
           children: [
             child,
-            SimpleNotifierBuilder(
-              simpleNotifier: GetIt.instance<GlobalLoadingNotifier>(),
+            QNotifierBuilder(
+              qNotifier: GetIt.instance<GlobalLoadingNotifier>(),
               builder: (context, currentState, previousState, child) {
                 if (currentState) {
                   return loadingIndicator ?? const BaseLoadingIndicator();

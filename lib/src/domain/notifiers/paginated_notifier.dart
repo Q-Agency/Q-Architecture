@@ -2,8 +2,8 @@ import 'package:either_dart/either.dart';
 import 'package:meta/meta.dart';
 import 'package:q_architecture/q_architecture.dart';
 
-typedef PaginatedEitherFailureOr<Entity>
-    = Future<Either<Failure, PaginatedList<Entity>>>;
+typedef PaginatedEitherFailureOr<Entity> =
+    Future<Either<Failure, PaginatedList<Entity>>>;
 
 abstract class PaginatedNotifier<Entity, Param>
     extends PaginatedStreamNotifier<Entity, Param> {
@@ -24,6 +24,5 @@ abstract class PaginatedNotifier<Entity, Param>
   PaginatedStreamFailureOr<Entity> getListStreamOrFailure(
     int page, [
     Param? parameter,
-  ]) =>
-      getListOrFailure(page, parameter).asStream();
+  ]) => getListOrFailure(page, parameter).asStream();
 }

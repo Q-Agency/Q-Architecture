@@ -4,7 +4,7 @@ import 'package:q_architecture/q_architecture.dart';
 ///
 ///The entire app is wrapped in [BaseWidget] which listens to this provider and failure can be shown above entire
 ///app by simply setting [globalFailure] to true when calling [BaseNotifier.execute] method.
-class GlobalFailureNotifier extends SimpleNotifier<Failure?> {
+class GlobalFailureNotifier extends QNotifier<Failure?> {
   GlobalFailureNotifier() : super(null);
 
   void setFailure(Failure? failure) => state = failure;
