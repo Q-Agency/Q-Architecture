@@ -659,10 +659,11 @@ In your state notifier:
 
 ```dart
 class ExampleNotifier extends BaseNotifier<String> {
-//...
-Future getSomeStringsStreamed() => executeStreamed(
-      _exampleRepository.getSomeStringsStreamed(),
-);
+  //...
+  Future getSomeStringsStreamed() => executeStreamed(
+        _exampleRepository.getSomeStringsStreamed(),
+  );
+}
 ```
 
 In repository:
