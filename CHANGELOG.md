@@ -1,3 +1,22 @@
+## 2.0.0
+
+- BREAKING CHANGE: Replaced Riverpod dependency with GetIt for dependency
+  injection
+- BREAKING CHANGE: Renamed SimpleNotifier to QNotifier and all related widgets
+- QNotifier is based on ChangeNotifier, instead of Riverpod's Notifier which is
+  completely removed from QArchitecture
+- Added QNotifierBuilder, QNotifierListener and QNotifierConsumer widgets to be
+  used with QNotifier instances
+- Added setupServiceLocator function for GetIt initialization with global
+  notifiers
+- Removed all provider-based implementations and mixins (BaseNotifierMixin,
+  PaginatedNotifierMixin, SimpleNotifierMixin)
+- Updated all examples to use GetIt service locator pattern instead of Riverpod
+- Changed uniqueKey type from UniqueKey to String in Failure and GlobalInfo
+  classes
+- Removed deprecated StateNotifier-based classes
+- Updated README.md
+
 ## 1.0.5
 
 - Fixed issue with ref in PaginatedNotifier and PaginatedStreamNotifier
