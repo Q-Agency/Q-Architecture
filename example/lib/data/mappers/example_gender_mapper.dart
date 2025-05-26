@@ -6,6 +6,6 @@ class ExampleGenderMapper {
 
 final _exampleGenderMap = {
   'male': ExampleGender.male,
-  'female': ExampleGender.male,
-  'other': ExampleGender.male,
+  'female': ExampleGender.female,
+  'other': ExampleGender.other,
 };
