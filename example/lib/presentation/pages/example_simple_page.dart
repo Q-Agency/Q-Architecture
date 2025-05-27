@@ -1,46 +1,54 @@
 import 'package:example/domain/notifiers/example_simple_notifier/example_simple_notifier.dart';
 import 'package:example/domain/notifiers/example_simple_notifier/example_simple_state.dart';
+import 'package:example/service_locator.dart';
 import 'package:flutter/material.dart';
-import 'package:hooks_riverpod/hooks_riverpod.dart';
+import 'package:q_architecture/q_architecture.dart';
 
-class ExampleSimplePage extends ConsumerWidget {
+class ExampleSimplePage extends StatelessWidget {
   static const routeName = '/simple-page';
 
   const ExampleSimplePage({super.key});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    final state = ref.watch(exampleSimpleNotifierProvider);
+  Widget build(BuildContext context) {
+    final exampleSimpleNotifier = getIt<ExampleSimpleNotifier>();
     return Scaffold(
       body: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          Text(
-            switch (state) {
-              Initial() => 'Initial',
-              Empty() => 'Empty',
-              Fetching() => 'Fetching',
-              Success(sentence: final string) => string,
-              Error(:final failure) => failure.title,
+          QNotifierConsumer(
+            qNotifier: exampleSimpleNotifier,
+            listener: (context, currentState, previousState) {
+              debugPrint(
+                'currentState: $currentState, previousState: $previousState',
+              );
             },
-            textAlign: TextAlign.center,
+            builder: (context, currentState, previousState, child) => Column(
+              children: [
+                Text(
+                  switch (currentState) {
+                    Initial() => 'Initial',
+                    Empty() => 'Empty',
+                    Fetching() => 'Fetching',
+                    Success(sentence: final string) => string,
+                    Error(:final failure) => failure.title,
+                  },
+                  textAlign: TextAlign.center,
+                ),
+              ],
+            ),
           ),
           TextButton(
             onPressed: () {
-              ref
-                  .read(exampleSimpleNotifierProvider.notifier)
-                  .getSomeStringSimpleExample();
-              ref
-                  .read(exampleSimpleNotifierProvider.notifier)
-                  .getSomeStringSimpleExample();
+              exampleSimpleNotifier.getSomeStringSimpleExample();
+              exampleSimpleNotifier.getSomeStringSimpleExample();
             },
             child: const Text('Simple state example with debounce'),
           ),
           TextButton(
-            onPressed: ref
-                .read(exampleSimpleNotifierProvider.notifier)
-                .getSomeStringSimpleExampleGlobalLoading,
+            onPressed:
+                exampleSimpleNotifier.getSomeStringSimpleExampleGlobalLoading,
             child: const Text('Global loading example'),
           ),
           ElevatedButton(

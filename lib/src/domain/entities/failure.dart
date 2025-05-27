@@ -1,9 +1,7 @@
 // ignore_for_file: avoid-dynamic
 
 import 'package:equatable/equatable.dart';
-import 'package:flutter/widgets.dart';
 import 'package:q_architecture/q_architecture.dart';
-import 'package:q_architecture/src/domain/mixins/simple_notifier_mixin.dart';
 
 /// Failure class that represents some kind of error that occurs in the app and being passed to UI
 class Failure extends Equatable {
@@ -19,8 +17,8 @@ class Failure extends Equatable {
   /// stackTrace of the [error] that can be caught by some try catch block, also useful for debugging
   final StackTrace? stackTrace;
 
-  /// uniqueKey set by [SimpleNotifierMixin.setGlobalFailure] method to trigger [globalFailureProvider] each time
-  final UniqueKey? uniqueKey;
+  /// uniqueKey set by [QNotifier.setGlobalFailure] method to trigger [GlobalFailureNotifier] each time
+  final String? uniqueKey;
 
   const Failure({
     required this.title,
@@ -36,54 +34,45 @@ class Failure extends Equatable {
     bool isCritical = false,
     dynamic error,
     StackTrace? stackTrace,
-    UniqueKey? uniqueKey,
-  }) =>
-      Failure(
-        title: title ?? 'Unknown error occurred',
-        isCritical: isCritical,
-        error: error,
-        stackTrace: stackTrace,
-        uniqueKey: uniqueKey,
-      );
+    String? uniqueKey,
+  }) => Failure(
+    title: title ?? 'Unknown error occurred',
+    isCritical: isCritical,
+    error: error,
+    stackTrace: stackTrace,
+    uniqueKey: uniqueKey,
+  );
 
   factory Failure.permissionDenied({
     String? title,
     bool isCritical = false,
     dynamic error,
     StackTrace? stackTrace,
-    UniqueKey? uniqueKey,
-  }) =>
-      Failure(
-        title: title ?? 'Permission denied',
-        isCritical: isCritical,
-        error: error,
-        stackTrace: stackTrace,
-        uniqueKey: uniqueKey,
-      );
+    String? uniqueKey,
+  }) => Failure(
+    title: title ?? 'Permission denied',
+    isCritical: isCritical,
+    error: error,
+    stackTrace: stackTrace,
+    uniqueKey: uniqueKey,
+  );
 
   Failure copyWith({
     String? title,
     bool? isCritical,
     dynamic error,
     StackTrace? stackTrace,
-    UniqueKey? uniqueKey,
-  }) =>
-      Failure(
-        title: title ?? this.title,
-        isCritical: isCritical ?? this.isCritical,
-        error: error ?? this.error,
-        stackTrace: stackTrace ?? this.stackTrace,
-        uniqueKey: uniqueKey ?? this.uniqueKey,
-      );
+    String? uniqueKey,
+  }) => Failure(
+    title: title ?? this.title,
+    isCritical: isCritical ?? this.isCritical,
+    error: error ?? this.error,
+    stackTrace: stackTrace ?? this.stackTrace,
+    uniqueKey: uniqueKey ?? this.uniqueKey,
+  );
 
   @override
-  List<Object?> get props => [
-        title,
-        isCritical,
-        error,
-        stackTrace,
-        uniqueKey,
-      ];
+  List<Object?> get props => [title, isCritical, error, stackTrace, uniqueKey];
 
   @override
   bool? get stringify => true;

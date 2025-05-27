@@ -1,22 +1,12 @@
 import 'package:example/data/repositories/example_repository.dart';
 import 'package:example/domain/notifiers/example_simple_notifier/example_simple_state.dart';
-import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:q_architecture/q_architecture.dart';
 
-final exampleSimpleNotifierProvider =
-    NotifierProvider.autoDispose<ExampleSimpleNotifier, ExampleSimpleState>(
-  () => ExampleSimpleNotifier(),
-);
+class ExampleSimpleNotifier extends QNotifier<ExampleSimpleState> {
+  final ExampleRepository _exampleRepository;
 
-class ExampleSimpleNotifier
-    extends AutoDisposeSimpleNotifier<ExampleSimpleState> {
-  late ExampleRepository _exampleRepository;
-
-  @override
-  ExampleSimpleState prepareForBuild() {
-    _exampleRepository = ref.watch(exampleRepositoryProvider);
-    return const ExampleSimpleState.initial();
-  }
+  ExampleSimpleNotifier(this._exampleRepository, {super.autoDispose})
+      : super(const ExampleSimpleState.initial());
 
   /// Example method when you want to get state updates when calling some repository method
   Future<void> getSomeStringSimpleExample() async {

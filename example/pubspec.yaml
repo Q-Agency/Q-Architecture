@@ -6,7 +6,7 @@ publish_to: "none"
 version: 1.0.0+1
 
 environment:
-  sdk: ">=3.0.2 <4.0.0"
+  sdk: ">=3.0.0 <4.0.0"
 
 dependencies:
   cupertino_icons: ^1.0.8
@@ -14,7 +14,7 @@ dependencies:
   equatable: ^2.0.7
   flutter:
     sdk: flutter
-  hooks_riverpod: ^2.6.1
+  get_it: ^8.0.3
   json_annotation: ^4.9.0
   q_architecture:
     path: ..
@@ -23,7 +23,7 @@ dev_dependencies:
   flutter_lints: ^5.0.0
   flutter_test:
     sdk: flutter
-  json_serializable: ^6.9.4
+  json_serializable: ^6.9.5
 
 flutter:
   uses-material-design: true

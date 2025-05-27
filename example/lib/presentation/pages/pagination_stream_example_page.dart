@@ -1,11 +1,9 @@
-//ignore_for_file: always_use_package_imports
-
 import 'dart:developer';
 
+import 'package:example/domain/notifiers/example_pagination/example_paginated_stream_notifier.dart';
+import 'package:example/service_locator.dart';
 import 'package:flutter/material.dart';
 import 'package:q_architecture/q_architecture.dart';
-
-import '../../domain/notifiers/example_pagination/example_paginated_stream_notifier.dart';
 
 class PaginationStreamExamplePage extends StatelessWidget {
   static const routeName = '/pagination-stream-example-page';
@@ -19,11 +17,11 @@ class PaginationStreamExamplePage extends StatelessWidget {
         title: const Text('Stream Pagination'),
       ),
       body: PaginatedListView(
+        paginatedStreamNotifier: getIt<ExamplePaginatedStreamNotifier>(),
         itemBuilder: (context, word, index) => _PaginationExampleTile(word),
         emptyListBuilder: (refresh) => const Center(
           child: Text('list empty'),
         ),
-        autoDisposeStreamNotifierProvider: paginatedStreamNotifierProvider,
         onError: (failure, listIsEmpty, onRefresh) {
           log('failure occurred: $failure');
           return null;

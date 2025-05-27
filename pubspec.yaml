@@ -2,7 +2,7 @@ name: q_architecture
 description: >
   A set of reusable classes that should speed up your development time  and
   reduce unnecessary boilerplate code.
-version: 1.0.5
+version: 2.0.0
 repository: https://github.com/Q-Agency/Q-Architecture
 issue_tracker: https://github.com/Q-Agency/Q-Architecture/issues
 
@@ -14,7 +14,7 @@ dependencies:
   equatable: ^2.0.7
   flutter:
     sdk: flutter
-  flutter_riverpod: ^2.6.1
+  get_it: ^8.0.3
   meta: ^1.16.0
 
 dev_dependencies:

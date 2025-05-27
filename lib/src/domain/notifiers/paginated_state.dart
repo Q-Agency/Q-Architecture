@@ -41,10 +41,7 @@ final class PaginatedLoaded<T> extends PaginatedState<T> {
   final List<T> list;
   final bool isLastPage;
 
-  const PaginatedLoaded(
-    this.list, {
-    this.isLastPage = false,
-  });
+  const PaginatedLoaded(this.list, {this.isLastPage = false});
 
   @override
   List<Object?> get props => [list];

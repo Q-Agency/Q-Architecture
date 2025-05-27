@@ -1,26 +1,24 @@
-//ignore_for_file: always_use_package_imports
 import 'dart:developer';
 
+import 'package:example/domain/notifiers/example_pagination/example_paginated_notifier.dart';
+import 'package:example/service_locator.dart';
 import 'package:flutter/material.dart';
-import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:q_architecture/q_architecture.dart';
 
-import '../../domain/notifiers/example_pagination/example_paginated_notifier.dart';
-
-class PaginationExamplePage extends ConsumerWidget {
+class PaginationExamplePage extends StatelessWidget {
   static const routeName = '/pagination-example-page';
 
   const PaginationExamplePage({super.key});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         title: const Text('Pagination'),
       ),
       body: PaginatedListView(
         itemBuilder: (context, word, index) => _PaginationExampleTile(word),
-        autoDisposeNotifierProvider: paginatedNotifierProvider,
+        paginatedStreamNotifier: getIt<ExamplePaginatedNotifier>(),
         emptyListBuilder: (refresh) => const Center(
           child: Text('list empty'),
         ),

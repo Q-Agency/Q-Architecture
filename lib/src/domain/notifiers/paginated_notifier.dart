@@ -1,106 +1,28 @@
-import 'package:flutter/foundation.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:q_architecture/paginated_notifier.dart';
-import 'package:q_architecture/src/domain/mixins/paginated_notifier_mixin.dart';
-import 'package:q_architecture/src/domain/mixins/paginated_stream_notifier_mixin.dart';
-import 'package:q_architecture/src/domain/mixins/simple_notifier_mixin.dart';
+import 'package:either_dart/either.dart';
+import 'package:meta/meta.dart';
+import 'package:q_architecture/q_architecture.dart';
+
+typedef PaginatedEitherFailureOr<Entity> =
+    Future<Either<Failure, PaginatedList<Entity>>>;
 
 abstract class PaginatedNotifier<Entity, Param>
-    extends Notifier<PaginatedState<Entity>>
-    with
-        SimpleNotifierMixin,
-        PaginatedStreamNotifierMixin<Entity, Param>,
-        PaginatedNotifierMixin<Entity, Param> {
-  ({PaginatedState<Entity> initialState, bool useGlobalFailure})
-      prepareForBuild();
+    extends PaginatedStreamNotifier<Entity, Param> {
+  PaginatedNotifier(
+    super.initialState, {
+    super.useGlobalFailure,
+    super.autoDispose,
+  });
 
-  /// do not override in child classes, use prepareForBuild instead
-  @nonVirtual
-  @override
-  PaginatedState<Entity> build() {
-    initWithRefAndGetOrUpdateState(
-      ref,
-      ({newState}) {
-        if (newState != null) state = newState;
-        return state;
-      },
-    );
-    final data = prepareForBuild();
-    setUserGlobalFailure(data.useGlobalFailure);
-    return data.initialState;
-  }
-}
-
-abstract class AutoDisposePaginatedNotifier<Entity, Param>
-    extends AutoDisposeNotifier<PaginatedState<Entity>>
-    with
-        SimpleNotifierMixin,
-        PaginatedStreamNotifierMixin<Entity, Param>,
-        PaginatedNotifierMixin<Entity, Param> {
-  ({PaginatedState<Entity> initialState, bool useGlobalFailure})
-      prepareForBuild();
-
-  /// do not override in child classes, use prepareForBuild instead
-  @nonVirtual
-  @override
-  PaginatedState<Entity> build() {
-    initWithRefAndGetOrUpdateState(
-      ref,
-      ({newState}) {
-        if (newState != null) state = newState;
-        return state;
-      },
-    );
-    final data = prepareForBuild();
-    setUserGlobalFailure(data.useGlobalFailure);
-    return data.initialState;
-  }
-}
-
-abstract class FamilyPaginatedNotifier<Entity, Param, Arg>
-    extends FamilyNotifier<PaginatedState<Entity>, Arg>
-    with
-        SimpleNotifierMixin,
-        PaginatedStreamNotifierMixin<Entity, Param>,
-        PaginatedNotifierMixin<Entity, Param> {
-  ({PaginatedState<Entity> initialState, bool useGlobalFailure})
-      prepareForBuild(Arg arg);
+  ///Gets the list or failure, needs to be implemented by the subclass
+  @protected
+  PaginatedEitherFailureOr<Entity> getListOrFailure(
+    int page, [
+    Param? parameter,
+  ]);
 
   @override
-  PaginatedState<Entity> build(Arg arg) {
-    initWithRefAndGetOrUpdateState(
-      ref,
-      ({newState}) {
-        if (newState != null) state = newState;
-        return state;
-      },
-    );
-    final data = prepareForBuild(arg);
-    setUserGlobalFailure(data.useGlobalFailure);
-    return data.initialState;
-  }
-}
-
-abstract class AutoDisposeFamilyPaginatedNotifier<Entity, Param, Arg>
-    extends AutoDisposeFamilyNotifier<PaginatedState<Entity>, Arg>
-    with
-        SimpleNotifierMixin,
-        PaginatedStreamNotifierMixin<Entity, Param>,
-        PaginatedNotifierMixin<Entity, Param> {
-  ({PaginatedState<Entity> initialState, bool useGlobalFailure})
-      prepareForBuild(Arg arg);
-
-  @override
-  PaginatedState<Entity> build(Arg arg) {
-    initWithRefAndGetOrUpdateState(
-      ref,
-      ({newState}) {
-        if (newState != null) state = newState;
-        return state;
-      },
-    );
-    final data = prepareForBuild(arg);
-    setUserGlobalFailure(data.useGlobalFailure);
-    return data.initialState;
-  }
+  PaginatedStreamFailureOr<Entity> getListStreamOrFailure(
+    int page, [
+    Param? parameter,
+  ]) => getListOrFailure(page, parameter).asStream();
 }

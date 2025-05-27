@@ -1,6 +1,5 @@
 import 'package:equatable/equatable.dart';
-import 'package:flutter/material.dart';
-import 'package:q_architecture/src/domain/entities/enums/global_info_status.dart';
+import 'package:q_architecture/q_architecture.dart';
 
 /// GlobalInfo class that represents some kind of info that occurs in the app and being passed to UI
 class GlobalInfo extends Equatable {
@@ -13,8 +12,8 @@ class GlobalInfo extends Equatable {
   /// GlobalInfo title that can be shown to user
   final String? title;
 
-  /// uniqueKey set by [BaseStateNotifier.setGlobalInfo] method to trigger [globalInfoProvider] each time
-  final UniqueKey? uniqueKey;
+  /// uniqueKey set by [BaseNotifier.setGlobalInfo] method to trigger [globalInfoProvider] each time
+  final String? uniqueKey;
 
   const GlobalInfo({
     required this.globalInfoStatus,
@@ -27,22 +26,16 @@ class GlobalInfo extends Equatable {
     GlobalInfoStatus? globalInfoStatus,
     String? title,
     String? message,
-    UniqueKey? uniqueKey,
-  }) =>
-      GlobalInfo(
-        globalInfoStatus: globalInfoStatus ?? this.globalInfoStatus,
-        title: title ?? this.title,
-        message: message ?? this.message,
-        uniqueKey: uniqueKey ?? this.uniqueKey,
-      );
+    String? uniqueKey,
+  }) => GlobalInfo(
+    globalInfoStatus: globalInfoStatus ?? this.globalInfoStatus,
+    title: title ?? this.title,
+    message: message ?? this.message,
+    uniqueKey: uniqueKey ?? this.uniqueKey,
+  );
 
   @override
-  List<Object?> get props => [
-        globalInfoStatus,
-        title,
-        message,
-        uniqueKey,
-      ];
+  List<Object?> get props => [globalInfoStatus, title, message, uniqueKey];
 
   @override
   bool? get stringify => true;
