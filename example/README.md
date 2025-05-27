@@ -39,7 +39,7 @@ abstract class YourRepository {
 class YourRepositoryImplementation implements YourRepository {
   @override
   EitherFailureOr<String> getYourString() async {
-    await Future.delayed(const Duration(seconds: 3));
+    await 3.seconds;
     if (Random().nextBool()) {
       return const Right('Your string');
     }
