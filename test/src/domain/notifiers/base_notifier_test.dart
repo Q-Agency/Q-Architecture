@@ -51,10 +51,13 @@ void main() {
         fireImmediately: false,
       );
       await testNotifier.execute(getSuccessfulResponse());
-      expect([
-        const BaseState<String>.loading(),
-        const BaseState.data(''),
-      ], states);
+      expect(
+        [
+          const BaseState<String>.loading(),
+          const BaseState.data(''),
+        ],
+        states,
+      );
     });
 
     test(
@@ -83,10 +86,13 @@ void main() {
       );
       await testNotifier.execute(getFailureResponse(), globalFailure: false);
       expect(GetIt.instance<GlobalLoadingNotifier>().state, false);
-      expect([
-        const BaseState<String>.loading(),
-        BaseState<String>.error(testGenericFailure),
-      ], states);
+      expect(
+        [
+          const BaseState<String>.loading(),
+          BaseState<String>.error(testGenericFailure),
+        ],
+        states,
+      );
     });
 
     test(
@@ -102,10 +108,13 @@ void main() {
           GetIt.instance<GlobalFailureNotifier>().state?.title,
           testGenericFailure.title,
         );
-        expect([
-          const BaseState<String>.loading(),
-          const BaseState<String>.initial(),
-        ], states);
+        expect(
+          [
+            const BaseState<String>.loading(),
+            const BaseState<String>.initial(),
+          ],
+          states,
+        );
       },
     );
 
@@ -162,10 +171,13 @@ void main() {
           getSuccessfulResponse(),
           onDataReceived: (data) => true,
         );
-        expect([
-          const BaseState<String>.loading(),
-          const BaseState.data(''),
-        ], states);
+        expect(
+          [
+            const BaseState<String>.loading(),
+            const BaseState.data(''),
+          ],
+          states,
+        );
       },
     );
 
@@ -181,10 +193,13 @@ void main() {
           getSuccessfulResponse(),
           onDataReceived: (data) => false,
         );
-        expect([
-          const BaseState<String>.loading(),
-          const BaseState<String>.initial(),
-        ], states);
+        expect(
+          [
+            const BaseState<String>.loading(),
+            const BaseState<String>.initial(),
+          ],
+          states,
+        );
       },
     );
 
@@ -200,10 +215,13 @@ void main() {
           getFailureResponse(),
           onFailureOccurred: (failure) => false,
         );
-        expect([
-          const BaseState<String>.loading(),
-          const BaseState<String>.initial(),
-        ], states);
+        expect(
+          [
+            const BaseState<String>.loading(),
+            const BaseState<String>.initial(),
+          ],
+          states,
+        );
       },
     );
 
@@ -220,10 +238,13 @@ void main() {
           onFailureOccurred: (failure) => true,
           globalFailure: false,
         );
-        expect([
-          const BaseState<String>.loading(),
-          BaseState<String>.error(testGenericFailure),
-        ], states);
+        expect(
+          [
+            const BaseState<String>.loading(),
+            BaseState<String>.error(testGenericFailure),
+          ],
+          states,
+        );
       },
     );
 
@@ -239,10 +260,13 @@ void main() {
           getFailureResponse(),
           onFailureOccurred: (failure) => false,
         );
-        expect([
-          const BaseState<String>.loading(),
-          const BaseState<String>.initial(),
-        ], states);
+        expect(
+          [
+            const BaseState<String>.loading(),
+            const BaseState<String>.initial(),
+          ],
+          states,
+        );
       },
     );
   });
@@ -257,11 +281,14 @@ void main() {
           fireImmediately: false,
         );
         await testNotifier.executeStreamed(getSuccessfulResponseStream());
-        expect([
-          const BaseState<String>.loading(),
-          const BaseState.data('a'),
-          const BaseState.data('b'),
-        ], states);
+        expect(
+          [
+            const BaseState<String>.loading(),
+            const BaseState.data('a'),
+            const BaseState.data('b'),
+          ],
+          states,
+        );
       },
     );
 
@@ -292,10 +319,13 @@ void main() {
         getFailureResponseStream(),
         globalFailure: false,
       );
-      expect([
-        const BaseState<String>.loading(),
-        BaseState<String>.error(testGenericFailure),
-      ], states);
+      expect(
+        [
+          const BaseState<String>.loading(),
+          BaseState<String>.error(testGenericFailure),
+        ],
+        states,
+      );
     });
 
     test(
@@ -311,10 +341,13 @@ void main() {
           GetIt.instance<GlobalFailureNotifier>().state?.title,
           testGenericFailure.title,
         );
-        expect([
-          const BaseState<String>.loading(),
-          const BaseState<String>.initial(),
-        ], states);
+        expect(
+          [
+            const BaseState<String>.loading(),
+            const BaseState<String>.initial(),
+          ],
+          states,
+        );
       },
     );
 
@@ -333,10 +366,13 @@ void main() {
           GetIt.instance<GlobalFailureNotifier>().state?.title,
           testGenericFailure.title,
         );
-        expect([
-          const BaseState<String>.loading(),
-          const BaseState.data('a'),
-        ], states);
+        expect(
+          [
+            const BaseState<String>.loading(),
+            const BaseState.data('a'),
+          ],
+          states,
+        );
       },
     );
 
@@ -352,11 +388,14 @@ void main() {
           getSuccessThenFailureResponseStream(),
           globalFailure: false,
         );
-        expect([
-          const BaseState<String>.loading(),
-          const BaseState.data('a'),
-          BaseState<String>.error(testGenericFailure),
-        ], states);
+        expect(
+          [
+            const BaseState<String>.loading(),
+            const BaseState.data('a'),
+            BaseState<String>.error(testGenericFailure),
+          ],
+          states,
+        );
       },
     );
   });

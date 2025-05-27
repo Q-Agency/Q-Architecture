@@ -59,10 +59,13 @@ void main() {
         );
         await testNotifier.getInitialList();
 
-        expect([
-          const PaginatedState<String>.loading(),
-          PaginatedState.loaded(getList(page: 1), isLastPage: false),
-        ], states);
+        expect(
+          [
+            const PaginatedState<String>.loading(),
+            PaginatedState.loaded(getList(page: 1), isLastPage: false),
+          ],
+          states,
+        );
       },
     );
 
@@ -78,11 +81,14 @@ void main() {
           fireImmediately: true,
         );
         await testNotifier.getInitialList();
-        expect([
-          const PaginatedState<String>.loading(),
-          PaginatedState.loaded(getList(page: 1), isLastPage: false),
-          PaginatedState.error(getList(page: 1), testGenericFailure),
-        ], states);
+        expect(
+          [
+            const PaginatedState<String>.loading(),
+            PaginatedState.loaded(getList(page: 1), isLastPage: false),
+            PaginatedState.error(getList(page: 1), testGenericFailure),
+          ],
+          states,
+        );
       },
     );
   });
@@ -100,10 +106,13 @@ void main() {
           fireImmediately: false,
         );
         await testNotifier.getNextPage();
-        expect([
-          const PaginatedState<String>.loadingMore([]),
-          PaginatedState.loaded(getList(page: 1), isLastPage: false),
-        ], states);
+        expect(
+          [
+            const PaginatedState<String>.loadingMore([]),
+            PaginatedState.loaded(getList(page: 1), isLastPage: false),
+          ],
+          states,
+        );
       },
     );
   });
@@ -125,15 +134,18 @@ void main() {
         );
         await testNotifier.getInitialList();
         await testNotifier.getNextPage();
-        expect([
-          const PaginatedState<String>.loading(),
-          PaginatedState.loaded(getList(page: 1), isLastPage: false),
-          PaginatedState.loadingMore(getList(page: 1)),
-          PaginatedState.loaded(
-            getList(page: 1) + getList(page: 2),
-            isLastPage: true,
-          ),
-        ], states);
+        expect(
+          [
+            const PaginatedState<String>.loading(),
+            PaginatedState.loaded(getList(page: 1), isLastPage: false),
+            PaginatedState.loadingMore(getList(page: 1)),
+            PaginatedState.loaded(
+              getList(page: 1) + getList(page: 2),
+              isLastPage: true,
+            ),
+          ],
+          states,
+        );
       },
     );
 
@@ -154,15 +166,18 @@ void main() {
         await testNotifier.getInitialList();
         await testNotifier.getNextPage();
         await testNotifier.getNextPage();
-        expect([
-          const PaginatedState<String>.loading(),
-          PaginatedState.loaded(getList(page: 1), isLastPage: false),
-          PaginatedState.loadingMore(getList(page: 1)),
-          PaginatedState.loaded(
-            getList(page: 1) + getList(page: 2),
-            isLastPage: true,
-          ),
-        ], states);
+        expect(
+          [
+            const PaginatedState<String>.loading(),
+            PaginatedState.loaded(getList(page: 1), isLastPage: false),
+            PaginatedState.loadingMore(getList(page: 1)),
+            PaginatedState.loaded(
+              getList(page: 1) + getList(page: 2),
+              isLastPage: true,
+            ),
+          ],
+          states,
+        );
       },
     );
 
@@ -183,15 +198,18 @@ void main() {
         await testNotifier.getInitialList();
         await 100.milliseconds;
         await testNotifier.getNextPage();
-        expect([
-          const PaginatedState<String>.loading(),
-          PaginatedState.loaded(getList(page: 1), isLastPage: false),
-          PaginatedState.loadingMore(getList(page: 1)),
-          PaginatedState.loaded(
-            getList(page: 1) + getList(page: 2),
-            isLastPage: true,
-          ),
-        ], states);
+        expect(
+          [
+            const PaginatedState<String>.loading(),
+            PaginatedState.loaded(getList(page: 1), isLastPage: false),
+            PaginatedState.loadingMore(getList(page: 1)),
+            PaginatedState.loaded(
+              getList(page: 1) + getList(page: 2),
+              isLastPage: true,
+            ),
+          ],
+          states,
+        );
       },
     );
 
@@ -211,12 +229,15 @@ void main() {
         );
         await testNotifier.getInitialList();
         await testNotifier.getNextPage();
-        expect([
-          const PaginatedState<String>.loading(),
-          PaginatedState.loaded(getList(page: 1), isLastPage: false),
-          PaginatedState.loadingMore(getList(page: 1)),
-          PaginatedState.error(getList(page: 1), testGenericFailure),
-        ], states);
+        expect(
+          [
+            const PaginatedState<String>.loading(),
+            PaginatedState.loaded(getList(page: 1), isLastPage: false),
+            PaginatedState.loadingMore(getList(page: 1)),
+            PaginatedState.error(getList(page: 1), testGenericFailure),
+          ],
+          states,
+        );
       },
     );
 
@@ -236,16 +257,19 @@ void main() {
         );
         await testNotifier.getInitialList();
         await testNotifier.getNextPage();
-        expect([
-          const PaginatedState<String>.loading(),
-          PaginatedState.loaded(getList(page: 1), isLastPage: false),
-          PaginatedState.error(getList(page: 1), testGenericFailure),
-          PaginatedState.loadingMore(getList(page: 1)),
-          PaginatedState.loaded(
-            getList(page: 1) + getList(page: 2),
-            isLastPage: true,
-          ),
-        ], states);
+        expect(
+          [
+            const PaginatedState<String>.loading(),
+            PaginatedState.loaded(getList(page: 1), isLastPage: false),
+            PaginatedState.error(getList(page: 1), testGenericFailure),
+            PaginatedState.loadingMore(getList(page: 1)),
+            PaginatedState.loaded(
+              getList(page: 1) + getList(page: 2),
+              isLastPage: true,
+            ),
+          ],
+          states,
+        );
       },
     );
   });
@@ -272,13 +296,16 @@ void main() {
         );
         await testNotifier.getInitialList();
         await testNotifier.refresh();
-        expect([
-          const PaginatedState<String>.loading(),
-          PaginatedState.loaded(getList(page: 1), isLastPage: false),
-          PaginatedState.error(getList(page: 1), testGenericFailure),
-          const PaginatedState<String>.loading(),
-          PaginatedState.loaded(getList(page: 1), isLastPage: false),
-        ], states);
+        expect(
+          [
+            const PaginatedState<String>.loading(),
+            PaginatedState.loaded(getList(page: 1), isLastPage: false),
+            PaginatedState.error(getList(page: 1), testGenericFailure),
+            const PaginatedState<String>.loading(),
+            PaginatedState.loaded(getList(page: 1), isLastPage: false),
+          ],
+          states,
+        );
       },
     );
 
@@ -300,17 +327,20 @@ void main() {
         await testNotifier.getInitialList();
         await testNotifier.getNextPage();
         await testNotifier.refresh();
-        expect([
-          const PaginatedState<String>.loading(),
-          PaginatedState.loaded(getList(page: 1), isLastPage: false),
-          PaginatedState.loadingMore(getList(page: 1)),
-          PaginatedState.loaded(
-            getList(page: 1) + getList(page: 2),
-            isLastPage: true,
-          ),
-          const PaginatedState<String>.loading(),
-          PaginatedState.loaded(getList(page: 1), isLastPage: false),
-        ], states);
+        expect(
+          [
+            const PaginatedState<String>.loading(),
+            PaginatedState.loaded(getList(page: 1), isLastPage: false),
+            PaginatedState.loadingMore(getList(page: 1)),
+            PaginatedState.loaded(
+              getList(page: 1) + getList(page: 2),
+              isLastPage: true,
+            ),
+            const PaginatedState<String>.loading(),
+            PaginatedState.loaded(getList(page: 1), isLastPage: false),
+          ],
+          states,
+        );
       },
     );
   });
@@ -332,5 +362,6 @@ class TestNotifier extends PaginatedStreamNotifier<String, Object> {
   PaginatedStreamFailureOr<String> getListStreamOrFailure(
     int page, [
     Object? parameter,
-  ]) => _testRepository.getListStreamOrFailure(page, parameter);
+  ]) =>
+      _testRepository.getListStreamOrFailure(page, parameter);
 }
