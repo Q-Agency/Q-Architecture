@@ -5,8 +5,12 @@ import 'package:example/presentation/pages/pagination_stream_example_page.dart';
 import 'package:example/presentation/widgets/message_displaying_base_widget.dart';
 import 'package:example/service_locator.dart';
 import 'package:flutter/material.dart';
+import 'package:q_architecture/q_architecture.dart';
 
 void main() {
+  initQArchitecture(
+    observers: [LoggingObserver()],
+  );
   setupServiceLocator();
   runApp(const MyApp());
 }
@@ -34,5 +38,22 @@ class MyApp extends StatelessWidget {
         child: MessageDisplayingBaseWidget(child: child),
       ),
     );
+  }
+}
+
+class LoggingObserver implements QNotifierObserver {
+  @override
+  void onDisposed(QNotifier notifier, finalState) {
+    debugPrint('🔴 [$notifier] Disposed: $finalState');
+  }
+
+  @override
+  void onInitialized(QNotifier notifier, initialState) {
+    debugPrint('🟢 [$notifier] Init: $initialState');
+  }
+
+  @override
+  void onStateChanged(QNotifier notifier, previousState, currentState) {
+    debugPrint('🔄 [$notifier] State Changed: $previousState → $currentState');
   }
 }

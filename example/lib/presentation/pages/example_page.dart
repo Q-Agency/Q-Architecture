@@ -9,21 +9,10 @@ import 'package:example/service_locator.dart';
 import 'package:flutter/material.dart';
 import 'package:q_architecture/q_architecture.dart';
 
-class ExamplePage extends StatefulWidget {
+class ExamplePage extends StatelessWidget {
   static const routeName = '/';
 
   const ExamplePage({super.key});
-
-  @override
-  State<ExamplePage> createState() => _ExamplePageState();
-}
-
-class _ExamplePageState extends State<ExamplePage> {
-  @override
-  void dispose() {
-    getIt.resetLazySingleton<ExampleNotifier>();
-    super.dispose();
-  }
 
   @override
   Widget build(BuildContext context) {

@@ -4,8 +4,8 @@ import 'package:either_dart/either.dart';
 import 'package:meta/meta.dart';
 import 'package:q_architecture/q_architecture.dart';
 
-typedef PaginatedStreamFailureOr<Entity> =
-    Stream<Either<Failure, PaginatedList<Entity>>>;
+typedef PaginatedStreamFailureOr<Entity>
+    = Stream<Either<Failure, PaginatedList<Entity>>>;
 
 abstract class PaginatedStreamNotifier<Entity, Param>
     extends QNotifier<PaginatedState<Entity>> {

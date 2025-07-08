@@ -14,7 +14,7 @@ void main() {
   );
   late TestNotifier testNotifier;
   setUpAll(() {
-    setupServiceLocator();
+    initQArchitecture();
   });
 
   setUp(() {

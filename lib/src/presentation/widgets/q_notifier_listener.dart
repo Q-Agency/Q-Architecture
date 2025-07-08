@@ -8,7 +8,7 @@ class QNotifierListener<T> extends StatefulWidget {
 
   /// The listener to call when the state changes.
   final void Function(BuildContext context, T currentState, T? previousState)
-  listener;
+      listener;
 
   /// Whether to fire the listener immediately when the widget is built.
   final bool fireImmediately;

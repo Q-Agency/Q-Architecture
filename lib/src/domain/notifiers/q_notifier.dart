@@ -8,6 +8,9 @@ import 'package:meta/meta.dart';
 import 'package:q_architecture/q_architecture.dart';
 
 class QNotifier<T> extends ChangeNotifier {
+  /// Global observer for all QNotifier state changes
+  static final List<QNotifierObserver> _observers = [];
+
   ///The current state
   T _state;
 
@@ -27,11 +30,18 @@ class QNotifier<T> extends ChangeNotifier {
   /// MUST be registered as a lazySingleton in GetIt, otherwise an exception
   /// will be thrown when attempting to reset the lazy singleton.
   QNotifier(T state, {bool autoDispose = false})
-    : _state = state,
-      _autoDispose = autoDispose;
+      : _state = state,
+        _autoDispose = autoDispose {
+    for (final observer in _observers) {
+      observer.onInitialized(this, _state);
+    }
+  }
 
   @override
   void dispose() {
+    for (final observer in _observers) {
+      observer.onDisposed(this, _state);
+    }
     removeAllListeners();
     _debounceTimer?.cancel();
     super.dispose();
@@ -58,8 +68,14 @@ class QNotifier<T> extends ChangeNotifier {
     if (_state == newState) return;
     _previousState = _state;
     _state = newState;
+    for (final observer in _observers) {
+      observer.onStateChanged(this, _previousState, _state);
+    }
     notifyListeners();
   }
+
+  static void addObservers(List<QNotifierObserver> observers) =>
+      _observers.addAll(observers);
 
   /// Adds a listener and returns a function that can be called to remove the listener.
   /// The returned callback must be stored and called when the listener should be removed
@@ -103,8 +119,7 @@ class QNotifier<T> extends ChangeNotifier {
       listenerId != null || listenerIndex != null,
       'listenerId or listenerIndex must be provided',
     );
-    final index =
-        listenerIndex ??
+    final index = listenerIndex ??
         _listenersWrappers.indexWhere((wrapper) => wrapper.id == listenerId);
     if (index != -1) {
       final wrapper = _listenersWrappers[index];

@@ -8,12 +8,10 @@ import 'package:example/domain/notifiers/example_pagination/example_paginated_no
 import 'package:example/domain/notifiers/example_pagination/example_paginated_stream_notifier.dart';
 import 'package:example/domain/notifiers/example_simple_notifier/example_simple_notifier.dart';
 import 'package:get_it/get_it.dart';
-import 'package:q_architecture/q_architecture.dart' as q_architecture;
 
 final getIt = GetIt.instance;
 
 void setupServiceLocator() {
-  q_architecture.setupServiceLocator();
   getIt.registerSingleton<ApiClient>(MockedApiClient());
   getIt.registerSingleton<ExampleGenderMapper>(ExampleGenderMapper());
   getIt.registerSingleton<ExampleUserEntityMapper>(
@@ -25,6 +23,7 @@ void setupServiceLocator() {
       getIt<ExampleUserEntityMapper>(),
     ),
   );
+
   getIt.registerLazySingleton<ExampleFiltersNotifier>(
     () => ExampleFiltersNotifier(),
     dispose: (instance) => instance.dispose(),
