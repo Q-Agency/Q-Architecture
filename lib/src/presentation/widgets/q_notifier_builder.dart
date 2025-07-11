@@ -12,8 +12,7 @@ class QNotifierBuilder<T> extends StatefulWidget {
     T currentState,
     T? previousState,
     Widget? child,
-  )
-  builder;
+  ) builder;
 
   /// A [QNotifier]-independent widget which is passed back to the [builder].
   ///

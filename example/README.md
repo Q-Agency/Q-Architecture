@@ -6,10 +6,11 @@ unnecessary boilerplate code.
 ## Get started
 
 - To use Q-Architecture effectively, you must properly set up your service
-  locator with GetIt. Start by calling setupServiceLocator() during app
-  initialization to register global notifiers (GlobalInfoNotifier,
-  GlobalLoadingNotifier and GlobalFailureNotifier). Then register your
-  dependencies in logical layers:
+  locator with GetIt (global notifiers, GlobalInfoNotifier,
+  GlobalLoadingNotifier and GlobalFailureNotifier) and optionally set up
+  observers for monitoring notifier lifecycle events. Start by calling
+  initQArchitecture() during app initialization. Then register your dependencies
+  in logical layers:
   1. Register repositories, services, and mappers as singletons:
 
 ```dart
@@ -117,6 +118,7 @@ table of contents.
 - [BaseState<State>](#basestatestate)
 - [QNotifier](#qnotifier)
 - [BaseNotifier](#basenotifier)
+- [QNotifierObserver](#qnotifier-observer)
 - [QNotifier widgets](#qnotifier-widgets)
 - [PaginatedStreamNotifier and PaginatedNotifier](#paginatedstreamnotifier-and-paginatednotifier)
 - [Global loading](#global-loading)
@@ -675,6 +677,62 @@ StreamFailureOr<String> getSomeStringsStreamed() async* {
   //...
   yield const Right('Some sentence from network');
 }
+```
+
+## QNotifierObserver
+
+The Q Architecture provides a powerful observer system that allows you to
+monitor all QNotifier lifecycle events across your entire application. This is
+useful for logging, analytics, debugging, and performance monitoring.
+
+### Observer Interface
+
+All observers must implement the `QNotifierObserver` interface:
+
+```dart
+abstract interface class QNotifierObserver {
+  /// Called when a QNotifier is initialized
+  void onInitialized(QNotifier notifier, dynamic initialState);
+  
+  /// Called when a QNotifier state changes
+  void onStateChanged(QNotifier notifier, dynamic previousState, dynamic currentState);
+  
+  /// Called when a QNotifier is disposed
+  void onDisposed(QNotifier notifier, dynamic finalState);
+}
+```
+
+### Creating Custom Observers
+
+You can create custom observers by implementing the interface:
+
+```dart
+class LoggingObserver implements QNotifierObserver {
+  @override
+  void onInitialized(QNotifier notifier, dynamic initialState) {
+    debugPrint('🟢 [$notifier] Initialized with: $initialState');
+  }
+
+  @override
+  void onStateChanged(QNotifier notifier, dynamic previousState, dynamic currentState) {
+    debugPrint('🔄 [$notifier] State Changed: $previousState → $currentState');
+  }
+
+  @override
+  void onDisposed(QNotifier notifier, dynamic finalState) {
+    debugPrint('🔴 [$notifier] Disposed with: $finalState');
+  }
+}
+```
+
+### Initialization with Observers
+
+Use `initQArchitecture()` to set up observers:
+
+```dart
+initQArchitecture(
+  observer: [LoggingObserver()],
+);
 ```
 
 ## QNotifier widgets

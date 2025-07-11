@@ -1,3 +1,14 @@
+## 2.1.0
+
+- Added QNotifierObserver interface for monitoring QNotifier lifecycle events
+- BREAKING CHANGE: Added initQArchitecture() function to replace
+  setupServiceLocator()
+- Added support for multiple observers through observers parameter in
+  initQArchitecture()
+- Added observer lifecycle callbacks: onInitialized, onStateChanged, and
+  onDisposed
+- Updated README.md
+
 ## 2.0.0
 
 - BREAKING CHANGE: Replaced Riverpod dependency with GetIt for dependency

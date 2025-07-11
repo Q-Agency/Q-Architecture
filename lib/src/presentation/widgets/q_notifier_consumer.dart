@@ -7,7 +7,7 @@ class QNotifierConsumer<T> extends StatefulWidget {
 
   /// The listener to call when the state changes.
   final void Function(BuildContext context, T currentState, T? previousState)
-  listener;
+      listener;
 
   /// The builder function.
   final Widget Function(
@@ -15,8 +15,7 @@ class QNotifierConsumer<T> extends StatefulWidget {
     T currentState,
     T? previousState,
     Widget? child,
-  )
-  builder;
+  ) builder;
 
   /// A [QNotifier]-independent widget which is passed back to the [builder].
   ///

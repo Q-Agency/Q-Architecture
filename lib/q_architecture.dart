@@ -1,4 +1,4 @@
-export 'src/common/utils/service_locator.dart';
+export 'src/common/utils/init_q_architecture.dart';
 export 'src/data/mappers/entity_mapper.dart';
 export 'src/data/mappers/form_mapper.dart';
 export 'src/data/mappers/mappers.dart';
@@ -18,6 +18,7 @@ export 'src/domain/notifiers/paginated_notifier.dart';
 export 'src/domain/notifiers/paginated_state.dart';
 export 'src/domain/notifiers/paginated_stream_notifier.dart';
 export 'src/domain/notifiers/q_notifier.dart';
+export 'src/domain/notifiers/q_notifier_observer.dart';
 export 'src/extensions/int_extension.dart';
 export 'src/extensions/iterable_extensions.dart';
 export 'src/presentation/widgets/base_loading_indicator.dart';
