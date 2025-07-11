@@ -51,7 +51,7 @@ class YourRepositoryImplementation implements YourRepository {
 
 - Add YourRepository to setupGetIt() method.
 
-````dart
+```dart
 getIt.registerSingleton<YourRepository>(
   YourRepositoryImplementation(),
 );
@@ -74,7 +74,7 @@ class YourNotifier extends BaseNotifier<String> {
         globalFailure: false,
       );
 }
-````
+```
 
 - Add YourNotifier to setupGetIt() method.
 
