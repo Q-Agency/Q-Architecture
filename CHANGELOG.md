@@ -1,3 +1,7 @@
+## 2.1.2
+
+- Updated pubspec.yaml dependencies
+
 ## 2.1.1
 
 - Updated pubspec.yaml dependencies
