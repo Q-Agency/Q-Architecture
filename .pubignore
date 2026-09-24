@@ -1,2 +1,6 @@
 example
 !example/README.md
+build/
+.dart_tool/
+.packages
+pubspec.lock

@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:q_architecture/q_architecture.dart';
 
 class PaginatedListView<Entity, Param, Arg> extends StatelessWidget {

@@ -2,7 +2,7 @@ import 'dart:developer';
 
 import 'package:example/domain/notifiers/example_pagination/example_paginated_stream_notifier.dart';
 import 'package:example/service_locator.dart';
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:q_architecture/q_architecture.dart';
 
 class PaginationStreamExamplePage extends StatelessWidget {

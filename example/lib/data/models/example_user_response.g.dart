@@ -14,12 +14,11 @@ ExampleUserResponse _$ExampleUserResponseFromJson(Map<String, dynamic> json) =>
       json['gender'] as String,
     );
 
-// ignore: unused_element
 Map<String, dynamic> _$ExampleUserResponseToJson(
-        ExampleUserResponse instance) =>
-    <String, dynamic>{
-      'firstName': instance.firstName,
-      'lastName': instance.lastName,
-      'birthday': instance.birthday.toIso8601String(),
-      'gender': instance.gender,
-    };
+  ExampleUserResponse instance,
+) => <String, dynamic>{
+  'firstName': instance.firstName,
+  'lastName': instance.lastName,
+  'birthday': instance.birthday.toIso8601String(),
+  'gender': instance.gender,
+};

@@ -1,7 +1,7 @@
 import 'package:example/domain/notifiers/example_simple_notifier/example_simple_notifier.dart';
 import 'package:example/domain/notifiers/example_simple_notifier/example_simple_state.dart';
 import 'package:example/service_locator.dart';
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:q_architecture/q_architecture.dart';
 
 class ExampleSimplePage extends StatelessWidget {

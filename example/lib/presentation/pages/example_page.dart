@@ -6,7 +6,7 @@ import 'package:example/presentation/pages/example_simple_page.dart';
 import 'package:example/presentation/pages/pagination_example_page.dart';
 import 'package:example/presentation/pages/pagination_stream_example_page.dart';
 import 'package:example/service_locator.dart';
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:q_architecture/q_architecture.dart';
 
 class ExamplePage extends StatelessWidget {

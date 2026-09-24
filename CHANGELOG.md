@@ -1,3 +1,8 @@
+## 3.0.0
+
+- BREAKING CHANGE: Bumped equatable from ^2.x to ^3.0.0
+- Updated pubspec.yaml dependencies
+
 ## 2.1.3
 
 - Updated pubspec.yaml dependencies
